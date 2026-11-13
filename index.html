@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ants Empires and Colony - Optimized Edition (5500x5500)</title>
+    <title>Ants Empires and Colony</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -22,7 +22,7 @@
         #start-screen {
             position: fixed;
             inset: 0;
-            background: radial-gradient(circle at center, rgba(27, 46, 17, 0.96), rgba(6, 11, 5, 0.99));
+            background: radial-gradient(circle at center, rgba(27, 46, 17, 0.94), rgba(6, 11, 5, 0.99));
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -32,17 +32,17 @@
             padding: 20px;
         }
         #start-screen h1 {
-            font-size: 3.6rem;
+            font-size: 3.2rem;
             color: #b5e48c;
             text-shadow: 0 4px 20px rgba(0, 0, 0, 0.95), 0 0 25px rgba(181, 228, 140, 0.35);
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             letter-spacing: 1.5px;
         }
         #start-screen p {
             color: #d8f3dc;
-            font-size: 1.15rem;
-            max-width: 600px;
-            margin-bottom: 35px;
+            font-size: 1.05rem;
+            max-width: 540px;
+            margin-bottom: 32px;
             line-height: 1.5;
         }
         .menu-buttons {
@@ -52,8 +52,8 @@
             justify-content: center;
         }
         .menu-btn {
-            padding: 16px 38px;
-            font-size: 1.25rem;
+            padding: 15px 34px;
+            font-size: 1.15rem;
             border-radius: 12px;
             border: 2px solid #95d5b2;
             cursor: pointer;
@@ -82,16 +82,16 @@
             margin-bottom: 4px;
         }
         header h1 { 
-            font-size: 1.45rem; 
+            font-size: 1.35rem; 
             color: #b5e48c; 
             text-shadow: 0 2px 6px rgba(0,0,0,0.8);
             letter-spacing: 0.5px;
         }
         #status-msg {
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             color: #fefae0;
             background: linear-gradient(90deg, #2d6a4f, #40916c);
-            padding: 4px 18px;
+            padding: 4px 16px;
             border-radius: 20px;
             display: inline-block;
             margin-top: 3px;
@@ -102,9 +102,9 @@
         
         .hud {
             display: flex;
-            gap: 12px;
-            background: rgba(20, 30, 18, 0.95);
-            padding: 8px 18px;
+            gap: 14px;
+            background: rgba(20, 30, 18, 0.92);
+            padding: 7px 16px;
             border-radius: 10px;
             border: 1px solid #52796f;
             margin-bottom: 6px;
@@ -133,7 +133,7 @@
             padding: 6px 12px;
             border-radius: 6px;
             font-weight: bold;
-            font-size: 0.75rem;
+            font-size: 0.76rem;
             cursor: pointer;
             box-shadow: 0 2px 5px rgba(0,0,0,0.4);
             transition: transform 0.1s, filter 0.2s;
@@ -169,9 +169,10 @@
 </head>
 <body>
 
+    <!-- Pantalla de Título -->
     <div id="start-screen">
         <h1>🐜 Ants Empires and Colony</h1>
-        <p>Mapa masivo de 5,500 x 5,500, nidos realistas en 2.5D (Mini Volcán y Cono de Termitas), y optimización sin lag. Elige un modo:</p>
+        <p>Construye y dirige tu imperio subterráneo en un bosque ampliado. Elige un modo de juego:</p>
         <div class="menu-buttons">
             <button class="menu-btn btn-mode-normal" onclick="startGame('normal')">👑 Modo Normal (Historia)</button>
             <button class="menu-btn btn-mode-sandbox" onclick="startGame('sandbox')">🌿 Modo Sandbox</button>
@@ -191,29 +192,29 @@
         <div class="stat stat-egg normal-only" style="display:none;">🥚 Huevos: <span id="egg-count">0</span></div>
         <div class="stat">🏰 Nidos: <span id="nest-count">0</span></div>
         <div class="stat sandbox-only">🥚 Cría: <span id="spawn-progress">0/10 🍓</span></div>
-        <button onclick="adjustZoom(0.25)">🔍 Zoom +</button>
-        <button onclick="adjustZoom(-0.25)">🔍 Zoom -</button>
-        <button onclick="resetZoom()">1x</button>
-        <button id="btn-speed" class="sandbox-only">Vel: 1x</button>
+        <button id="btn-speed" class="sandbox-only">Velocidad: 1x</button>
         <button id="btn-clear" class="btn-danger">Reiniciar</button>
-        <button class="btn-menu-back" onclick="showMainMenu()">Menú</button>
+        <button id="btn-back-menu" class="btn-menu-back" onclick="showMainMenu()">Menú</button>
     </div>
 
+    <!-- Barra de herramientas Sandbox -->
     <div class="toolbar" id="toolbar-sandbox">
-        <button id="tool-nest" class="tool-btn active" onclick="setTool('nest')">🌋 Hormiguero (Volcán)</button>
-        <button id="tool-termite_nest" class="tool-btn btn-termite" onclick="setTool('termite_nest')">🏰 Termitero (Cono)</button>
+        <button id="tool-nest" class="tool-btn active" onclick="setTool('nest')">🏠 Nido Hormigas</button>
+        <button id="tool-termite_nest" class="tool-btn btn-termite" onclick="setTool('termite_nest')">🏰 Nido Termitas</button>
         <button id="tool-beetle" class="tool-btn btn-beetle" onclick="setTool('beetle')">🪲 Escarabajo Pelotero</button>
         <button id="tool-food" class="tool-btn" onclick="setTool('food')">🍓 Soltar Comida</button>
         <button id="tool-spider" class="tool-btn btn-predator" onclick="setTool('spider')">🕷️ Araña Teje-redes</button>
         <button id="tool-mantis" class="tool-btn btn-predator" onclick="setTool('mantis')">🦗 Mantis Alfa</button>
     </div>
 
+    <!-- Barra de herramientas Modo Normal (Historia) -->
     <div class="toolbar" id="toolbar-normal" style="display:none;">
         <button id="tool-queen" class="tool-btn btn-queen active" onclick="setTool('queen')">👑 Colocar Reina</button>
         <button id="tool-normal_nest" class="tool-btn" onclick="setTool('normal_nest')" disabled>🏠 Colocar Colonia (0/1)</button>
     </div>
 
-    <canvas id="gameCanvas" width="5500" height="5500"></canvas>
+    <!-- Mapa Ampliado 3000x1800 -->
+    <canvas id="gameCanvas" width="3000" height="1800"></canvas>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
@@ -232,51 +233,19 @@
         const btnSpeed = document.getElementById('btn-speed');
 
         const TILT = 0.78;
-        const MAP_WIDTH = 5500;
-        const MAP_HEIGHT = 5500;
 
         let gameMode = 'sandbox';
         let currentTool = 'nest';
         let storedFood = 100;
         let foodSpawnCounter = 0;
+
+        // Temporizador de 5 minutos (300 segundos) para que árboles y arbustos den comida
         let natureFoodTimer = 300; 
-        let zoom = 0.55;
-
-        let fogCanvas = document.createElement('canvas');
-        fogCanvas.width = MAP_WIDTH;
-        fogCanvas.height = MAP_HEIGHT;
-        let fogCtx = fogCanvas.getContext('2d');
-
-        function initFog() {
-            fogCtx.globalCompositeOperation = 'source-over';
-            fogCtx.fillStyle = '#0b1109';
-            fogCtx.fillRect(0, 0, MAP_WIDTH, MAP_HEIGHT);
-        }
-
-        function revealFog(x, y, radius) {
-            if (gameMode !== 'normal') return;
-            fogCtx.globalCompositeOperation = 'destination-out';
-            let grad = fogCtx.createRadialGradient(x, y, radius * 0.4, x, y, radius);
-            grad.addColorStop(0, 'rgba(0,0,0,1)');
-            grad.addColorStop(1, 'rgba(0,0,0,0)');
-            fogCtx.fillStyle = grad;
-            fogCtx.beginPath();
-            fogCtx.arc(x, y, radius, 0, Math.PI * 2);
-            fogCtx.fill();
-            fogCtx.globalCompositeOperation = 'source-over';
-        }
-
-        function adjustZoom(amount) {
-            zoom = Math.max(0.18, Math.min(2.0, zoom + amount));
-        }
-
-        function resetZoom() {
-            zoom = 0.55;
-        }
 
         let queen = null;
         let queenTarget = null;
         let eggs = [];
+
         let antNests = [];
         let termiteNests = [];
         let ants = [];
@@ -313,15 +282,15 @@
         let flowers = [];
 
         const toolDescriptions = {
-            nest: "🌋 Hormiguero (Forma de Mini Volcán 2.5D)",
-            termite_nest: "🏰 Termitero (Cono Irregular de Barro 2.5D)",
-            beetle: "🪲 Escarabajo Pelotero",
+            nest: "🏠 Colocar Hormiguero (Crecimiento automático al recolectar comida)",
+            termite_nest: "🏰 Colocar Termitero (Montículo arcilloso 3D)",
+            beetle: "🪲 Invocar Escarabajo Pelotero",
             food: "🍓 Soltar Comida",
-            spider: "🕷️ Araña Teje-redes",
-            mantis: "🦗 Mantis Alfa",
-            queen: "👑 Coloca tu Hormiga Reina",
-            normal_nest: "🏠 Funda tu única Colonia",
-            control_queen: "👑 Controla a la Reina (WASD / Clic)"
+            spider: "🕷️ Invocar Araña",
+            mantis: "🦗 Invocar Mantis Alfa",
+            queen: "👑 Haz clic en el suelo del bosque para colocar a tu Hormiga Reina",
+            normal_nest: "🏠 Haz clic en un lugar despejado para fundar tu única Colonia",
+            control_queen: "👑 Controla a la Reina: Recoge 10 🍓 y llévalas a la colonia para poner un huevo (tarda 30s)"
         };
 
         function showMainMenu() {
@@ -331,7 +300,6 @@
         function startGame(mode) {
             gameMode = mode;
             startScreen.style.display = 'none';
-            initFog();
 
             if (mode === 'normal') {
                 modeBadge.textContent = "[Modo Normal]";
@@ -339,7 +307,7 @@
                 document.getElementById('toolbar-normal').style.display = 'flex';
                 document.querySelectorAll('.sandbox-only').forEach(el => el.style.display = 'none');
                 document.querySelectorAll('.normal-only').forEach(el => el.style.display = 'block');
-                gameSpeed = 1;
+                gameSpeed = 1; // Sin velocidad x2 / x4 en modo normal
             } else {
                 modeBadge.textContent = "[Modo Sandbox]";
                 document.getElementById('toolbar-sandbox').style.display = 'flex';
@@ -366,7 +334,8 @@
         function spawnHitParticles(x, y, color = '#fff', count = 5) {
             for (let i = 0; i < count; i++) {
                 particles.push({
-                    x: x, y: y,
+                    x: x,
+                    y: y,
                     vx: (Math.random() - 0.5) * 4,
                     vy: (Math.random() - 0.5) * 4 - 1,
                     life: 15 + Math.random() * 10,
@@ -391,8 +360,8 @@
         }
 
         function canPlaceAt(x, y, tool) {
-            if (x < 60 || x > MAP_WIDTH - 60 || y < 60 || y > MAP_HEIGHT - 60) return false;
-            const reqRadius = (tool === 'nest' || tool === 'termite_nest' || tool === 'normal_nest') ? 32 : (tool === 'mantis') ? 22 : (tool === 'spider' || tool === 'beetle' || tool === 'queen') ? 16 : 12;
+            if (x < 45 || x > canvas.width - 45 || y < 45 || y > canvas.height - 45) return false;
+            const reqRadius = (tool === 'nest' || tool === 'termite_nest' || tool === 'normal_nest') ? 28 : (tool === 'mantis') ? 22 : (tool === 'spider' || tool === 'beetle' || tool === 'queen') ? 16 : 12;
 
             for (let r of rocks) {
                 if (Math.hypot(x - r.x, (y - r.y) / TILT) < r.radius + reqRadius) return false;
@@ -442,16 +411,13 @@
             entity.x = nextX;
             entity.y = nextY;
 
-            const margin = 30;
+            const margin = 25;
             if (entity.x < margin) { entity.x = margin; entity.angle = Math.PI - entity.angle; }
-            if (entity.x > MAP_WIDTH - margin) { entity.x = MAP_WIDTH - margin; entity.angle = Math.PI - entity.angle; }
+            if (entity.x > canvas.width - margin) { entity.x = canvas.width - margin; entity.angle = Math.PI - entity.angle; }
             if (entity.y < margin) { entity.y = margin; entity.angle = -entity.angle; }
-            if (entity.y > MAP_HEIGHT - margin) { entity.y = MAP_HEIGHT - margin; entity.angle = -entity.angle; }
+            if (entity.y > canvas.height - margin) { entity.y = canvas.height - margin; entity.angle = -entity.angle; }
         }
 
-        /* ==========================================================
-         * CLASES DE ENTIDADES (MODELO 1: 2.5D DE ALTA CALIDAD)
-         * ========================================================== */
         class QueenAnt {
             constructor(x, y) {
                 this.x = x;
@@ -509,12 +475,10 @@
                         this.y = nextY;
                     }
 
-                    const margin = 30;
-                    this.x = Math.max(margin, Math.min(MAP_WIDTH - margin, this.x));
-                    this.y = Math.max(margin, Math.min(MAP_HEIGHT - margin, this.y));
+                    const margin = 25;
+                    this.x = Math.max(margin, Math.min(canvas.width - margin, this.x));
+                    this.y = Math.max(margin, Math.min(canvas.height - margin, this.y));
                 }
-
-                revealFog(this.x, this.y, 220);
 
                 if (!this.hasFood) {
                     for (let i = foods.length - 1; i >= 0; i--) {
@@ -525,7 +489,7 @@
                             f.amount--;
                             if (f.amount <= 0) foods.splice(i, 1);
                             spawnHitParticles(this.x, this.y, '#ffccd5', 6);
-                            statusEl.textContent = "🍓 ¡Comida recogida! Llévala a tu Colonia";
+                            statusEl.textContent = "🍓 ¡Comida recogida! Llévala a tu Colonia (requiere 10 🍓 para poner huevo)";
                             break;
                         }
                     }
@@ -537,6 +501,7 @@
                         storedFood += 1;
                         updateUI();
 
+                        // Ahora se requieren 10 de comida para poner un huevo
                         if (storedFood >= 10) {
                             storedFood -= 10;
                             const offsetAngle = Math.random() * Math.PI * 2;
@@ -545,13 +510,13 @@
                                 x: nest.x + Math.cos(offsetAngle) * offsetR,
                                 y: nest.y + Math.sin(offsetAngle) * offsetR * TILT,
                                 nest: nest,
-                                timer: 30,
+                                timer: 30, // 30 segundos
                                 maxTimer: 30
                             });
                             spawnHitParticles(nest.x, nest.y, '#ffd166', 12);
-                            statusEl.textContent = "🥚 ¡10 🍓 entregadas! Huevo puesto";
+                            statusEl.textContent = "🥚 ¡10 🍓 entregadas! Huevo puesto (Eclosiona en 30s)";
                         } else {
-                            statusEl.textContent = `🍓 Comida entregada (${storedFood}/10 🍓)`;
+                            statusEl.textContent = `🍓 Comida entregada (${storedFood}/10 🍓 para siguiente huevo)`;
                         }
                         updateUI();
                     }
@@ -565,12 +530,12 @@
                 ctx.strokeStyle = 'rgba(255, 209, 102, 0.7)';
                 ctx.lineWidth = 2;
                 ctx.beginPath();
-                ctx.ellipse(0, 2, 22, 22 * TILT, 0, 0, Math.PI * 2);
+                ctx.ellipse(0, 2, 20, 20 * TILT, 0, 0, Math.PI * 2);
                 ctx.stroke();
 
                 ctx.fillStyle = 'rgba(0,0,0,0.42)';
                 ctx.beginPath();
-                ctx.ellipse(3, 6, 14, 7, 0, 0, Math.PI * 2);
+                ctx.ellipse(3, 6, 13, 6.5, 0, 0, Math.PI * 2);
                 ctx.fill();
 
                 ctx.scale(1, TILT);
@@ -590,41 +555,45 @@
 
                 ctx.fillStyle = '#3d1308';
                 ctx.beginPath();
-                ctx.ellipse(-9, 0, 9.5, 5.8, 0, 0, Math.PI * 2);
+                ctx.ellipse(-9, 0, 8.5, 5.2, 0, 0, Math.PI * 2);
                 ctx.fill();
 
                 ctx.strokeStyle = '#e09f3e';
-                ctx.lineWidth = 1.5;
+                ctx.lineWidth = 1.4;
                 ctx.beginPath();
-                ctx.moveTo(-9, -5); ctx.lineTo(-9, 5);
-                ctx.moveTo(-13, -4); ctx.lineTo(-13, 4);
+                ctx.moveTo(-9, -4.5); ctx.lineTo(-9, 4.5);
+                ctx.moveTo(-12, -3.8); ctx.lineTo(-12, 3.8);
                 ctx.stroke();
 
                 ctx.fillStyle = '#5e2110';
                 ctx.beginPath();
-                ctx.ellipse(0, 0, 5.2, 4, 0, 0, Math.PI * 2);
+                ctx.ellipse(0, 0, 4.8, 3.6, 0, 0, Math.PI * 2);
                 ctx.fill();
 
                 ctx.fillStyle = '#4a1c0e';
                 ctx.beginPath();
-                ctx.ellipse(8, 0, 4.8, 4.2, 0, 0, Math.PI * 2);
+                ctx.ellipse(7.5, 0, 4.2, 3.8, 0, 0, Math.PI * 2);
                 ctx.fill();
 
                 ctx.fillStyle = '#ffd166';
                 ctx.beginPath();
-                ctx.moveTo(6.5, -3.5);
-                ctx.lineTo(9, -7);
-                ctx.lineTo(10.5, -3.5);
-                ctx.lineTo(12, -6);
-                ctx.lineTo(12, 0);
-                ctx.lineTo(6.5, 0);
+                ctx.moveTo(6, -3);
+                ctx.lineTo(8, -6);
+                ctx.lineTo(9.5, -3);
+                ctx.lineTo(11, -5.5);
+                ctx.lineTo(11, 0);
+                ctx.lineTo(6, 0);
                 ctx.closePath();
                 ctx.fill();
 
                 if (this.hasFood) {
                     ctx.fillStyle = '#ff2a55';
                     ctx.beginPath();
-                    ctx.arc(15, 0, 5.2, 0, Math.PI * 2);
+                    ctx.arc(14, 0, 4.8, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#ffccd5';
+                    ctx.beginPath();
+                    ctx.arc(12.5, -1.5, 1.6, 0, Math.PI * 2);
                     ctx.fill();
                 }
 
@@ -656,16 +625,13 @@
                 this.pheromoneTimer = 0;
                 this.slowTimer = 0;
                 this.walkCycle = Math.random() * Math.PI * 2;
-                this.straightTimer = 0;
-                this.straightAngle = this.angle;
+                this.wanderOffset = (Math.random() - 0.5) * 0.2;
             }
 
             update() {
                 let currentSpeed = this.slowTimer > 0 ? this.speed * 0.35 : this.speed;
                 if (this.slowTimer > 0) this.slowTimer--;
                 this.walkCycle += currentSpeed * 0.28;
-
-                revealFog(this.x, this.y, 150);
 
                 let target = null;
                 let minDist = 105;
@@ -692,8 +658,13 @@
                         target.hp -= this.damage;
                         target.x += Math.cos(targetAngle) * 2.5;
                         target.y += Math.sin(targetAngle) * 2.5 * TILT;
+                        if (Math.random() < 0.2) spawnHitParticles(target.x, target.y, '#ffccd5', 2);
                     }
                 } else {
+                    this.wanderOffset += (Math.random() - 0.5) * 0.14;
+                    this.wanderOffset = Math.max(-0.25, Math.min(0.25, this.wanderOffset));
+                    this.angle += this.wanderOffset;
+
                     if (this.hasFood) {
                         const dx = this.nest.x - this.x;
                         const dy = (this.nest.y - this.y) / TILT;
@@ -719,35 +690,45 @@
                             updateUI();
                         }
                     } else {
-                        let closestFood = null;
-                        let closestDist = Infinity;
-                        for (let f of foods) {
-                            let d = Math.hypot(f.x - this.x, (f.y - this.y) / TILT);
-                            if (d < closestDist) {
-                                closestDist = d;
-                                closestFood = f;
+                        let foundTarget = false;
+                        for (let i = foods.length - 1; i >= 0; i--) {
+                            let f = foods[i];
+                            let dist = Math.hypot(f.x - this.x, (f.y - this.y) / TILT);
+                            
+                            if (dist < 95) {
+                                let targetAngle = Math.atan2((f.y - this.y) / TILT, f.x - this.x);
+                                this.angle = this.lerpAngle(this.angle, targetAngle, 0.25);
+                                foundTarget = true;
+
+                                if (dist < 9) {
+                                    this.hasFood = true;
+                                    f.amount--;
+                                    if (f.amount <= 0) foods.splice(i, 1);
+                                    break;
+                                }
                             }
                         }
 
-                        if (closestFood) {
-                            let targetAngle = Math.atan2((closestFood.y - this.y) / TILT, closestFood.x - this.x);
-                            this.angle = this.lerpAngle(this.angle, targetAngle, 0.25);
+                        if (!foundTarget && pheromones.length > 0) {
+                            let bestPheromone = null;
+                            let maxLife = 0;
 
-                            if (closestDist < 9) {
-                                this.hasFood = true;
-                                closestFood.amount--;
-                                if (closestFood.amount <= 0) {
-                                    let idx = foods.indexOf(closestFood);
-                                    if (idx > -1) foods.splice(idx, 1);
+                            for (let p of pheromones) {
+                                let dist = Math.hypot(p.x - this.x, (p.y - this.y) / TILT);
+                                if (dist > 12 && dist < 80) {
+                                    let angleToP = Math.atan2((p.y - this.y) / TILT, p.x - this.x);
+                                    let diff = Math.abs(this.normalizeAngle(angleToP - this.angle));
+                                    if (diff < 1.15 && p.life > maxLife) {
+                                        maxLife = p.life;
+                                        bestPheromone = p;
+                                    }
                                 }
                             }
-                        } else {
-                            if (this.straightTimer <= 0) {
-                                this.straightTimer = 150 + Math.random() * 200;
-                                this.straightAngle = this.angle + (Math.random() - 0.5) * Math.PI * 1.5;
+
+                            if (bestPheromone) {
+                                let targetAngle = Math.atan2((bestPheromone.y - this.y) / TILT, bestPheromone.x - this.x);
+                                this.angle = this.lerpAngle(this.angle, targetAngle, 0.14);
                             }
-                            this.straightTimer--;
-                            this.angle = this.lerpAngle(this.angle, this.straightAngle, 0.1);
                         }
                     }
                 }
@@ -759,9 +740,9 @@
                 ctx.save();
                 ctx.translate(this.x, this.y);
 
-                ctx.fillStyle = 'rgba(0,0,0,0.38)';
+                ctx.fillStyle = 'rgba(0,0,0,0.35)';
                 ctx.beginPath();
-                ctx.ellipse(2, 4, 6.5, 3.2, 0, 0, Math.PI * 2);
+                ctx.ellipse(2, 4, 6, 3, 0, 0, Math.PI * 2);
                 ctx.fill();
 
                 ctx.scale(1, TILT);
@@ -796,6 +777,18 @@
                     ctx.beginPath();
                     ctx.arc(8, 0, 3.5, 0, Math.PI * 2);
                     ctx.fill();
+                    ctx.fillStyle = '#ffccd5';
+                    ctx.beginPath();
+                    ctx.arc(7, -1, 1.2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                if (this.slowTimer > 0) {
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+                    ctx.lineWidth = 1.4;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, 9.5, 0, Math.PI * 2);
+                    ctx.stroke();
                 }
 
                 ctx.restore();
@@ -825,6 +818,7 @@
                 this.hasFood = false;
                 this.slowTimer = 0;
                 this.walkCycle = Math.random() * Math.PI * 2;
+                this.wanderOffset = (Math.random() - 0.5) * 0.2;
             }
 
             update() {
@@ -857,8 +851,13 @@
                         target.hp -= this.damage;
                         target.x += Math.cos(targetAngle) * 2.5;
                         target.y += Math.sin(targetAngle) * 2.5 * TILT;
+                        if (Math.random() < 0.2) spawnHitParticles(target.x, target.y, '#ffe8d6', 2);
                     }
                 } else {
+                    this.wanderOffset += (Math.random() - 0.5) * 0.14;
+                    this.wanderOffset = Math.max(-0.25, Math.min(0.25, this.wanderOffset));
+                    this.angle += this.wanderOffset;
+
                     if (this.hasFood) {
                         const dx = this.nest.x - this.x;
                         const dy = (this.nest.y - this.y) / TILT;
@@ -877,24 +876,20 @@
                             updateUI();
                         }
                     } else {
-                        let closestFood = null;
-                        let closestDist = Infinity;
-                        for (let f of foods) {
-                            let d = Math.hypot(f.x - this.x, (f.y - this.y) / TILT);
-                            if (d < closestDist) {
-                                closestDist = d;
-                                closestFood = f;
-                            }
-                        }
+                        for (let i = foods.length - 1; i >= 0; i--) {
+                            let f = foods[i];
+                            let dist = Math.hypot(f.x - this.x, (f.y - this.y) / TILT);
+                            
+                            if (dist < 90) {
+                                let targetAngle = Math.atan2((f.y - this.y) / TILT, f.x - this.x);
+                                this.angle = this.lerpAngle(this.angle, targetAngle, 0.22);
 
-                        if (closestFood) {
-                            let targetAngle = Math.atan2((closestFood.y - this.y) / TILT, closestFood.x - this.x);
-                            this.angle = this.lerpAngle(this.angle, targetAngle, 0.22);
-
-                            if (closestDist < 9) {
-                                this.hasFood = true;
-                                closestFood.amount--;
-                                if (closestFood.amount <= 0) foods.splice(foods.indexOf(closestFood), 1);
+                                if (dist < 9) {
+                                    this.hasFood = true;
+                                    f.amount--;
+                                    if (f.amount <= 0) foods.splice(i, 1);
+                                    break;
+                                }
                             }
                         }
                     }
@@ -907,46 +902,47 @@
                 ctx.save();
                 ctx.translate(this.x, this.y);
 
-                ctx.fillStyle = 'rgba(0,0,0,0.38)';
+                ctx.fillStyle = 'rgba(0,0,0,0.35)';
                 ctx.beginPath();
-                ctx.ellipse(2, 4, 7, 3.5, 0, 0, Math.PI * 2);
+                ctx.ellipse(2, 4, 6.5, 3.2, 0, 0, Math.PI * 2);
                 ctx.fill();
 
                 ctx.scale(1, TILT);
                 ctx.rotate(this.angle);
 
-                ctx.strokeStyle = '#5a3d28';
-                ctx.lineWidth = 1.3;
-                let legSwing = Math.sin(this.walkCycle) * 3.5;
+                ctx.strokeStyle = '#7f4f24';
+                ctx.lineWidth = 1.2;
+                let legSwing = Math.sin(this.walkCycle) * 3;
                 ctx.beginPath();
-                ctx.moveTo(-3, -3); ctx.lineTo(-7 + legSwing, -12);
-                ctx.moveTo(0, -3); ctx.lineTo(1 - legSwing, -13);
-                ctx.moveTo(3, -3); ctx.lineTo(8 + legSwing, -12);
-                ctx.moveTo(-3, 3); ctx.lineTo(-7 - legSwing, 12);
-                ctx.moveTo(0, 3); ctx.lineTo(1 + legSwing, 13);
-                ctx.moveTo(3, 3); ctx.lineTo(8 - legSwing, 12);
+                ctx.moveTo(-2, -3); ctx.lineTo(-4 + legSwing, -10);
+                ctx.moveTo(1, -3); ctx.lineTo(3 - legSwing, -10);
+                ctx.moveTo(-2, 3); ctx.lineTo(-4 - legSwing, 10);
+                ctx.moveTo(1, 3); ctx.lineTo(3 + legSwing, 10);
                 ctx.stroke();
 
                 ctx.fillStyle = '#f8edeb';
                 ctx.beginPath();
-                ctx.ellipse(-6, 0, 5.5, 3.4, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#dda15e';
-                ctx.beginPath();
-                ctx.ellipse(0, 0, 3.5, 2.5, 0, 0, Math.PI * 2);
+                ctx.ellipse(-4, 0, 5.2, 3.2, 0, 0, Math.PI * 2);
                 ctx.fill();
 
                 ctx.fillStyle = '#bc6c25';
                 ctx.beginPath();
-                ctx.arc(5, 0, 3.2, 0, Math.PI * 2);
+                ctx.arc(3.8, 0, 3.4, 0, Math.PI * 2);
                 ctx.fill();
 
                 if (this.hasFood) {
                     ctx.fillStyle = '#ff2a55';
                     ctx.beginPath();
-                    ctx.arc(10, 0, 3.2, 0, Math.PI * 2);
+                    ctx.arc(8, 0, 3, 0, Math.PI * 2);
                     ctx.fill();
+                }
+
+                if (this.slowTimer > 0) {
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+                    ctx.lineWidth = 1.4;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, 9.5, 0, Math.PI * 2);
+                    ctx.stroke();
                 }
 
                 ctx.restore();
@@ -967,7 +963,7 @@
             constructor(x, y) {
                 this.x = x;
                 this.y = y;
-                this.radius = 16;
+                this.radius = 15;
                 this.angle = Math.random() * Math.PI * 2;
                 this.speed = 1.4;
                 this.hp = 240;
@@ -982,24 +978,48 @@
                 this.walkCycle += this.speed * 0.22;
                 if (this.hasBall) this.ballSpin += 0.1;
 
-                let closestFood = null;
-                let minD = Infinity;
-                for (let f of foods) {
-                    let d = Math.hypot(f.x - this.x, (f.y - this.y) / TILT);
-                    if (d < minD) { minD = d; closestFood = f; }
+                let threat = null;
+                let minThreatDist = 140;
+                for (let en of enemies) {
+                    let d = Math.hypot(en.x - this.x, (en.y - this.y) / TILT);
+                    if (d < minThreatDist) { minThreatDist = d; threat = en; }
+                }
+                if (!threat) {
+                    for (let a of ants) {
+                        let d = Math.hypot(a.x - this.x, (a.y - this.y) / TILT);
+                        if (d < 65) { minThreatDist = d; threat = a; break; }
+                    }
                 }
 
-                if (closestFood) {
-                    let targetAngle = Math.atan2((closestFood.y - this.y) / TILT, closestFood.x - this.x);
-                    this.angle = this.lerpAngle(this.angle, targetAngle, 0.15);
-
-                    if (minD < 16) {
-                        let idx = foods.indexOf(closestFood);
-                        if (idx > -1) foods.splice(idx, 1);
-                        this.hasBall = true;
+                if (threat) {
+                    const fleeAngle = Math.atan2((this.y - threat.y) / TILT, this.x - threat.x);
+                    this.angle = this.lerpAngle(this.angle, fleeAngle, 0.18);
+                    if (this.hasBall && minThreatDist < 55) {
+                        this.hasBall = false;
+                        spawnFoodCluster(this.x, this.y, 3);
                     }
+                } else if (this.hasBall) {
+                    this.angle += (Math.random() - 0.5) * 0.08;
                 } else {
-                    this.angle += (Math.random() - 0.5) * 0.2;
+                    let closestFood = null;
+                    let minD = 280;
+                    for (let f of foods) {
+                        let d = Math.hypot(f.x - this.x, (f.y - this.y) / TILT);
+                        if (d < minD) { minD = d; closestFood = f; }
+                    }
+
+                    if (closestFood) {
+                        let targetAngle = Math.atan2((closestFood.y - this.y) / TILT, closestFood.x - this.x);
+                        this.angle = this.lerpAngle(this.angle, targetAngle, 0.15);
+
+                        if (minD < 14) {
+                            let idx = foods.indexOf(closestFood);
+                            if (idx > -1) foods.splice(idx, 1);
+                            this.hasBall = true;
+                        }
+                    } else {
+                        this.angle += (Math.random() - 0.5) * 0.2;
+                    }
                 }
 
                 moveEntitySmooth(this, this.speed, 14);
@@ -1011,57 +1031,68 @@
 
                 if (this.hp < this.maxHp) {
                     ctx.fillStyle = 'rgba(0,0,0,0.65)';
-                    ctx.fillRect(-16, -26, 32, 4);
+                    ctx.fillRect(-16, -24, 32, 4);
                     ctx.fillStyle = '#80ed99';
-                    ctx.fillRect(-16, -26, 32 * Math.max(0, this.hp / this.maxHp), 4);
+                    ctx.fillRect(-16, -24, 32 * Math.max(0, this.hp / this.maxHp), 4);
                 }
 
-                ctx.fillStyle = 'rgba(0,0,0,0.45)';
+                ctx.fillStyle = 'rgba(0,0,0,0.42)';
                 ctx.beginPath();
-                ctx.ellipse(3, 7, 17, 10, 0, 0, Math.PI * 2);
+                ctx.ellipse(3, 6, 16, 9, 0, 0, Math.PI * 2);
                 ctx.fill();
 
                 ctx.scale(1, TILT);
                 ctx.rotate(this.angle);
 
-                ctx.strokeStyle = '#1b2e11';
-                ctx.lineWidth = 2.2;
-                let legSwing = Math.sin(this.walkCycle) * 3;
+                ctx.strokeStyle = '#1b2618';
+                ctx.lineWidth = 2;
+                let swing = Math.sin(this.walkCycle) * 3;
                 ctx.beginPath();
-                ctx.moveTo(-6, -4); ctx.lineTo(-11 + legSwing, -16);
-                ctx.moveTo(2, -4); ctx.lineTo(3 - legSwing, -18);
-                ctx.moveTo(8, -4); ctx.lineTo(13 + legSwing, -16);
-                ctx.moveTo(-6, 4); ctx.lineTo(-11 - legSwing, 16);
-                ctx.moveTo(2, 4); ctx.lineTo(3 + legSwing, 18);
-                ctx.moveTo(8, 4); ctx.lineTo(13 - legSwing, 16);
+                ctx.moveTo(-4, -8); ctx.lineTo(-8 + swing, -16);
+                ctx.moveTo(2, -8); ctx.lineTo(4 - swing, -17);
+                ctx.moveTo(7, -6); ctx.lineTo(11 + swing, -14);
+                ctx.moveTo(-4, 8); ctx.lineTo(-8 - swing, 16);
+                ctx.moveTo(2, 8); ctx.lineTo(4 + swing, 17);
+                ctx.moveTo(7, 6); ctx.lineTo(11 - swing, 14);
                 ctx.stroke();
-
-                ctx.fillStyle = '#386641';
-                ctx.beginPath();
-                ctx.ellipse(0, 0, 16, 12, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.strokeStyle = '#283618';
-                ctx.lineWidth = 1.5;
-                ctx.beginPath(); ctx.moveTo(-16, 0); ctx.lineTo(16, 0); ctx.stroke();
-
-                ctx.fillStyle = 'rgba(255,255,255,0.22)';
-                ctx.beginPath();
-                ctx.ellipse(-4, -4, 7, 3.5, -0.3, 0, Math.PI * 2);
-                ctx.fill();
 
                 ctx.fillStyle = '#283618';
                 ctx.beginPath();
-                ctx.arc(12, 0, 5.5, 0, Math.PI * 2);
+                ctx.ellipse(0, 0, 15, 11, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#4f772d';
+                ctx.beginPath();
+                ctx.ellipse(-2, -1, 12, 8, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = 'rgba(181, 228, 140, 0.35)';
+                ctx.beginPath();
+                ctx.ellipse(-2, -3.5, 8, 3, -0.2, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#132a13';
+                ctx.beginPath();
+                ctx.moveTo(13, -3); ctx.lineTo(19, 0); ctx.lineTo(13, 3);
                 ctx.fill();
 
                 if (this.hasBall) {
                     ctx.save();
-                    ctx.translate(-24, 0);
+                    ctx.translate(-21, 0);
                     ctx.rotate(this.ballSpin);
                     ctx.fillStyle = '#583101';
                     ctx.beginPath();
                     ctx.arc(0, 0, this.ballSize, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.fillStyle = '#3d1e00';
+                    ctx.beginPath();
+                    ctx.arc(-4, -3, 3.5, 0, Math.PI * 2);
+                    ctx.arc(5, 4, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#e63946';
+                    ctx.beginPath();
+                    ctx.arc(2, -5, 2.5, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.restore();
                 }
@@ -1113,6 +1144,12 @@
                 let target = null;
                 let minDist = this.sight;
 
+                for (let other of enemies) {
+                    if (other !== this && other.type !== this.type) {
+                        let d = Math.hypot(other.x - this.x, (other.y - this.y) / TILT);
+                        if (d < minDist) { minDist = d; target = other; }
+                    }
+                }
                 for (let ant of ants) {
                     let d = Math.hypot(ant.x - this.x, (ant.y - this.y) / TILT);
                     if (d < minDist) { minDist = d; target = ant; }
@@ -1120,6 +1157,10 @@
                 for (let t of termites) {
                     let d = Math.hypot(t.x - this.x, (t.y - this.y) / TILT);
                     if (d < minDist) { minDist = d; target = t; }
+                }
+                for (let b of beetles) {
+                    let d = Math.hypot(b.x - this.x, (b.y - this.y) / TILT);
+                    if (d < minDist) { minDist = d; target = b; }
                 }
 
                 if (target) {
@@ -1135,6 +1176,8 @@
                         target.hp -= this.damage;
                         target.x += Math.cos(targetAngle) * 4.5;
                         target.y += Math.sin(targetAngle) * 4.5 * TILT;
+                        if (Math.random() < 0.35) spawnHitParticles(target.x, target.y, '#ffbe0b', 3);
+
                         if (target.hp <= 0) this.hp = Math.min(this.maxHp, this.hp + 25);
                     }
                 } else {
@@ -1163,48 +1206,70 @@
                 ctx.rotate(this.angle);
 
                 if (this.type === 'mantis') {
-                    let swing = Math.sin(this.walkCycle) * 3;
-                    ctx.strokeStyle = '#1b4332'; ctx.lineWidth = 2.2;
+                    ctx.strokeStyle = '#1b4332';
+                    ctx.lineWidth = 2.6;
+                    let swing = Math.sin(this.walkCycle) * 4;
                     ctx.beginPath();
-                    ctx.moveTo(-10, -5); ctx.lineTo(-18 + swing, -18);
-                    ctx.moveTo(-10, 5); ctx.lineTo(-18 - swing, 18);
+                    ctx.moveTo(-6, -5); ctx.lineTo(-16 + swing, -20);
+                    ctx.moveTo(-6, 5); ctx.lineTo(-16 - swing, 20);
+                    ctx.moveTo(0, -5); ctx.lineTo(-3 - swing, -18);
+                    ctx.moveTo(0, 5); ctx.lineTo(-3 + swing, 18);
                     ctx.stroke();
 
-                    ctx.fillStyle = '#2d6a4f';
+                    ctx.strokeStyle = '#40916c';
+                    ctx.lineWidth = 4.2;
                     ctx.beginPath();
-                    ctx.ellipse(-6, 0, 14, 6, 0, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    ctx.fillStyle = '#52b788';
-                    ctx.beginPath();
-                    ctx.ellipse(10, 0, 13, 6.5, 0, 0, Math.PI * 2);
-                    ctx.fill();
+                    ctx.moveTo(10, -4); ctx.lineTo(28, -17); ctx.lineTo(21, -3);
+                    ctx.moveTo(10, 4); ctx.lineTo(28, 17); ctx.lineTo(21, 3);
+                    ctx.stroke();
 
                     ctx.fillStyle = '#1b4332';
                     ctx.beginPath();
-                    ctx.moveTo(-17, -4.5); ctx.lineTo(-24, 0); ctx.lineTo(-17, 4.5); ctx.closePath();
+                    ctx.ellipse(-8, 0, 17, 8, 0, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.fillStyle = '#2d6a4f';
+                    ctx.beginPath();
+                    ctx.ellipse(9, 0, 12, 6, 0, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.fillStyle = '#74c69d';
+                    ctx.beginPath();
+                    ctx.arc(21, 0, 6.5, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.fillStyle = '#ffb703';
+                    ctx.beginPath();
+                    ctx.arc(23, -4.5, 2.6, 0, Math.PI * 2);
+                    ctx.arc(23, 4.5, 2.6, 0, Math.PI * 2);
                     ctx.fill();
                 } else {
-                    let legSwing = Math.sin(this.walkCycle) * 5;
-                    ctx.strokeStyle = '#111';
-                    ctx.lineWidth = 1.8;
-                    for (let i = 0; i < 4; i++) {
-                        let offset = (i - 1.5) * 6;
-                        let sgn = i < 2 ? -1 : 1;
+                    ctx.strokeStyle = '#0f0f0f';
+                    ctx.lineWidth = 2.4;
+                    let swing = Math.sin(this.walkCycle) * 3.5;
+                    for (let i = -1; i <= 1; i += 2) {
                         ctx.beginPath();
-                        ctx.moveTo(offset, 0);
-                        ctx.lineTo(offset * 2.2, sgn * (20 + legSwing * (i % 2 === 0 ? 1 : -1)));
+                        ctx.moveTo(-3, 0); ctx.lineTo(-16 + swing * i, i * 21);
+                        ctx.moveTo(-1, 0); ctx.lineTo(-7 - swing * i, i * 23);
+                        ctx.moveTo(2, 0); ctx.lineTo(9 + swing * i, i * 22);
+                        ctx.moveTo(4, 0); ctx.lineTo(17 - swing * i, i * 18);
                         ctx.stroke();
                     }
 
-                    ctx.fillStyle = '#2b2d42';
-                    ctx.beginPath(); ctx.arc(-4, 0, 10, 0, Math.PI * 2); ctx.fill();
+                    ctx.fillStyle = '#161616';
+                    ctx.beginPath();
+                    ctx.arc(-7, 0, 11.5, 0, Math.PI * 2);
+                    ctx.arc(7, 0, 7.8, 0, Math.PI * 2);
+                    ctx.fill();
 
-                    ctx.fillStyle = '#1f1f1f';
-                    ctx.beginPath(); ctx.ellipse(11, 0, 14, 11, 0, 0, Math.PI * 2); ctx.fill();
+                    ctx.fillStyle = '#d90429';
+                    ctx.beginPath();
+                    ctx.moveTo(-8, -4); ctx.lineTo(-3, 0); ctx.lineTo(-8, 4); ctx.lineTo(-13, 0);
+                    ctx.fill();
 
-                    ctx.fillStyle = '#e63946';
-                    ctx.beginPath(); ctx.arc(11, 0, 4.5, 0, Math.PI * 2); ctx.fill();
+                    ctx.fillStyle = '#ff0054';
+                    ctx.fillRect(13, -3.5, 2.2, 2.2);
+                    ctx.fillRect(13, 1.3, 2.2, 2.2);
                 }
 
                 ctx.restore();
@@ -1250,67 +1315,67 @@
             foods = [];
             beetles = [];
 
-            for (let i = 0; i < 220; i++) {
+            for (let i = 0; i < 75; i++) {
                 dirtPatches.push({
-                    x: Math.random() * MAP_WIDTH,
-                    y: Math.random() * MAP_HEIGHT,
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
                     rx: 70 + Math.random() * 95,
                     ry: (50 + Math.random() * 70) * TILT,
                     angle: Math.random() * Math.PI
                 });
             }
 
-            for (let i = 0; i < 1500; i++) {
+            for (let i = 0; i < 500; i++) {
                 pebbles.push({
-                    x: Math.random() * MAP_WIDTH,
-                    y: Math.random() * MAP_HEIGHT,
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
                     r: 1.5 + Math.random() * 3.5,
                     color: Math.random() > 0.5 ? '#58615d' : '#7f8a86'
                 });
             }
 
-            for (let i = 0; i < 130; i++) {
+            for (let i = 0; i < 45; i++) {
                 mushrooms.push({
-                    x: Math.random() * MAP_WIDTH,
-                    y: Math.random() * MAP_HEIGHT,
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
                     color: Math.random() > 0.5 ? '#e76f51' : '#f4a261',
                     size: 3.5 + Math.random() * 3
                 });
             }
 
             const grassColors = ['#224215', '#346221', '#487d2e'];
-            for (let i = 0; i < 18000; i++) {
+            for (let i = 0; i < 6500; i++) {
                 grassBlades.push({
-                    x: Math.random() * MAP_WIDTH,
-                    y: Math.random() * MAP_HEIGHT,
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
                     h: 6 + Math.random() * 9,
                     lean: (Math.random() - 0.5) * 6,
                     color: grassColors[Math.floor(Math.random() * grassColors.length)]
                 });
             }
 
-            for (let i = 0; i < 250; i++) {
+            for (let i = 0; i < 90; i++) {
                 ferns.push({
-                    x: 60 + Math.random() * (MAP_WIDTH - 120),
-                    y: 60 + Math.random() * (MAP_HEIGHT - 120),
+                    x: 60 + Math.random() * (canvas.width - 120),
+                    y: 60 + Math.random() * (canvas.height - 120),
                     size: 20 + Math.random() * 14,
                     angle: Math.random() * Math.PI * 2
                 });
             }
 
-            for (let i = 0; i < 65; i++) {
+            for (let i = 0; i < 22; i++) {
                 logs.push({
-                    x: 180 + Math.random() * (MAP_WIDTH - 360),
-                    y: 180 + Math.random() * (MAP_HEIGHT - 360),
+                    x: 180 + Math.random() * (canvas.width - 360),
+                    y: 180 + Math.random() * (canvas.height - 360),
                     w: 105 + Math.random() * 70,
                     h: 30 + Math.random() * 14,
                     angle: Math.random() * Math.PI
                 });
             }
 
-            for (let i = 0; i < 120; i++) {
-                let rx = 120 + Math.random() * (MAP_WIDTH - 240);
-                let ry = 120 + Math.random() * (MAP_HEIGHT - 240);
+            for (let i = 0; i < 42; i++) {
+                let rx = 120 + Math.random() * (canvas.width - 240);
+                let ry = 120 + Math.random() * (canvas.height - 240);
                 let radius = 26 + Math.random() * 28;
                 if (!isCollidingWithLog(rx, ry, 55)) {
                     let points = [];
@@ -1325,17 +1390,17 @@
             }
 
             const flowerColors = ['#ffb703', '#fb8500', '#ffffff', '#e0a96d', '#9b5de5', '#00bbf9'];
-            for (let i = 0; i < 600; i++) {
+            for (let i = 0; i < 220; i++) {
                 flowers.push({
-                    x: 50 + Math.random() * (MAP_WIDTH - 100),
-                    y: 50 + Math.random() * (MAP_HEIGHT - 100),
+                    x: 50 + Math.random() * (canvas.width - 100),
+                    y: 50 + Math.random() * (canvas.height - 100),
                     color: flowerColors[Math.floor(Math.random() * flowerColors.length)]
                 });
             }
 
-            for (let i = 0; i < 110; i++) {
-                const bx = 90 + Math.random() * (MAP_WIDTH - 180);
-                const by = 90 + Math.random() * (MAP_HEIGHT - 180);
+            for (let i = 0; i < 40; i++) {
+                const bx = 90 + Math.random() * (canvas.width - 180);
+                const by = 90 + Math.random() * (canvas.height - 180);
                 let radius = 32 + Math.random() * 16;
                 let lobes = [];
                 let numLobes = 4 + Math.floor(Math.random() * 3);
@@ -1348,9 +1413,9 @@
                 spawnFoodCluster(bx + (Math.random() - 0.5) * 65, by + (Math.random() - 0.5) * 65, 10);
             }
 
-            for (let i = 0; i < 85; i++) {
-                const tx = 140 + Math.random() * (MAP_WIDTH - 280);
-                const ty = 140 + Math.random() * (MAP_HEIGHT - 280);
+            for (let i = 0; i < 30; i++) {
+                const tx = 140 + Math.random() * (canvas.width - 280);
+                const ty = 140 + Math.random() * (canvas.height - 280);
                 let radius = 68 + Math.random() * 30;
                 let lobes = [];
                 let numLobes = 5 + Math.floor(Math.random() * 3);
@@ -1377,9 +1442,8 @@
             queen = null;
             queenTarget = null;
             foodSpawnCounter = 0;
-            natureFoodTimer = 300;
+            natureFoodTimer = 300; // 5 minutos exactos
             generateEnvironment();
-            initFog();
 
             if (gameMode === 'normal') {
                 storedFood = 0;
@@ -1397,13 +1461,11 @@
         }
 
         function placeNest(x, y, type) {
-            let newNest = { x, y, radius: 28 };
+            let newNest = { x, y, radius: 26 };
             if (type === 'ant') {
                 antNests.push(newNest);
                 if (gameMode === 'sandbox') {
                     for (let i = 0; i < 8; i++) ants.push(new Ant(x, y, newNest));
-                } else {
-                    revealFog(x, y, 220);
                 }
             } else {
                 termiteNests.push(newNest);
@@ -1416,22 +1478,24 @@
             for (let i = 0; i < count; i++) {
                 const offsetX = (Math.random() - 0.5) * 60;
                 const offsetY = (Math.random() - 0.5) * 60 * TILT;
-                let fx = Math.max(30, Math.min(MAP_WIDTH - 30, x + offsetX));
-                let fy = Math.max(30, Math.min(MAP_HEIGHT - 30, y + offsetY));
+                let fx = Math.max(30, Math.min(canvas.width - 30, x + offsetX));
+                let fy = Math.max(30, Math.min(canvas.height - 30, y + offsetY));
                 if (!checkObstacleCollision(fx, fy, 4)) {
                     foods.push({ x: fx, y: fy, amount: 5 });
                 }
             }
         }
 
+        // Cada 5 minutos (300s), los árboles y arbustos proveen comida en el bosque
         function triggerNatureHarvest() {
+            // Recolectar algunos arbustos y árboles al azar para que dejen caer comida
             let sources = [...bushes, ...trees];
-            for (let i = 0; i < Math.min(15, sources.length); i++) {
+            for (let i = 0; i < Math.min(12, sources.length); i++) {
                 let src = sources[Math.floor(Math.random() * sources.length)];
                 spawnFoodCluster(src.x, src.y, 8);
             }
-            statusEl.textContent = "🌿 ¡Los árboles han producido nuevo alimento!";
-            spawnHitParticles(MAP_WIDTH / 2, MAP_HEIGHT / 2, '#b5e48c', 20);
+            statusEl.textContent = "🌿 ¡Los árboles y arbustos del bosque han producido nuevo alimento!";
+            spawnHitParticles(canvas.width / 2, canvas.height / 2, '#b5e48c', 20);
         }
 
         function updateUI() {
@@ -1446,31 +1510,23 @@
 
         canvas.addEventListener('mousemove', (e) => {
             const rect = canvas.getBoundingClientRect();
-            const rawX = (e.clientX - rect.left) * (canvas.width / rect.width);
-            const rawY = (e.clientY - rect.top) * (canvas.height / rect.height);
-            
-            if (gameMode === 'normal' && queen) {
-                mousePos.x = (rawX - canvas.width / 2) / zoom + queen.x;
-                mousePos.y = (rawY - canvas.height / 2) / zoom + queen.y;
-            } else {
-                mousePos.x = (rawX - canvas.width / 2) / zoom + canvas.width / 2;
-                mousePos.y = (rawY - canvas.height / 2) / zoom + canvas.height / 2;
-            }
+            mousePos.x = (e.clientX - rect.left) * (canvas.width / rect.width);
+            mousePos.y = (e.clientY - rect.top) * (canvas.height / rect.height);
         });
 
         canvas.addEventListener('mousedown', (e) => {
-            const clickX = mousePos.x;
-            const clickY = mousePos.y;
+            const rect = canvas.getBoundingClientRect();
+            const clickX = (e.clientX - rect.left) * (canvas.width / rect.width);
+            const clickY = (e.clientY - rect.top) * (canvas.height / rect.height);
 
             if (gameMode === 'normal') {
                 if (currentTool === 'queen' && !queen) {
                     if (!canPlaceAt(clickX, clickY, 'queen')) {
-                        statusEl.textContent = "⚠️ No puedes colocar a la Reina sobre rocas o troncos";
+                        statusEl.textContent = "⚠️ No puedes colocar a la Reina encima de rocas o troncos";
                         statusEl.style.background = "linear-gradient(90deg, #9b2226, #ae2012)";
                         return;
                     }
                     queen = new QueenAnt(clickX, clickY);
-                    revealFog(clickX, clickY, 220);
                     document.getElementById('tool-queen').disabled = true;
                     const btnNormalNest = document.getElementById('tool-normal_nest');
                     btnNormalNest.disabled = false;
@@ -1501,7 +1557,7 @@
             }
 
             if (!canPlaceAt(clickX, clickY, currentTool)) {
-                statusEl.textContent = "⚠️ Espacio bloqueado por obstáculos";
+                statusEl.textContent = "⚠️ Espacio bloqueado por obstáculos o entidades";
                 statusEl.style.background = "linear-gradient(90deg, #9b2226, #ae2012)";
                 return;
             }
@@ -1525,19 +1581,17 @@
             updateUI();
         });
 
-        if (btnSpeed) {
-            btnSpeed.addEventListener('click', () => {
-                if (gameMode === 'normal') return;
-                gameSpeed = gameSpeed === 1 ? 2 : gameSpeed === 2 ? 4 : 1;
-                btnSpeed.textContent = `Vel: ${gameSpeed}x`;
-            });
-        }
+        btnSpeed.addEventListener('click', () => {
+            if (gameMode === 'normal') return; // Bloqueado en modo normal
+            gameSpeed = gameSpeed === 1 ? 2 : gameSpeed === 2 ? 4 : 1;
+            btnSpeed.textContent = `Velocidad: ${gameSpeed}x`;
+        });
 
         document.getElementById('btn-clear').addEventListener('click', init);
 
         function drawEnvironmentBase() {
             ctx.fillStyle = '#345822';
-            ctx.fillRect(0, 0, MAP_WIDTH, MAP_HEIGHT);
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             for (let d of dirtPatches) {
                 ctx.save();
@@ -1613,6 +1667,11 @@
                 ctx.ellipse(l.w/2 - 2, 0, 6, l.h/2 - 1, 0, 0, Math.PI * 2);
                 ctx.fill();
 
+                ctx.fillStyle = '#386641';
+                ctx.beginPath();
+                ctx.ellipse(-10, -l.h/3, l.w * 0.32, 6, 0, 0, Math.PI * 2);
+                ctx.fill();
+
                 ctx.restore();
             }
 
@@ -1640,6 +1699,13 @@
                 ctx.closePath();
                 ctx.fill();
 
+                ctx.fillStyle = '#3d4542';
+                ctx.beginPath();
+                ctx.moveTo(r.points[0].x, r.points[0].y + 6);
+                for (let pt of r.points) ctx.lineTo(pt.x, pt.y + 6);
+                ctx.closePath();
+                ctx.fill();
+
                 ctx.fillStyle = '#6c757d';
                 ctx.beginPath();
                 ctx.moveTo(r.points[0].x, r.points[0].y - 3);
@@ -1653,77 +1719,6 @@
                     ctx.ellipse(r.radius * 0.15, -r.radius * 0.25 * TILT - 3, r.radius * 0.42, r.radius * 0.28, 0, 0, Math.PI * 2);
                     ctx.fill();
                 }
-
-                ctx.restore();
-            }
-        }
-
-        /* ==========================================================
-         * RENDERIZADO DE NIDOS 2.5D REALISTAS (VOLCÁN Y CONO)
-         * ========================================================== */
-        function drawNests() {
-            // 1. HORMIGUERO (Forma de Mini Volcán 2.5D)
-            for (let n of antNests) {
-                ctx.save();
-                ctx.translate(n.x, n.y);
-
-                ctx.fillStyle = 'rgba(0,0,0,0.5)';
-                ctx.beginPath();
-                ctx.ellipse(6, 10, n.radius + 10, (n.radius + 6) * TILT, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#582f0e';
-                ctx.beginPath();
-                ctx.ellipse(0, 0, n.radius + 6, (n.radius + 2) * TILT, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#7f4f24';
-                ctx.beginPath();
-                ctx.ellipse(0, -6, n.radius * 0.75, (n.radius * 0.7) * TILT, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#a98467';
-                ctx.beginPath();
-                ctx.ellipse(0, -10, n.radius * 0.45, (n.radius * 0.4) * TILT, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#1e1005';
-                ctx.beginPath();
-                ctx.ellipse(0, -12, n.radius * 0.22, (n.radius * 0.2) * TILT, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.restore();
-            }
-
-            // 2. TERMITERO (Cono Irregular de Barro 2.5D)
-            for (let n of termiteNests) {
-                ctx.save();
-                ctx.translate(n.x, n.y);
-
-                ctx.fillStyle = 'rgba(0,0,0,0.5)';
-                ctx.beginPath();
-                ctx.ellipse(8, 12, n.radius + 12, (n.radius + 8) * TILT, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#8d6b4f';
-                ctx.beginPath();
-                ctx.ellipse(0, 0, n.radius + 8, (n.radius + 4) * TILT, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#bc6c25';
-                ctx.beginPath();
-                ctx.ellipse(-3, -8, n.radius * 0.65, (n.radius * 0.6) * TILT, -0.2, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#dda15e';
-                ctx.beginPath();
-                ctx.ellipse(2, -15, n.radius * 0.35, (n.radius * 0.32) * TILT, 0.1, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#603813';
-                ctx.beginPath();
-                ctx.ellipse(1, -18, n.radius * 0.12, (n.radius * 0.1) * TILT, 0, 0, Math.PI * 2);
-                ctx.fill();
 
                 ctx.restore();
             }
@@ -1798,9 +1793,10 @@
             let effectiveSpeed = gameMode === 'normal' ? 1 : gameSpeed;
 
             for (let s = 0; s < effectiveSpeed; s++) {
+                // Temporizador de naturaleza (cada 5 minutos = 18000 frames a 60fps)
                 natureFoodTimer -= 1 / 60;
                 if (natureFoodTimer <= 0) {
-                    natureFoodTimer = 300;
+                    natureFoodTimer = 300; // Reiniciar a 5 minutos
                     triggerNatureHarvest();
                 }
 
@@ -1812,7 +1808,7 @@
                         const hatched = eggs.splice(i, 1)[0];
                         ants.push(new Ant(hatched.nest.x, hatched.nest.y, hatched.nest));
                         spawnHitParticles(hatched.nest.x, hatched.nest.y, '#b5e48c', 12);
-                        statusEl.textContent = "🐜 ¡Nació una nueva hormiga obrera!";
+                        statusEl.textContent = "🐜 ¡Un huevo ha eclosionado! Nació una nueva hormiga obrera";
                         needsUIUpdate = true;
                     }
                 }
@@ -1830,6 +1826,35 @@
                     if (pt.life <= 0) particles.splice(i, 1);
                 }
 
+                for (let i = webs.length - 1; i >= 0; i--) {
+                    let w = webs[i];
+                    w.x += Math.cos(w.angle) * w.speed;
+                    w.y += Math.sin(w.angle) * w.speed * TILT;
+                    w.life--;
+
+                    let hit = false;
+                    for (let ant of ants) {
+                        if (Math.hypot(ant.x - w.x, (ant.y - w.y) / TILT) < 14) {
+                            ant.slowTimer = 200;
+                            hit = true;
+                            break;
+                        }
+                    }
+                    if (!hit) {
+                        for (let t of termites) {
+                            if (Math.hypot(t.x - w.x, (t.y - w.y) / TILT) < 14) {
+                                t.slowTimer = 200;
+                                hit = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (hit || w.life <= 0 || checkObstacleCollision(w.x, w.y, 2)) {
+                        webs.splice(i, 1);
+                    }
+                }
+
                 for (let ant of ants) ant.update();
                 for (let t of termites) t.update();
                 for (let b of beetles) b.update();
@@ -1842,22 +1867,51 @@
                         needsUIUpdate = true;
                     }
                 }
+
+                for (let i = termites.length - 1; i >= 0; i--) {
+                    if (termites[i].hp <= 0) {
+                        foods.push({ x: termites[i].x, y: termites[i].y, amount: 3 });
+                        termites.splice(i, 1);
+                        needsUIUpdate = true;
+                    }
+                }
+
+                for (let i = beetles.length - 1; i >= 0; i--) {
+                    if (beetles[i].hp <= 0) {
+                        spawnFoodCluster(beetles[i].x, beetles[i].y, 6);
+                        beetles.splice(i, 1);
+                        needsUIUpdate = true;
+                    }
+                }
+
+                for (let i = enemies.length - 1; i >= 0; i--) {
+                    if (enemies[i].hp <= 0) {
+                        let drop = enemies[i].type === 'mantis' ? 30 : 15;
+                        spawnFoodCluster(enemies[i].x, enemies[i].y, Math.ceil(drop / 3));
+                        enemies.splice(i, 1);
+                        needsUIUpdate = true;
+                    }
+                }
             }
 
             if (needsUIUpdate) updateUI();
 
-            ctx.save();
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawEnvironmentBase();
 
-            ctx.translate(canvas.width / 2, canvas.height / 2);
-            ctx.scale(zoom, zoom);
-            if (gameMode === 'normal' && queen) {
-                ctx.translate(-queen.x, -queen.y);
-            } else {
-                ctx.translate(-MAP_WIDTH / 2, -MAP_HEIGHT / 2);
+            for (let p of pheromones) {
+                ctx.fillStyle = `rgba(200, 240, 255, ${p.life / 950})`;
+                ctx.beginPath();
+                ctx.ellipse(p.x, p.y, 2.2, 1.6, 0, 0, Math.PI * 2);
+                ctx.fill();
             }
 
-            drawEnvironmentBase();
+            if (queen && queenTarget) {
+                ctx.strokeStyle = 'rgba(255, 209, 102, 0.85)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.ellipse(queenTarget.x, queenTarget.y, 10, 10 * TILT, 0, 0, Math.PI * 2);
+                ctx.stroke();
+            }
 
             for (let f of foods) {
                 let r = 2.8 + f.amount * 0.55;
@@ -1877,12 +1931,68 @@
                 ctx.fill();
             }
 
-            drawNests();
+            for (let w of webs) {
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
+                ctx.lineWidth = 1.8;
+                ctx.beginPath();
+                ctx.arc(w.x, w.y, 4.5, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+
+            for (let n of antNests) {
+                ctx.fillStyle = 'rgba(0,0,0,0.45)';
+                ctx.beginPath();
+                ctx.ellipse(n.x + 4, n.y + 6, n.radius + 9, (n.radius + 9) * TILT, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#582f0e';
+                ctx.beginPath();
+                ctx.ellipse(n.x, n.y, n.radius + 8, (n.radius + 8) * TILT, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#7f4f24';
+                ctx.beginPath();
+                ctx.ellipse(n.x, n.y - 3, n.radius + 4, (n.radius + 4) * TILT, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#0b0503';
+                ctx.beginPath();
+                ctx.ellipse(n.x, n.y - 4, n.radius - 6, (n.radius - 6) * TILT, 0, 0, Math.PI * 2);
+                ctx.fill();
+            }
 
             for (let egg of eggs) {
                 ctx.fillStyle = '#fefae0';
                 ctx.beginPath();
                 ctx.ellipse(egg.x, egg.y - 3, 4.5, 3.2, 0.2, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#ffd166';
+                ctx.font = 'bold 11px Segoe UI';
+                ctx.textAlign = 'center';
+                ctx.fillText(`${Math.ceil(egg.timer)}s`, egg.x, egg.y - 10);
+            }
+
+            for (let n of termiteNests) {
+                ctx.fillStyle = 'rgba(0,0,0,0.45)';
+                ctx.beginPath();
+                ctx.ellipse(n.x + 5, n.y + 7, n.radius + 10, (n.radius + 10) * TILT, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#774936';
+                ctx.beginPath();
+                ctx.ellipse(n.x, n.y, n.radius + 9, (n.radius + 9) * TILT, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#9c6644';
+                ctx.beginPath();
+                ctx.ellipse(n.x - 2, n.y - 9, n.radius * 0.65, n.radius * 0.85, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#2e190a';
+                ctx.beginPath();
+                ctx.ellipse(n.x + 4, n.y + 2, 5.5, 4, 0, 0, Math.PI * 2);
+                ctx.ellipse(n.x - 7, n.y + 3, 4.5, 3.5, 0, 0, Math.PI * 2);
                 ctx.fill();
             }
 
@@ -1891,18 +2001,43 @@
             allEntities.sort((a, b) => a.y - b.y);
             for (let ent of allEntities) ent.draw();
 
+            for (let pt of particles) {
+                ctx.fillStyle = pt.color;
+                ctx.globalAlpha = pt.life / pt.maxLife;
+                ctx.beginPath();
+                ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.globalAlpha = 1.0;
+
             drawCanopyLayer();
 
-            if (gameMode === 'normal') {
-                ctx.drawImage(fogCanvas, 0, 0);
+            let sunGrad = ctx.createRadialGradient(canvas.width * 0.3, canvas.height * 0.2, 100, canvas.width * 0.5, canvas.height * 0.5, canvas.width * 0.8);
+            sunGrad.addColorStop(0, 'rgba(255, 243, 176, 0.08)');
+            sunGrad.addColorStop(1, 'rgba(6, 15, 5, 0.32)');
+            ctx.fillStyle = sunGrad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const showCursorPreview = (gameMode === 'sandbox') || (currentTool === 'queen' && !queen) || (currentTool === 'normal_nest' && antNests.length === 0);
+            if (showCursorPreview) {
+                const validPlacement = canPlaceAt(mousePos.x, mousePos.y, currentTool);
+                const previewRadius = (currentTool === 'nest' || currentTool === 'termite_nest' || currentTool === 'normal_nest') ? 28 : (currentTool === 'mantis') ? 22 : (currentTool === 'spider' || currentTool === 'beetle' || currentTool === 'queen') ? 16 : 14;
+
+                ctx.strokeStyle = validPlacement ? 'rgba(181, 228, 140, 0.95)' : 'rgba(255, 77, 109, 0.98)';
+                ctx.fillStyle = validPlacement ? 'rgba(181, 228, 140, 0.2)' : 'rgba(255, 77, 109, 0.3)';
+                ctx.setLineDash([5, 4]);
+                ctx.lineWidth = 2.2;
+                ctx.beginPath();
+                ctx.ellipse(mousePos.x, mousePos.y, previewRadius, previewRadius * TILT, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+                ctx.setLineDash([]);
             }
 
-            ctx.restore();
             requestAnimationFrame(loop);
         }
 
         generateEnvironment();
-        initFog();
         loop();
     </script>
 </body>
