@@ -18,6 +18,7 @@
             overflow-x: hidden;
         }
 
+        /* Pantalla de Inicio */
         #start-screen {
             position: fixed;
             inset: 0;
@@ -170,7 +171,7 @@
 
     <div id="start-screen">
         <h1>🐜 Ants Empires and Colony</h1>
-        <p>Versión optimizada sin lag: Mapa masivo de 5,500 x 5,500, nidos realistas (Volcán y Cono de Termitas) y modelos 2.5D mejorados.</p>
+        <p>Mapa masivo de 5,500 x 5,500, nidos realistas en 2.5D (Mini Volcán y Cono de Termitas), y optimización sin lag. Elige un modo:</p>
         <div class="menu-buttons">
             <button class="menu-btn btn-mode-normal" onclick="startGame('normal')">👑 Modo Normal (Historia)</button>
             <button class="menu-btn btn-mode-sandbox" onclick="startGame('sandbox')">🌿 Modo Sandbox</button>
@@ -199,7 +200,7 @@
     </div>
 
     <div class="toolbar" id="toolbar-sandbox">
-        <button id="tool-nest" class="tool-btn active" onclick="setTool('nest')">🏠 Hormiguero (Volcán)</button>
+        <button id="tool-nest" class="tool-btn active" onclick="setTool('nest')">🌋 Hormiguero (Volcán)</button>
         <button id="tool-termite_nest" class="tool-btn btn-termite" onclick="setTool('termite_nest')">🏰 Termitero (Cono)</button>
         <button id="tool-beetle" class="tool-btn btn-beetle" onclick="setTool('beetle')">🪲 Escarabajo Pelotero</button>
         <button id="tool-food" class="tool-btn" onclick="setTool('food')">🍓 Soltar Comida</button>
@@ -312,8 +313,8 @@
         let flowers = [];
 
         const toolDescriptions = {
-            nest: "🏠 Hormiguero (Forma de Mini Volcán)",
-            termite_nest: "🏰 Termitero (Cono Irregular de Barro)",
+            nest: "🌋 Hormiguero (Forma de Mini Volcán 2.5D)",
+            termite_nest: "🏰 Termitero (Cono Irregular de Barro 2.5D)",
             beetle: "🪲 Escarabajo Pelotero",
             food: "🍓 Soltar Comida",
             spider: "🕷️ Araña Teje-redes",
@@ -449,7 +450,7 @@
         }
 
         /* ==========================================================
-         * CLASES DE ENTIDADES (MODELOS 2.5D DE MÁXIMA CALIDAD)
+         * CLASES DE ENTIDADES (MODELO 1: 2.5D DE ALTA CALIDAD)
          * ========================================================== */
         class QueenAnt {
             constructor(x, y) {
@@ -1658,7 +1659,7 @@
         }
 
         /* ==========================================================
-         * RENDERIZADO DE NIDOS 2.5D REALISTAS
+         * RENDERIZADO DE NIDOS 2.5D REALISTAS (VOLCÁN Y CONO)
          * ========================================================== */
         function drawNests() {
             // 1. HORMIGUERO (Forma de Mini Volcán 2.5D)
@@ -1666,19 +1667,16 @@
                 ctx.save();
                 ctx.translate(n.x, n.y);
 
-                // Sombra base del cono
                 ctx.fillStyle = 'rgba(0,0,0,0.5)';
                 ctx.beginPath();
                 ctx.ellipse(6, 10, n.radius + 10, (n.radius + 6) * TILT, 0, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Base del cono del volcán de tierra
                 ctx.fillStyle = '#582f0e';
                 ctx.beginPath();
                 ctx.ellipse(0, 0, n.radius + 6, (n.radius + 2) * TILT, 0, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Elevación cónica superior (efecto 3D volcánico)
                 ctx.fillStyle = '#7f4f24';
                 ctx.beginPath();
                 ctx.ellipse(0, -6, n.radius * 0.75, (n.radius * 0.7) * TILT, 0, 0, Math.PI * 2);
@@ -1689,7 +1687,6 @@
                 ctx.ellipse(0, -10, n.radius * 0.45, (n.radius * 0.4) * TILT, 0, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Cráter central oscuro (entrada al hormiguero)
                 ctx.fillStyle = '#1e1005';
                 ctx.beginPath();
                 ctx.ellipse(0, -12, n.radius * 0.22, (n.radius * 0.2) * TILT, 0, 0, Math.PI * 2);
@@ -1703,19 +1700,16 @@
                 ctx.save();
                 ctx.translate(n.x, n.y);
 
-                // Sombra del termitero
                 ctx.fillStyle = 'rgba(0,0,0,0.5)';
                 ctx.beginPath();
                 ctx.ellipse(8, 12, n.radius + 12, (n.radius + 8) * TILT, 0, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Montículo cónico irregular
                 ctx.fillStyle = '#8d6b4f';
                 ctx.beginPath();
                 ctx.ellipse(0, 0, n.radius + 8, (n.radius + 4) * TILT, 0, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Torre cónica alta con crestas de barro
                 ctx.fillStyle = '#bc6c25';
                 ctx.beginPath();
                 ctx.ellipse(-3, -8, n.radius * 0.65, (n.radius * 0.6) * TILT, -0.2, 0, Math.PI * 2);
@@ -1726,7 +1720,6 @@
                 ctx.ellipse(2, -15, n.radius * 0.35, (n.radius * 0.32) * TILT, 0.1, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Texturas y chimeneas de ventilación del termitero
                 ctx.fillStyle = '#603813';
                 ctx.beginPath();
                 ctx.ellipse(1, -18, n.radius * 0.12, (n.radius * 0.1) * TILT, 0, 0, Math.PI * 2);
@@ -1884,7 +1877,6 @@
                 ctx.fill();
             }
 
-            // Dibujar nidos realistas (Volcán y Cono de Termitas)
             drawNests();
 
             for (let egg of eggs) {
