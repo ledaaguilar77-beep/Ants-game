@@ -185,4 +185,395 @@
                                 const diff = Math.abs(this.normalizeAngle(angleToP - this.angle));
                                 if (diff < 1.05 && p.life > maxLife) {
                                     maxLife = p.life;
-                                    bestP
+                                    bestPheromone = p;
+                                }
+                            }
+                        }
+
+                        if (bestPheromone) {
+                            const targetAngle = Math.atan2(bestPheromone.y - this.y, bestPheromone.x - this.x);
+                            this.angle = this.lerpAngle(this.angle, targetAngle, 0.14);
+                        }
+                    }
+                }
+
+                // Calcular siguiente posición
+                let nextX = this.x + Math.cos(this.angle) * this.speed;
+                let nextY = this.y + Math.sin(this.angle) * this.speed;
+
+                // Evitar chocar contra rocas
+                for (let rock of rocks) {
+                    const dist = Math.hypot(nextX - rock.x, nextY - rock.y);
+                    if (dist < rock.radius + 4) {
+                        // Desviar ángulo alrededor de la roca
+                        const pushAngle = Math.atan2(this.y - rock.y, this.x - rock.x);
+                        this.angle = pushAngle + (Math.random() > 0.5 ? 0.6 : -0.6);
+                        nextX = this.x + Math.cos(this.angle) * this.speed;
+                        nextY = this.y + Math.sin(this.angle) * this.speed;
+                        break;
+                    }
+                }
+
+                this.x = nextX;
+                this.y = nextY;
+
+                // Límites del mapa
+                if (this.x < 12) { this.x = 12; this.angle = Math.PI - this.angle; }
+                if (this.x > canvas.width - 12) { this.x = canvas.width - 12; this.angle = Math.PI - this.angle; }
+                if (this.y < 12) { this.y = 12; this.angle = -this.angle; }
+                if (this.y > canvas.height - 12) { this.y = canvas.height - 12; this.angle = -this.angle; }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+
+                // Sombra sutil
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+                ctx.beginPath();
+                ctx.ellipse(-1, 2, 5, 2.5, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Cuerpo de la hormiga (marrón rojizo oscuro)
+                ctx.fillStyle = '#2b120a';
+                ctx.beginPath();
+                ctx.ellipse(-4, 0, 3.2, 2.1, 0, 0, Math.PI * 2);
+                ctx.ellipse(0, 0, 2.2, 1.5, 0, 0, Math.PI * 2);
+                ctx.ellipse(3.5, 0, 2, 1.8, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Comida transportada (baya roja)
+                if (this.hasFood) {
+                    ctx.fillStyle = '#e63946';
+                    ctx.beginPath();
+                    ctx.arc(6.5, 0, 2.8, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                ctx.restore();
+            }
+
+            normalizeAngle(a) {
+                while (a > Math.PI) a -= Math.PI * 2;
+                while (a < -Math.PI) a += Math.PI * 2;
+                return a;
+            }
+
+            lerpAngle(a, b, t) {
+                const diff = this.normalizeAngle(b - a);
+                return a + diff * t;
+            }
+        }
+
+        function generateEnvironment() {
+            grassBlades = [];
+            rocks = [];
+            bushes = [];
+            trees = [];
+            flowers = [];
+            foods = [];
+
+            // Textura de briznas de hierba
+            for (let i = 0; i < 450; i++) {
+                grassBlades.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    h: 4 + Math.random() * 6,
+                    color: Math.random() > 0.5 ? '#3d6b2b' : '#588f40'
+                });
+            }
+
+            // Rocas (obstáculos reales)
+            for (let i = 0; i < 7; i++) {
+                rocks.push({
+                    x: 60 + Math.random() * (canvas.width - 120),
+                    y: 60 + Math.random() * (canvas.height - 120),
+                    radius: 16 + Math.random() * 16
+                });
+            }
+
+            // Flores silvestres
+            const flowerColors = ['#ffbe0b', '#ff006e', '#ffffff', '#fb5607'];
+            for (let i = 0; i < 35; i++) {
+                flowers.push({
+                    x: 20 + Math.random() * (canvas.width - 40),
+                    y: 20 + Math.random() * (canvas.height - 40),
+                    color: flowerColors[Math.floor(Math.random() * flowerColors.length)]
+                });
+            }
+
+            // Arbustos (generan comida natural cerca)
+            for (let i = 0; i < 6; i++) {
+                const bx = 50 + Math.random() * (canvas.width - 100);
+                const by = 50 + Math.random() * (canvas.height - 100);
+                bushes.push({ x: bx, y: by, radius: 24 + Math.random() * 10 });
+                
+                // Soltar bayas silvestres alrededor del arbusto
+                spawnFoodCluster(bx + (Math.random() - 0.5) * 40, by + (Math.random() - 0.5) * 40, 8);
+            }
+
+            // Árboles grandes (capa superior con transparencia para ver debajo)
+            for (let i = 0; i < 5; i++) {
+                trees.push({
+                    x: 70 + Math.random() * (canvas.width - 140),
+                    y: 70 + Math.random() * (canvas.height - 140),
+                    radius: 48 + Math.random() * 18
+                });
+            }
+        }
+
+        function init() {
+            nest = null;
+            ants = [];
+            pheromones = [];
+            storedFood = 20;
+            generateEnvironment();
+            
+            statusEl.textContent = "📍 Haz clic en el césped para fundar tu hormiguero";
+            statusEl.style.background = "#386641";
+            updateUI();
+        }
+
+        function placeNest(x, y) {
+            // Verificar que no esté encima de una roca
+            for (let rock of rocks) {
+                if (Math.hypot(x - rock.x, y - rock.y) < rock.radius + 25) {
+                    statusEl.textContent = "⚠️ Muy cerca de una roca, elige otro lugar";
+                    statusEl.style.background = "#bc4749";
+                    return;
+                }
+            }
+
+            nest = { x, y, radius: 22 };
+            for (let i = 0; i < 15; i++) {
+                ants.push(new Ant(nest.x, nest.y));
+            }
+            
+            statusEl.textContent = "🍓 ¡Colonia fundada! Haz clic en el mapa para soltar comida";
+            statusEl.style.background = "#2b593f";
+            updateUI();
+        }
+
+        function spawnFoodCluster(x, y, count = 12) {
+            for (let i = 0; i < count; i++) {
+                const offsetX = (Math.random() - 0.5) * 35;
+                const offsetY = (Math.random() - 0.5) * 35;
+                foods.push({
+                    x: Math.max(15, Math.min(canvas.width - 15, x + offsetX)),
+                    y: Math.max(15, Math.min(canvas.height - 15, y + offsetY)),
+                    amount: 5
+                });
+            }
+        }
+
+        function updateUI() {
+            foodEl.textContent = storedFood;
+            antEl.textContent = ants.length;
+            btnSpawn.disabled = !nest || storedFood < 10;
+        }
+
+        // Eventos del ratón
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            mousePos.x = (e.clientX - rect.left) * (canvas.width / rect.width);
+            mousePos.y = (e.clientY - rect.top) * (canvas.height / rect.height);
+        });
+
+        canvas.addEventListener('mousedown', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const clickX = (e.clientX - rect.left) * (canvas.width / rect.width);
+            const clickY = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+            if (!nest) {
+                placeNest(clickX, clickY);
+            } else {
+                spawnFoodCluster(clickX, clickY);
+            }
+        });
+
+        btnSpawn.addEventListener('click', () => {
+            if (nest && storedFood >= 10) {
+                storedFood -= 10;
+                ants.push(new Ant(nest.x, nest.y));
+                updateUI();
+            }
+        });
+
+        btnSpeed.addEventListener('click', () => {
+            gameSpeed = gameSpeed === 1 ? 2 : gameSpeed === 2 ? 4 : 1;
+            btnSpeed.textContent = `Velocidad: ${gameSpeed}x`;
+        });
+
+        btnClear.addEventListener('click', init);
+
+        function drawEnvironmentBase() {
+            // Césped base
+            ctx.fillStyle = '#4a7c36';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Briznas de hierba
+            for (let g of grassBlades) {
+                ctx.strokeStyle = g.color;
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(g.x, g.y);
+                ctx.lineTo(g.x + 2, g.y - g.h);
+                ctx.stroke();
+            }
+
+            // Flores silvestres
+            for (let fl of flowers) {
+                ctx.fillStyle = fl.color;
+                ctx.beginPath();
+                ctx.arc(fl.x, fl.y, 2.5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#4a3000';
+                ctx.beginPath();
+                ctx.arc(fl.x, fl.y, 1, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Rocas con sombra y volumen
+            for (let r of rocks) {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+                ctx.beginPath();
+                ctx.arc(r.x + 4, r.y + 5, r.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#7d8582';
+                ctx.beginPath();
+                ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#9aa39f';
+                ctx.beginPath();
+                ctx.arc(r.x - r.radius * 0.25, r.y - r.radius * 0.25, r.radius * 0.6, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function drawCanopyLayer() {
+            // Arbustos
+            for (let b of bushes) {
+                ctx.fillStyle = 'rgba(0,0,0,0.2)';
+                ctx.beginPath();
+                ctx.arc(b.x + 4, b.y + 4, b.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#2d5a27';
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#3d7a35';
+                ctx.beginPath();
+                ctx.arc(b.x - 4, b.y - 4, b.radius * 0.7, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Copas de árboles (semitransparentes para poder ver las hormigas pasar por debajo)
+            for (let t of trees) {
+                // Sombra en el suelo
+                ctx.fillStyle = 'rgba(15, 30, 12, 0.22)';
+                ctx.beginPath();
+                ctx.arc(t.x + 18, t.y + 20, t.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Tronco pequeño visible en el centro
+                ctx.fillStyle = '#4a3219';
+                ctx.beginPath();
+                ctx.arc(t.x, t.y, 8, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Copa frondosa translúcida
+                ctx.fillStyle = 'rgba(34, 78, 29, 0.75)';
+                ctx.beginPath();
+                ctx.arc(t.x, t.y, t.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = 'rgba(56, 118, 48, 0.65)';
+                ctx.beginPath();
+                ctx.arc(t.x - 10, t.y - 10, t.radius * 0.65, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function loop() {
+            if (nest) {
+                for (let s = 0; s < gameSpeed; s++) {
+                    for (let i = pheromones.length - 1; i >= 0; i--) {
+                        pheromones[i].life--;
+                        if (pheromones[i].life <= 0) pheromones.splice(i, 1);
+                    }
+                    for (let ant of ants) ant.update();
+                }
+            }
+
+            // 1. Dibujar suelo y rocas
+            drawEnvironmentBase();
+
+            // 2. Dibujar feromonas (rastro blanco/azulado sutil sobre el pasto)
+            for (let p of pheromones) {
+                ctx.fillStyle = `rgba(220, 245, 255, ${p.life / 950})`;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // 3. Dibujar comida (bayas rojas)
+            for (let f of foods) {
+                ctx.fillStyle = '#e63946';
+                ctx.beginPath();
+                ctx.arc(f.x, f.y, 2.2 + f.amount * 0.55, 0, Math.PI * 2);
+                ctx.fill();
+                // Brillo en la baya
+                ctx.fillStyle = '#ffccd5';
+                ctx.beginPath();
+                ctx.arc(f.x - 1, f.y - 1, 1, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // 4. Dibujar hormiguero (o previsualización donde apunta el ratón)
+            if (nest) {
+                // Montículo de tierra alrededor del agujero
+                ctx.fillStyle = '#7f5539';
+                ctx.beginPath();
+                ctx.arc(nest.x, nest.y, nest.radius + 7, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#9c6644';
+                ctx.beginPath();
+                ctx.arc(nest.x, nest.y, nest.radius + 2, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Entrada oscura
+                ctx.fillStyle = '#1f130c';
+                ctx.beginPath();
+                ctx.arc(nest.x, nest.y, nest.radius - 6, 0, Math.PI * 2);
+                ctx.fill();
+            } else {
+                // Fantasma indicador de colocación
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+                ctx.setLineDash([4, 4]);
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(mousePos.x, mousePos.y, 24, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+
+            // 5. Dibujar hormigas
+            for (let ant of ants) ant.draw();
+
+            // 6. Dibujar arbustos y copas de árboles por encima
+            drawCanopyLayer();
+
+            requestAnimationFrame(loop);
+        }
+
+        init();
+        loop();
+    </script>
+</body>
+</html>
