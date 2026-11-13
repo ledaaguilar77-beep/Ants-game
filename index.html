@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Colonia de Hormigas</title>
+    <title>Colonia de Hormigas - Bosque</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            background-color: #1e1916;
-            color: #f3e9dc;
+            background-color: #1b2418;
+            color: #eef5db;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             flex-direction: column;
@@ -18,29 +18,38 @@
         }
         header {
             text-align: center;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
-        h1 { font-size: 1.6rem; color: #e09f3e; }
-        p { font-size: 0.9rem; color: #cbbba0; }
+        h1 { font-size: 1.6rem; color: #a7c957; }
+        #status-msg {
+            font-size: 0.95rem;
+            color: #f2e8cf;
+            background: #386641;
+            padding: 4px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 5px;
+            font-weight: bold;
+        }
         
         .hud {
             display: flex;
             gap: 15px;
-            background: #2b231e;
+            background: #283623;
             padding: 10px 20px;
             border-radius: 10px;
-            border: 1px solid #4a3c31;
+            border: 1px solid #4f6d45;
             margin-bottom: 12px;
             align-items: center;
             flex-wrap: wrap;
             justify-content: center;
         }
         .stat { font-weight: bold; font-size: 1rem; }
-        .stat span { color: #8ac926; }
+        .stat span { color: #a7c957; }
         
         button {
-            background-color: #e09f3e;
-            color: #1e1916;
+            background-color: #6a994e;
+            color: white;
             border: none;
             padding: 8px 14px;
             border-radius: 6px;
@@ -48,22 +57,22 @@
             cursor: pointer;
             transition: transform 0.1s, background 0.2s;
         }
-        button:hover { background-color: #f4b350; }
+        button:hover { background-color: #82b862; }
         button:active { transform: scale(0.96); }
         button:disabled {
-            background-color: #5c5046;
-            color: #8c7f73;
+            background-color: #465441;
+            color: #84967d;
             cursor: not-allowed;
         }
-        .btn-danger { background-color: #d62828; color: white; }
-        .btn-danger:hover { background-color: #f73b3b; }
+        .btn-danger { background-color: #bc4749; }
+        .btn-danger:hover { background-color: #d65a5c; }
 
         canvas {
-            background-color: #3d2e24;
-            border: 3px solid #6b5344;
-            border-radius: 8px;
+            background-color: #4a7c36;
+            border: 4px solid #314928;
+            border-radius: 10px;
             cursor: crosshair;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
             max-width: 100%;
         }
     </style>
@@ -71,19 +80,19 @@
 <body>
 
     <header>
-        <h1>🐜 Simulador de Colonia de Hormigas</h1>
-        <p>Haz clic en la tierra para soltar comida. Las hormigas dejarán feromonas para guiar al resto.</p>
+        <h1>🌿 Colonia de Hormigas</h1>
+        <div id="status-msg">📍 Haz clic en el césped para fundar tu hormiguero</div>
     </header>
 
     <div class="hud">
-        <div class="stat">🍎 Comida: <span id="food-count">20</span></div>
-        <div class="stat">🐜 Hormigas: <span id="ant-count">15</span></div>
-        <button id="btn-spawn-ant">Crear Hormiga (Costo: 10 🍎)</button>
+        <div class="stat">🍓 Comida: <span id="food-count">20</span></div>
+        <div class="stat">🐜 Hormigas: <span id="ant-count">0</span></div>
+        <button id="btn-spawn-ant" disabled>Crear Hormiga (10 🍓)</button>
         <button id="btn-speed">Velocidad: 1x</button>
-        <button id="btn-clear" class="btn-danger">Reiniciar</button>
+        <button id="btn-clear" class="btn-danger">Nuevo Mapa</button>
     </div>
 
-    <canvas id="gameCanvas" width="800" height="500"></canvas>
+    <canvas id="gameCanvas" width="850" height="520"></canvas>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
@@ -92,22 +101,31 @@
         // UI Elementos
         const foodEl = document.getElementById('food-count');
         const antEl = document.getElementById('ant-count');
+        const statusEl = document.getElementById('status-msg');
         const btnSpawn = document.getElementById('btn-spawn-ant');
         const btnSpeed = document.getElementById('btn-speed');
         const btnClear = document.getElementById('btn-clear');
 
-        // Configuración del juego
-        const NEST = { x: canvas.width / 2, y: canvas.height / 2, radius: 22 };
+        // Estado del juego
+        let nest = null; // { x, y, radius }
         let storedFood = 20;
         let ants = [];
         let foods = [];
         let pheromones = [];
         let gameSpeed = 1;
+        let mousePos = { x: -100, y: -100 };
+
+        // Elementos del entorno
+        let grassBlades = [];
+        let rocks = [];
+        let bushes = [];
+        let trees = [];
+        let flowers = [];
 
         class Ant {
-            constructor() {
-                this.x = NEST.x;
-                this.y = NEST.y;
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
                 this.angle = Math.random() * Math.PI * 2;
                 this.speed = 1.8;
                 this.hasFood = false;
@@ -115,42 +133,36 @@
             }
 
             update() {
-                // Movimiento errático natural
                 this.angle += (Math.random() - 0.5) * 0.4;
 
                 if (this.hasFood) {
-                    // Volver al hormiguero
-                    const dx = NEST.x - this.x;
-                    const dy = NEST.y - this.y;
+                    const dx = nest.x - this.x;
+                    const dy = nest.y - this.y;
                     const dist = Math.hypot(dx, dy);
                     
-                    // Girar suavemente hacia el nido
                     const targetAngle = Math.atan2(dy, dx);
-                    this.angle = this.lerpAngle(this.angle, targetAngle, 0.15);
+                    this.angle = this.lerpAngle(this.angle, targetAngle, 0.16);
 
-                    // Dejar rastro de feromona de comida
                     this.pheromoneTimer++;
-                    if (this.pheromoneTimer % 8 === 0) {
-                        pheromones.push({ x: this.x, y: this.y, life: 300 });
+                    if (this.pheromoneTimer % 7 === 0) {
+                        pheromones.push({ x: this.x, y: this.y, life: 350 });
                     }
 
-                    // Entregar comida al llegar
-                    if (dist < NEST.radius) {
+                    if (dist < nest.radius) {
                         this.hasFood = false;
                         storedFood += 2;
-                        this.angle += Math.PI; // Dar media vuelta
+                        this.angle += Math.PI;
                         updateUI();
                     }
                 } else {
-                    // Buscar comida cercana
                     let foundTarget = false;
                     for (let i = foods.length - 1; i >= 0; i--) {
                         const f = foods[i];
                         const dist = Math.hypot(f.x - this.x, f.y - this.y);
                         
-                        if (dist < 60) {
+                        if (dist < 65) {
                             const targetAngle = Math.atan2(f.y - this.y, f.x - this.x);
-                            this.angle = this.lerpAngle(this.angle, targetAngle, 0.2);
+                            this.angle = this.lerpAngle(this.angle, targetAngle, 0.22);
                             foundTarget = true;
 
                             if (dist < 8) {
@@ -162,187 +174,15 @@
                         }
                     }
 
-                    // Si no ve comida directa, seguir feromonas
                     if (!foundTarget && pheromones.length > 0) {
                         let bestPheromone = null;
                         let maxLife = 0;
 
                         for (let p of pheromones) {
                             const dist = Math.hypot(p.x - this.x, p.y - this.y);
-                            // Detectar feromonas en un cono frontal
-                            if (dist > 10 && dist < 50) {
+                            if (dist > 10 && dist < 55) {
                                 const angleToP = Math.atan2(p.y - this.y, p.x - this.x);
                                 const diff = Math.abs(this.normalizeAngle(angleToP - this.angle));
-                                if (diff < 1.0 && p.life > maxLife) {
+                                if (diff < 1.05 && p.life > maxLife) {
                                     maxLife = p.life;
-                                    bestPheromone = p;
-                                }
-                            }
-                        }
-
-                        if (bestPheromone) {
-                            const targetAngle = Math.atan2(bestPheromone.y - this.y, bestPheromone.x - this.x);
-                            this.angle = this.lerpAngle(this.angle, targetAngle, 0.12);
-                        }
-                    }
-                }
-
-                // Avanzar
-                this.x += Math.cos(this.angle) * this.speed;
-                this.y += Math.sin(this.angle) * this.speed;
-
-                // Rebotar en los bordes del mapa
-                if (this.x < 10) { this.x = 10; this.angle = Math.PI - this.angle; }
-                if (this.x > canvas.width - 10) { this.x = canvas.width - 10; this.angle = Math.PI - this.angle; }
-                if (this.y < 10) { this.y = 10; this.angle = -this.angle; }
-                if (this.y > canvas.height - 10) { this.y = canvas.height - 10; this.angle = -this.angle; }
-            }
-
-            draw() {
-                ctx.save();
-                ctx.translate(this.x, this.y);
-                ctx.rotate(this.angle);
-
-                // Cuerpo de la hormiga (3 segmentos)
-                ctx.fillStyle = '#140f0d';
-                ctx.beginPath();
-                ctx.ellipse(-4, 0, 3, 2, 0, 0, Math.PI * 2); // Abdomen
-                ctx.ellipse(0, 0, 2.2, 1.5, 0, 0, Math.PI * 2); // Tórax
-                ctx.ellipse(3.5, 0, 2, 1.8, 0, 0, Math.PI * 2); // Cabeza
-                ctx.fill();
-
-                // Si lleva comida, dibujarla en sus mandíbulas
-                if (this.hasFood) {
-                    ctx.fillStyle = '#8ac926';
-                    ctx.beginPath();
-                    ctx.arc(6, 0, 2.5, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-
-                ctx.restore();
-            }
-
-            normalizeAngle(a) {
-                while (a > Math.PI) a -= Math.PI * 2;
-                while (a < -Math.PI) a += Math.PI * 2;
-                return a;
-            }
-
-            lerpAngle(a, b, t) {
-                const diff = this.normalizeAngle(b - a);
-                return a + diff * t;
-            }
-        }
-
-        function init() {
-            ants = [];
-            foods = [];
-            pheromones = [];
-            storedFood = 20;
-
-            for (let i = 0; i < 15; i++) {
-                ants.push(new Ant());
-            }
-
-            // Comida inicial aleatoria
-            spawnFoodCluster(150, 120);
-            spawnFoodCluster(650, 380);
-            updateUI();
-        }
-
-        function spawnFoodCluster(x, y) {
-            for (let i = 0; i < 12; i++) {
-                const offsetX = (Math.random() - 0.5) * 35;
-                const offsetY = (Math.random() - 0.5) * 35;
-                foods.push({
-                    x: Math.max(15, Math.min(canvas.width - 15, x + offsetX)),
-                    y: Math.max(15, Math.min(canvas.height - 15, y + offsetY)),
-                    amount: 5
-                });
-            }
-        }
-
-        function updateUI() {
-            foodEl.textContent = storedFood;
-            antEl.textContent = ants.length;
-            btnSpawn.disabled = storedFood < 10;
-        }
-
-        // Eventos de usuario
-        canvas.addEventListener('mousedown', (e) => {
-            const rect = canvas.getBoundingClientRect();
-            const scaleX = canvas.width / rect.width;
-            const scaleY = canvas.height / rect.height;
-            const clickX = (e.clientX - rect.left) * scaleX;
-            const clickY = (e.clientY - rect.top) * scaleY;
-            spawnFoodCluster(clickX, clickY);
-        });
-
-        btnSpawn.addEventListener('click', () => {
-            if (storedFood >= 10) {
-                storedFood -= 10;
-                ants.push(new Ant());
-                updateUI();
-            }
-        });
-
-        btnSpeed.addEventListener('click', () => {
-            gameSpeed = gameSpeed === 1 ? 2 : gameSpeed === 2 ? 4 : 1;
-            btnSpeed.textContent = `Velocidad: ${gameSpeed}x`;
-        });
-
-        btnClear.addEventListener('click', init);
-
-        // Bucle principal
-        function loop() {
-            for (let s = 0; s < gameSpeed; s++) {
-                // Actualizar feromonas
-                for (let i = pheromones.length - 1; i >= 0; i--) {
-                    pheromones[i].life--;
-                    if (pheromones[i].life <= 0) pheromones.splice(i, 1);
-                }
-                // Actualizar hormigas
-                for (let ant of ants) ant.update();
-            }
-
-            // Dibujar fondo
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Dibujar feromonas (rastros azules tenues)
-            for (let p of pheromones) {
-                ctx.fillStyle = `rgba(100, 200, 255, ${p.life / 900})`;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
-                ctx.fill();
-            }
-
-            // Dibujar comida
-            for (let f of foods) {
-                ctx.fillStyle = '#8ac926';
-                ctx.beginPath();
-                ctx.arc(f.x, f.y, 2 + f.amount * 0.6, 0, Math.PI * 2);
-                ctx.fill();
-            }
-
-            // Dibujar hormiguero
-            ctx.fillStyle = '#241914';
-            ctx.beginPath();
-            ctx.arc(NEST.x, NEST.y, NEST.radius + 6, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.fillStyle = '#0f0a08';
-            ctx.beginPath();
-            ctx.arc(NEST.x, NEST.y, NEST.radius - 4, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Dibujar hormigas
-            for (let ant of ants) ant.draw();
-
-            requestAnimationFrame(loop);
-        }
-
-        init();
-        loop();
-    </script>
-</body>
-</html>
+                                    bestP
