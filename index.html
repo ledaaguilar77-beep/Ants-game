@@ -3,76 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Colonia de Hormigas - Bosque</title>
+    <title>Ecosistema de Hormigas y Depredadores</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            background-color: #1b2418;
+            background-color: #151d13;
             color: #eef5db;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            padding: 15px;
+            padding: 12px;
         }
         header {
             text-align: center;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
-        h1 { font-size: 1.6rem; color: #a7c957; }
+        h1 { font-size: 1.5rem; color: #a7c957; }
         #status-msg {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: #f2e8cf;
             background: #386641;
             padding: 4px 12px;
             border-radius: 20px;
             display: inline-block;
-            margin-top: 5px;
+            margin-top: 4px;
             font-weight: bold;
         }
         
         .hud {
             display: flex;
-            gap: 15px;
-            background: #283623;
-            padding: 10px 20px;
+            gap: 12px;
+            background: #23301f;
+            padding: 8px 16px;
             border-radius: 10px;
             border: 1px solid #4f6d45;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             align-items: center;
             flex-wrap: wrap;
             justify-content: center;
         }
-        .stat { font-weight: bold; font-size: 1rem; }
+        .stat { font-weight: bold; font-size: 0.95rem; }
         .stat span { color: #a7c957; }
         
+        .toolbar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
         button {
-            background-color: #6a994e;
+            background-color: #4a7c36;
             color: white;
             border: none;
-            padding: 8px 14px;
+            padding: 7px 12px;
             border-radius: 6px;
             font-weight: bold;
+            font-size: 0.85rem;
             cursor: pointer;
             transition: transform 0.1s, background 0.2s;
         }
-        button:hover { background-color: #82b862; }
-        button:active { transform: scale(0.96); }
+        button:hover { background-color: #6a994e; }
+        button:active { transform: scale(0.95); }
+        button.active {
+            background-color: #bc4749;
+            box-shadow: 0 0 8px rgba(255,255,255,0.4);
+        }
         button:disabled {
-            background-color: #465441;
-            color: #84967d;
+            background-color: #3b4637;
+            color: #788773;
             cursor: not-allowed;
         }
-        .btn-danger { background-color: #bc4749; }
-        .btn-danger:hover { background-color: #d65a5c; }
+        .btn-action { background-color: #386641; }
+        .btn-action:hover { background-color: #4a7c36; }
+        .btn-danger { background-color: #9b2226; }
+        .btn-danger:hover { background-color: #bc4749; }
 
         canvas {
-            background-color: #4a7c36;
-            border: 4px solid #314928;
+            background-color: #43702f;
+            border: 4px solid #273b20;
             border-radius: 10px;
             cursor: crosshair;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.7);
             max-width: 100%;
         }
     </style>
@@ -80,19 +95,28 @@
 <body>
 
     <header>
-        <h1>🌿 Colonia de Hormigas</h1>
-        <div id="status-msg">📍 Haz clic en el césped para fundar tu hormiguero</div>
+        <h1>🌿 Ecosistema: Colonia de Hormigas vs Depredadores</h1>
+        <div id="status-msg">🛠️ Herramienta seleccionada: Colocar Hormiguero</div>
     </header>
 
     <div class="hud">
-        <div class="stat">🍓 Comida: <span id="food-count">20</span></div>
+        <div class="stat">🍓 Comida Global: <span id="food-count">40</span></div>
         <div class="stat">🐜 Hormigas: <span id="ant-count">0</span></div>
+        <div class="stat">🏠 Nidos: <span id="nest-count">0</span></div>
         <button id="btn-spawn-ant" disabled>Crear Hormiga (10 🍓)</button>
         <button id="btn-speed">Velocidad: 1x</button>
-        <button id="btn-clear" class="btn-danger">Nuevo Mapa</button>
+        <button id="btn-clear" class="btn-danger">Reiniciar Mapa</button>
     </div>
 
-    <canvas id="gameCanvas" width="850" height="520"></canvas>
+    <div class="toolbar">
+        <button id="tool-nest" class="active" onclick="setTool('nest')">🏠 Colocar Hormiguero</button>
+        <button id="tool-food" onclick="setTool('food')">🍓 Soltar Comida</button>
+        <button id="tool-spider" class="btn-action" onclick="setTool('spider')">🕷️ Invocar Araña</button>
+        <button id="tool-mantis" class="btn-action" onclick="setTool('mantis')">🦗 Invocar Mantis</button>
+        <button id="tool-termites" class="btn-action" onclick="setTool('termites')">🐜 Invocar Termitas</button>
+    </div>
+
+    <canvas id="gameCanvas" width="1200" height="750"></canvas>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
@@ -101,15 +125,17 @@
         // UI Elementos
         const foodEl = document.getElementById('food-count');
         const antEl = document.getElementById('ant-count');
+        const nestEl = document.getElementById('nest-count');
         const statusEl = document.getElementById('status-msg');
         const btnSpawn = document.getElementById('btn-spawn-ant');
         const btnSpeed = document.getElementById('btn-speed');
-        const btnClear = document.getElementById('btn-clear');
 
         // Estado del juego
-        let nest = null; // { x, y, radius }
-        let storedFood = 20;
+        let currentTool = 'nest'; // 'nest', 'food', 'spider', 'mantis', 'termites'
+        let storedFood = 40;
+        let nests = [];
         let ants = [];
+        let enemies = [];
         let foods = [];
         let pheromones = [];
         let gameSpeed = 1;
@@ -122,92 +148,118 @@
         let trees = [];
         let flowers = [];
 
+        function setTool(tool) {
+            currentTool = tool;
+            document.querySelectorAll('.toolbar button').forEach(b => b.classList.remove('active'));
+            document.getElementById(`tool-${tool}`).classList.add('active');
+
+            const names = {
+                nest: "🏠 Colocar Hormiguero (Haz clic en el mapa)",
+                food: "🍓 Soltar Comida (Haz clic para poner bayas)",
+                spider: "🕷️ Invocar Araña (Depredador solitario y letal)",
+                mantis: "🦗 Invocar Mantis (Cazador rápido y ágil)",
+                termites: "🐜 Invocar Termitas (Colonia rival agresiva)"
+            };
+            statusEl.textContent = names[tool];
+        }
+
         class Ant {
-            constructor(x, y) {
+            constructor(x, y, nestRef) {
                 this.x = x;
                 this.y = y;
+                this.nest = nestRef;
                 this.angle = Math.random() * Math.PI * 2;
-                this.speed = 1.8;
+                this.speed = 1.9;
                 this.hasFood = false;
                 this.pheromoneTimer = 0;
             }
 
             update() {
-                this.angle += (Math.random() - 0.5) * 0.4;
-
-                if (this.hasFood) {
-                    const dx = nest.x - this.x;
-                    const dy = nest.y - this.y;
-                    const dist = Math.hypot(dx, dy);
-                    
-                    const targetAngle = Math.atan2(dy, dx);
-                    this.angle = this.lerpAngle(this.angle, targetAngle, 0.16);
-
-                    this.pheromoneTimer++;
-                    if (this.pheromoneTimer % 7 === 0) {
-                        pheromones.push({ x: this.x, y: this.y, life: 350 });
+                // Huir de enemigos cercanos si están muy cerca
+                let fleeAngle = null;
+                for (let en of enemies) {
+                    let distToEn = Math.hypot(en.x - this.x, en.y - this.y);
+                    if (distToEn < 70) {
+                        fleeAngle = Math.atan2(this.y - en.y, this.x - en.x);
+                        break;
                     }
+                }
 
-                    if (dist < nest.radius) {
-                        this.hasFood = false;
-                        storedFood += 2;
-                        this.angle += Math.PI;
-                        updateUI();
-                    }
+                if (fleeAngle !== null) {
+                    this.angle = this.lerpAngle(this.angle, fleeAngle, 0.3);
                 } else {
-                    let foundTarget = false;
-                    for (let i = foods.length - 1; i >= 0; i--) {
-                        const f = foods[i];
-                        const dist = Math.hypot(f.x - this.x, f.y - this.y);
+                    this.angle += (Math.random() - 0.5) * 0.45;
+
+                    if (this.hasFood) {
+                        const dx = this.nest.x - this.x;
+                        const dy = this.nest.y - this.y;
+                        const dist = Math.hypot(dx, dy);
                         
-                        if (dist < 65) {
-                            const targetAngle = Math.atan2(f.y - this.y, f.x - this.x);
-                            this.angle = this.lerpAngle(this.angle, targetAngle, 0.22);
-                            foundTarget = true;
+                        const targetAngle = Math.atan2(dy, dx);
+                        this.angle = this.lerpAngle(this.angle, targetAngle, 0.18);
 
-                            if (dist < 8) {
-                                this.hasFood = true;
-                                f.amount--;
-                                if (f.amount <= 0) foods.splice(i, 1);
-                                break;
-                            }
+                        this.pheromoneTimer++;
+                        if (this.pheromoneTimer % 6 === 0) {
+                            pheromones.push({ x: this.x, y: this.y, life: 350 });
                         }
-                    }
 
-                    if (!foundTarget && pheromones.length > 0) {
-                        let bestPheromone = null;
-                        let maxLife = 0;
+                        if (dist < this.nest.radius) {
+                            this.hasFood = false;
+                            storedFood += 2;
+                            this.angle += Math.PI;
+                            updateUI();
+                        }
+                    } else {
+                        let foundTarget = false;
+                        for (let i = foods.length - 1; i >= 0; i--) {
+                            const f = foods[i];
+                            const dist = Math.hypot(f.x - this.x, f.y - this.y);
+                            
+                            if (dist < 70) {
+                                const targetAngle = Math.atan2(f.y - this.y, f.x - this.x);
+                                this.angle = this.lerpAngle(this.angle, targetAngle, 0.25);
+                                foundTarget = true;
 
-                        for (let p of pheromones) {
-                            const dist = Math.hypot(p.x - this.x, p.y - this.y);
-                            if (dist > 10 && dist < 55) {
-                                const angleToP = Math.atan2(p.y - this.y, p.x - this.x);
-                                const diff = Math.abs(this.normalizeAngle(angleToP - this.angle));
-                                if (diff < 1.05 && p.life > maxLife) {
-                                    maxLife = p.life;
-                                    bestPheromone = p;
+                                if (dist < 8) {
+                                    this.hasFood = true;
+                                    f.amount--;
+                                    if (f.amount <= 0) foods.splice(i, 1);
+                                    break;
                                 }
                             }
                         }
 
-                        if (bestPheromone) {
-                            const targetAngle = Math.atan2(bestPheromone.y - this.y, bestPheromone.x - this.x);
-                            this.angle = this.lerpAngle(this.angle, targetAngle, 0.14);
+                        if (!foundTarget && pheromones.length > 0) {
+                            let bestPheromone = null;
+                            let maxLife = 0;
+
+                            for (let p of pheromones) {
+                                const dist = Math.hypot(p.x - this.x, p.y - this.y);
+                                if (dist > 10 && dist < 60) {
+                                    const angleToP = Math.atan2(p.y - this.y, p.x - this.x);
+                                    const diff = Math.abs(this.normalizeAngle(angleToP - this.angle));
+                                    if (diff < 1.1 && p.life > maxLife) {
+                                        maxLife = p.life;
+                                        bestPheromone = p;
+                                    }
+                                }
+                            }
+
+                            if (bestPheromone) {
+                                const targetAngle = Math.atan2(bestPheromone.y - this.y, bestPheromone.x - this.x);
+                                this.angle = this.lerpAngle(this.angle, targetAngle, 0.15);
+                            }
                         }
                     }
                 }
 
-                // Calcular siguiente posición
+                // Movimiento y colisión con rocas
                 let nextX = this.x + Math.cos(this.angle) * this.speed;
                 let nextY = this.y + Math.sin(this.angle) * this.speed;
 
-                // Evitar chocar contra rocas
                 for (let rock of rocks) {
-                    const dist = Math.hypot(nextX - rock.x, nextY - rock.y);
-                    if (dist < rock.radius + 4) {
-                        // Desviar ángulo alrededor de la roca
-                        const pushAngle = Math.atan2(this.y - rock.y, this.x - rock.x);
-                        this.angle = pushAngle + (Math.random() > 0.5 ? 0.6 : -0.6);
+                    if (Math.hypot(nextX - rock.x, nextY - rock.y) < rock.radius + 4) {
+                        this.angle += Math.PI / 2;
                         nextX = this.x + Math.cos(this.angle) * this.speed;
                         nextY = this.y + Math.sin(this.angle) * this.speed;
                         break;
@@ -217,11 +269,11 @@
                 this.x = nextX;
                 this.y = nextY;
 
-                // Límites del mapa
-                if (this.x < 12) { this.x = 12; this.angle = Math.PI - this.angle; }
-                if (this.x > canvas.width - 12) { this.x = canvas.width - 12; this.angle = Math.PI - this.angle; }
-                if (this.y < 12) { this.y = 12; this.angle = -this.angle; }
-                if (this.y > canvas.height - 12) { this.y = canvas.height - 12; this.angle = -this.angle; }
+                // Limites
+                if (this.x < 15) { this.x = 15; this.angle = Math.PI - this.angle; }
+                if (this.x > canvas.width - 15) { this.x = canvas.width - 15; this.angle = Math.PI - this.angle; }
+                if (this.y < 15) { this.y = 15; this.angle = -this.angle; }
+                if (this.y > canvas.height - 15) { this.y = canvas.height - 15; this.angle = -this.angle; }
             }
 
             draw() {
@@ -229,13 +281,6 @@
                 ctx.translate(this.x, this.y);
                 ctx.rotate(this.angle);
 
-                // Sombra sutil
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
-                ctx.beginPath();
-                ctx.ellipse(-1, 2, 5, 2.5, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Cuerpo de la hormiga (marrón rojizo oscuro)
                 ctx.fillStyle = '#2b120a';
                 ctx.beginPath();
                 ctx.ellipse(-4, 0, 3.2, 2.1, 0, 0, Math.PI * 2);
@@ -243,11 +288,106 @@
                 ctx.ellipse(3.5, 0, 2, 1.8, 0, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Comida transportada (baya roja)
                 if (this.hasFood) {
                     ctx.fillStyle = '#e63946';
                     ctx.beginPath();
                     ctx.arc(6.5, 0, 2.8, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.restore();
+            }
+
+            normalizeAngle(a) {
+                while (a > Math.PI) a -= Math.PI * 2;
+                while (a < -Math.PI) a += Math.PI * 2;
+                return a;
+            }
+
+            lerpAngle(a, b, t) {
+                const diff = this.normalizeAngle(b - a);
+                return a + diff * t;
+            }
+        }
+
+        class Enemy {
+            constructor(x, y, type) {
+                this.x = x;
+                this.y = y;
+                this.type = type; // 'spider', 'mantis', 'termites'
+                this.angle = Math.random() * Math.PI * 2;
+                
+                if (type === 'spider') {
+                    this.speed = 1.3;
+                    this.radius = 12;
+                    this.color = '#1f1f1f';
+                } else if (type === 'mantis') {
+                    this.speed = 2.2;
+                    this.radius = 10;
+                    this.color = '#2d6a4f';
+                } else { // termita
+                    this.speed = 1.6;
+                    this.radius = 8;
+                    this.color = '#d4a373';
+                }
+            }
+
+            update() {
+                // Buscar la hormiga más cercana para cazarla
+                let closestAnt = null;
+                let minDist = 180;
+
+                for (let ant of ants) {
+                    let d = Math.hypot(ant.x - this.x, ant.y - this.y);
+                    if (d < minDist) {
+                        minDist = d;
+                        closestAnt = ant;
+                    }
+                }
+
+                if (closestAnt) {
+                    let targetAngle = Math.atan2(closestAnt.y - this.y, closestAnt.x - this.x);
+                    this.angle = this.lerpAngle(this.angle, targetAngle, 0.15);
+
+                    // Si atrapa a la hormiga, la elimina
+                    if (minDist < this.radius + 4) {
+                        let index = ants.indexOf(closestAnt);
+                        if (index > -1) ants.splice(index, 1);
+                        updateUI();
+                    }
+                } else {
+                    this.angle += (Math.random() - 0.5) * 0.4;
+                }
+
+                this.x += Math.cos(this.angle) * this.speed;
+                this.y += Math.sin(this.angle) * this.speed;
+
+                if (this.x < 20 || this.x > canvas.width - 20) this.angle = Math.PI - this.angle;
+                if (this.y < 20 || this.y > canvas.height - 20) this.angle = -this.angle;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+
+                if (this.type === 'spider') {
+                    ctx.fillStyle = '#111';
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                    // Ojos rojos
+                    ctx.fillStyle = '#ff0000';
+                    ctx.fillRect(3, -4, 2, 2);
+                    ctx.fillRect(3, 2, 2, 2);
+                } else if (this.type === 'mantis') {
+                    ctx.fillStyle = '#40916c';
+                    ctx.beginPath();
+                    ctx.ellipse(0, 0, 10, 4, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                } else {
+                    ctx.fillStyle = '#b08968';
+                    ctx.beginPath();
+                    ctx.ellipse(0, 0, 7, 3.5, 0, 0, Math.PI * 2);
                     ctx.fill();
                 }
 
@@ -274,94 +414,82 @@
             flowers = [];
             foods = [];
 
-            // Textura de briznas de hierba
-            for (let i = 0; i < 450; i++) {
+            for (let i = 0; i < 800; i++) {
                 grassBlades.push({
                     x: Math.random() * canvas.width,
                     y: Math.random() * canvas.height,
                     h: 4 + Math.random() * 6,
-                    color: Math.random() > 0.5 ? '#3d6b2b' : '#588f40'
+                    color: Math.random() > 0.5 ? '#3b6829' : '#4e8038'
                 });
             }
 
-            // Rocas (obstáculos reales)
-            for (let i = 0; i < 7; i++) {
+            for (let i = 0; i < 12; i++) {
                 rocks.push({
-                    x: 60 + Math.random() * (canvas.width - 120),
-                    y: 60 + Math.random() * (canvas.height - 120),
-                    radius: 16 + Math.random() * 16
+                    x: 80 + Math.random() * (canvas.width - 160),
+                    y: 80 + Math.random() * (canvas.height - 160),
+                    radius: 18 + Math.random() * 20
                 });
             }
 
-            // Flores silvestres
             const flowerColors = ['#ffbe0b', '#ff006e', '#ffffff', '#fb5607'];
-            for (let i = 0; i < 35; i++) {
+            for (let i = 0; i < 60; i++) {
                 flowers.push({
-                    x: 20 + Math.random() * (canvas.width - 40),
-                    y: 20 + Math.random() * (canvas.height - 40),
+                    x: 30 + Math.random() * (canvas.width - 60),
+                    y: 30 + Math.random() * (canvas.height - 60),
                     color: flowerColors[Math.floor(Math.random() * flowerColors.length)]
                 });
             }
 
-            // Arbustos (generan comida natural cerca)
-            for (let i = 0; i < 6; i++) {
-                const bx = 50 + Math.random() * (canvas.width - 100);
-                const by = 50 + Math.random() * (canvas.height - 100);
-                bushes.push({ x: bx, y: by, radius: 24 + Math.random() * 10 });
-                
-                // Soltar bayas silvestres alrededor del arbusto
-                spawnFoodCluster(bx + (Math.random() - 0.5) * 40, by + (Math.random() - 0.5) * 40, 8);
+            for (let i = 0; i < 10; i++) {
+                const bx = 60 + Math.random() * (canvas.width - 120);
+                const by = 60 + Math.random() * (canvas.height - 120);
+                bushes.push({ x: bx, y: by, radius: 26 + Math.random() * 12 });
+                spawnFoodCluster(bx + (Math.random() - 0.5) * 45, by + (Math.random() - 0.5) * 45, 10);
             }
 
-            // Árboles grandes (capa superior con transparencia para ver debajo)
-            for (let i = 0; i < 5; i++) {
+            for (let i = 0; i < 8; i++) {
                 trees.push({
-                    x: 70 + Math.random() * (canvas.width - 140),
-                    y: 70 + Math.random() * (canvas.height - 140),
-                    radius: 48 + Math.random() * 18
+                    x: 90 + Math.random() * (canvas.width - 180),
+                    y: 90 + Math.random() * (canvas.height - 180),
+                    radius: 52 + Math.random() * 20
                 });
             }
         }
 
         function init() {
-            nest = null;
+            nests = [];
             ants = [];
+            enemies = [];
             pheromones = [];
-            storedFood = 20;
+            storedFood = 40;
             generateEnvironment();
-            
-            statusEl.textContent = "📍 Haz clic en el césped para fundar tu hormiguero";
-            statusEl.style.background = "#386641";
             updateUI();
+            setTool('nest');
         }
 
         function placeNest(x, y) {
-            // Verificar que no esté encima de una roca
             for (let rock of rocks) {
-                if (Math.hypot(x - rock.x, y - rock.y) < rock.radius + 25) {
-                    statusEl.textContent = "⚠️ Muy cerca de una roca, elige otro lugar";
-                    statusEl.style.background = "#bc4749";
-                    return;
-                }
+                if (Math.hypot(x - rock.x, y - rock.y) < rock.radius + 25) return;
             }
 
-            nest = { x, y, radius: 22 };
-            for (let i = 0; i < 15; i++) {
-                ants.push(new Ant(nest.x, nest.y));
+            let newNest = { x, y, radius: 22 };
+            nests.push(newNest);
+
+            // Crear hormigas iniciales para este nuevo nido
+            for (let i = 0; i < 5; i++) {
+                ants.push(new Ant(newNest.x, newNest.y, newNest));
             }
-            
-            statusEl.textContent = "🍓 ¡Colonia fundada! Haz clic en el mapa para soltar comida";
-            statusEl.style.background = "#2b593f";
+
             updateUI();
         }
 
         function spawnFoodCluster(x, y, count = 12) {
             for (let i = 0; i < count; i++) {
-                const offsetX = (Math.random() - 0.5) * 35;
-                const offsetY = (Math.random() - 0.5) * 35;
+                const offsetX = (Math.random() - 0.5) * 40;
+                const offsetY = (Math.random() - 0.5) * 40;
                 foods.push({
-                    x: Math.max(15, Math.min(canvas.width - 15, x + offsetX)),
-                    y: Math.max(15, Math.min(canvas.height - 15, y + offsetY)),
+                    x: Math.max(20, Math.min(canvas.width - 20, x + offsetX)),
+                    y: Math.max(20, Math.min(canvas.height - 20, y + offsetY)),
                     amount: 5
                 });
             }
@@ -370,10 +498,10 @@
         function updateUI() {
             foodEl.textContent = storedFood;
             antEl.textContent = ants.length;
-            btnSpawn.disabled = !nest || storedFood < 10;
+            nestEl.textContent = nests.length;
+            btnSpawn.disabled = nests.length === 0 || storedFood < 10;
         }
 
-        // Eventos del ratón
         canvas.addEventListener('mousemove', (e) => {
             const rect = canvas.getBoundingClientRect();
             mousePos.x = (e.clientX - rect.left) * (canvas.width / rect.width);
@@ -385,17 +513,25 @@
             const clickX = (e.clientX - rect.left) * (canvas.width / rect.width);
             const clickY = (e.clientY - rect.top) * (canvas.height / rect.height);
 
-            if (!nest) {
+            if (currentTool === 'nest') {
                 placeNest(clickX, clickY);
-            } else {
+            } else if (currentTool === 'food') {
                 spawnFoodCluster(clickX, clickY);
+            } else if (currentTool === 'spider') {
+                enemies.push(new Enemy(clickX, clickY, 'spider'));
+            } else if (currentTool === 'mantis') {
+                enemies.push(new Enemy(clickX, clickY, 'mantis'));
+            } else if (currentTool === 'termites') {
+                for(let i=0; i<3; i++) enemies.push(new Enemy(clickX + (Math.random()-0.5)*20, clickY + (Math.random()-0.5)*20, 'termites'));
             }
         });
 
         btnSpawn.addEventListener('click', () => {
-            if (nest && storedFood >= 10) {
+            if (nests.length > 0 && storedFood >= 10) {
                 storedFood -= 10;
-                ants.push(new Ant(nest.x, nest.y));
+                // Asignar al último hormiguero creado o al más cercano
+                let randomNest = nests[Math.floor(Math.random() * nests.length)];
+                ants.push(new Ant(randomNest.x, randomNest.y, randomNest));
                 updateUI();
             }
         });
@@ -405,14 +541,12 @@
             btnSpeed.textContent = `Velocidad: ${gameSpeed}x`;
         });
 
-        btnClear.addEventListener('click', init);
+        document.getElementById('btn-clear').addEventListener('click', init);
 
         function drawEnvironmentBase() {
-            // Césped base
-            ctx.fillStyle = '#4a7c36';
+            ctx.fillStyle = '#43702f';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Briznas de hierba
             for (let g of grassBlades) {
                 ctx.strokeStyle = g.color;
                 ctx.lineWidth = 1.5;
@@ -422,98 +556,69 @@
                 ctx.stroke();
             }
 
-            // Flores silvestres
             for (let fl of flowers) {
                 ctx.fillStyle = fl.color;
                 ctx.beginPath();
                 ctx.arc(fl.x, fl.y, 2.5, 0, Math.PI * 2);
                 ctx.fill();
-                ctx.fillStyle = '#4a3000';
-                ctx.beginPath();
-                ctx.arc(fl.x, fl.y, 1, 0, Math.PI * 2);
-                ctx.fill();
             }
 
-            // Rocas con sombra y volumen
             for (let r of rocks) {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
                 ctx.beginPath();
                 ctx.arc(r.x + 4, r.y + 5, r.radius, 0, Math.PI * 2);
                 ctx.fill();
 
-                ctx.fillStyle = '#7d8582';
+                ctx.fillStyle = '#737a77';
                 ctx.beginPath();
                 ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#9aa39f';
-                ctx.beginPath();
-                ctx.arc(r.x - r.radius * 0.25, r.y - r.radius * 0.25, r.radius * 0.6, 0, Math.PI * 2);
                 ctx.fill();
             }
         }
 
         function drawCanopyLayer() {
-            // Arbustos
             for (let b of bushes) {
                 ctx.fillStyle = 'rgba(0,0,0,0.2)';
                 ctx.beginPath();
                 ctx.arc(b.x + 4, b.y + 4, b.radius, 0, Math.PI * 2);
                 ctx.fill();
 
-                ctx.fillStyle = '#2d5a27';
+                ctx.fillStyle = '#264e21';
                 ctx.beginPath();
                 ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
                 ctx.fill();
-
-                ctx.fillStyle = '#3d7a35';
-                ctx.beginPath();
-                ctx.arc(b.x - 4, b.y - 4, b.radius * 0.7, 0, Math.PI * 2);
-                ctx.fill();
             }
 
-            // Copas de árboles (semitransparentes para poder ver las hormigas pasar por debajo)
             for (let t of trees) {
-                // Sombra en el suelo
-                ctx.fillStyle = 'rgba(15, 30, 12, 0.22)';
+                ctx.fillStyle = 'rgba(10, 20, 8, 0.25)';
                 ctx.beginPath();
                 ctx.arc(t.x + 18, t.y + 20, t.radius, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Tronco pequeño visible en el centro
-                ctx.fillStyle = '#4a3219';
+                ctx.fillStyle = '#3d2814';
                 ctx.beginPath();
                 ctx.arc(t.x, t.y, 8, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Copa frondosa translúcida
-                ctx.fillStyle = 'rgba(34, 78, 29, 0.75)';
+                ctx.fillStyle = 'rgba(28, 66, 23, 0.78)';
                 ctx.beginPath();
                 ctx.arc(t.x, t.y, t.radius, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = 'rgba(56, 118, 48, 0.65)';
-                ctx.beginPath();
-                ctx.arc(t.x - 10, t.y - 10, t.radius * 0.65, 0, Math.PI * 2);
                 ctx.fill();
             }
         }
 
         function loop() {
-            if (nest) {
-                for (let s = 0; s < gameSpeed; s++) {
-                    for (let i = pheromones.length - 1; i >= 0; i--) {
-                        pheromones[i].life--;
-                        if (pheromones[i].life <= 0) pheromones.splice(i, 1);
-                    }
-                    for (let ant of ants) ant.update();
+            for (let s = 0; s < gameSpeed; s++) {
+                for (let i = pheromones.length - 1; i >= 0; i--) {
+                    pheromones[i].life--;
+                    if (pheromones[i].life <= 0) pheromones.splice(i, 1);
                 }
+                for (let ant of ants) ant.update();
+                for (let en of enemies) en.update();
             }
 
-            // 1. Dibujar suelo y rocas
             drawEnvironmentBase();
 
-            // 2. Dibujar feromonas (rastro blanco/azulado sutil sobre el pasto)
             for (let p of pheromones) {
                 ctx.fillStyle = `rgba(220, 245, 255, ${p.life / 950})`;
                 ctx.beginPath();
@@ -521,52 +626,40 @@
                 ctx.fill();
             }
 
-            // 3. Dibujar comida (bayas rojas)
             for (let f of foods) {
                 ctx.fillStyle = '#e63946';
                 ctx.beginPath();
                 ctx.arc(f.x, f.y, 2.2 + f.amount * 0.55, 0, Math.PI * 2);
                 ctx.fill();
-                // Brillo en la baya
-                ctx.fillStyle = '#ffccd5';
+            }
+
+            // Dibujar todos los hormigueros
+            for (let n of nests) {
+                ctx.fillStyle = '#65422d';
                 ctx.beginPath();
-                ctx.arc(f.x - 1, f.y - 1, 1, 0, Math.PI * 2);
+                ctx.arc(n.x, n.y, n.radius + 7, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#170e09';
+                ctx.beginPath();
+                ctx.arc(n.x, n.y, n.radius - 5, 0, Math.PI * 2);
                 ctx.fill();
             }
 
-            // 4. Dibujar hormiguero (o previsualización donde apunta el ratón)
-            if (nest) {
-                // Montículo de tierra alrededor del agujero
-                ctx.fillStyle = '#7f5539';
-                ctx.beginPath();
-                ctx.arc(nest.x, nest.y, nest.radius + 7, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#9c6644';
-                ctx.beginPath();
-                ctx.arc(nest.x, nest.y, nest.radius + 2, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Entrada oscura
-                ctx.fillStyle = '#1f130c';
-                ctx.beginPath();
-                ctx.arc(nest.x, nest.y, nest.radius - 6, 0, Math.PI * 2);
-                ctx.fill();
-            } else {
-                // Fantasma indicador de colocación
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+            // Previsualizador si seleccionas hormiguero
+            if (currentTool === 'nest') {
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
                 ctx.setLineDash([4, 4]);
                 ctx.lineWidth = 2;
                 ctx.beginPath();
-                ctx.arc(mousePos.x, mousePos.y, 24, 0, Math.PI * 2);
+                ctx.arc(mousePos.x, mousePos.y, 22, 0, Math.PI * 2);
                 ctx.stroke();
                 ctx.setLineDash([]);
             }
 
-            // 5. Dibujar hormigas
             for (let ant of ants) ant.draw();
+            for (let en of enemies) en.draw();
 
-            // 6. Dibujar arbustos y copas de árboles por encima
             drawCanopyLayer();
 
             requestAnimationFrame(loop);
