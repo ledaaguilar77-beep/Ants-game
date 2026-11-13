@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ants Colony: Wild Forest Edition</title>
+    <title>Ants Empires and Colony</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -15,19 +15,80 @@
             align-items: center;
             min-height: 100vh;
             padding: 8px;
+            overflow-x: hidden;
         }
+
+        /* Pantalla de Inicio */
+        #start-screen {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(27, 46, 17, 0.94), rgba(6, 11, 5, 0.99));
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            text-align: center;
+            padding: 20px;
+        }
+        #start-screen h1 {
+            font-size: 3.2rem;
+            color: #b5e48c;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.95), 0 0 25px rgba(181, 228, 140, 0.35);
+            margin-bottom: 10px;
+            letter-spacing: 1.5px;
+        }
+        #start-screen p {
+            color: #d8f3dc;
+            font-size: 1.05rem;
+            max-width: 540px;
+            margin-bottom: 32px;
+            line-height: 1.5;
+        }
+        .menu-buttons {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .menu-btn {
+            padding: 15px 34px;
+            font-size: 1.15rem;
+            border-radius: 12px;
+            border: 2px solid #95d5b2;
+            cursor: pointer;
+            font-weight: bold;
+            color: #fff;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.65);
+            transition: transform 0.15s, filter 0.2s, box-shadow 0.2s;
+        }
+        .menu-btn:hover {
+            transform: translateY(-3px);
+            filter: brightness(1.15);
+            box-shadow: 0 12px 30px rgba(82, 183, 136, 0.4);
+        }
+        .menu-btn:active { transform: scale(0.96); }
+        .btn-mode-normal {
+            background: linear-gradient(180deg, #e09f3e, #9e2a2b);
+            border-color: #fff3b0;
+        }
+        .btn-mode-sandbox {
+            background: linear-gradient(180deg, #52b788, #1b4332);
+            border-color: #b7e4c7;
+        }
+
         header {
             text-align: center;
             margin-bottom: 4px;
         }
-        h1 { 
+        header h1 { 
             font-size: 1.35rem; 
             color: #b5e48c; 
             text-shadow: 0 2px 6px rgba(0,0,0,0.8);
             letter-spacing: 0.5px;
         }
         #status-msg {
-            font-size: 0.8rem;
+            font-size: 0.82rem;
             color: #fefae0;
             background: linear-gradient(90deg, #2d6a4f, #40916c);
             padding: 4px 16px;
@@ -55,6 +116,7 @@
         .stat { font-weight: bold; font-size: 0.85rem; }
         .stat span { color: #b5e48c; }
         .stat-enemy span { color: #ff758f; }
+        .stat-egg span { color: #ffd166; }
         
         .toolbar {
             display: flex;
@@ -64,7 +126,7 @@
             justify-content: center;
         }
 
-        button {
+        button.tool-btn, .hud button {
             background: linear-gradient(180deg, #52b788, #2d6a4f);
             color: white;
             border: 1px solid #74c69d;
@@ -76,17 +138,24 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.4);
             transition: transform 0.1s, filter 0.2s;
         }
-        button:hover { filter: brightness(1.15); }
-        button:active { transform: scale(0.95); }
-        button.active {
+        button.tool-btn:hover, .hud button:hover { filter: brightness(1.15); }
+        button.tool-btn:active, .hud button:active { transform: scale(0.95); }
+        button.tool-btn.active {
             background: linear-gradient(180deg, #e63946, #9b2226);
             border-color: #ffb3c1;
             box-shadow: 0 0 10px rgba(230, 57, 70, 0.7);
         }
-        .btn-termite { background: linear-gradient(180deg, #dda15e, #bc6c25); border-color: #faedcd; }
-        .btn-beetle { background: linear-gradient(180deg, #606c38, #283618); border-color: #a3b18a; }
-        .btn-predator { background: linear-gradient(180deg, #9d0208, #6a040f); border-color: #ffccd5; }
-        .btn-danger { background: linear-gradient(180deg, #800f2f, #590d22); border-color: #ff758f; }
+        button.tool-btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            filter: grayscale(0.8);
+        }
+        .btn-queen { background: linear-gradient(180deg, #f4a261, #b5651d) !important; border-color: #ffe5d9 !important; }
+        .btn-termite { background: linear-gradient(180deg, #dda15e, #bc6c25) !important; border-color: #faedcd !important; }
+        .btn-beetle { background: linear-gradient(180deg, #606c38, #283618) !important; border-color: #a3b18a !important; }
+        .btn-predator { background: linear-gradient(180deg, #9d0208, #6a040f) !important; border-color: #ffccd5 !important; }
+        .btn-danger { background: linear-gradient(180deg, #800f2f, #590d22) !important; border-color: #ff758f !important; }
+        .btn-menu-back { background: linear-gradient(180deg, #495057, #212529) !important; border-color: #adb5bd !important; }
 
         canvas {
             background-color: #345822;
@@ -100,53 +169,79 @@
 </head>
 <body>
 
+    <!-- Pantalla de Título -->
+    <div id="start-screen">
+        <h1>🐜 Ants Empires and Colony</h1>
+        <p>Construye y dirige tu imperio subterráneo en el bosque salvaje. Elige un modo de juego para comenzar:</p>
+        <div class="menu-buttons">
+            <button class="menu-btn btn-mode-normal" onclick="startGame('normal')">👑 Modo Normal</button>
+            <button class="menu-btn btn-mode-sandbox" onclick="startGame('sandbox')">🌿 Modo Sandbox</button>
+        </div>
+    </div>
+
     <header>
-        <h1>🌲 Ants Colony: Wild Forest</h1>
-        <div id="status-msg">🏠 Colocar Hormiguero (La colonia crece automáticamente cada 10 🍓 recolectadas)</div>
+        <h1>🐜 Ants Empires and Colony <span id="mode-badge" style="font-size: 0.85rem; color: #ffd166;"></span></h1>
+        <div id="status-msg">Selecciona un modo de juego</div>
     </header>
 
     <div class="hud">
         <div class="stat">🍓 Comida: <span id="food-count">100</span></div>
         <div class="stat">🐜 Hormigas: <span id="ant-count">0</span></div>
-        <div class="stat">🏗️ Termitas: <span id="termite-count">0</span></div>
-        <div class="stat stat-enemy">☠️ Enemigos: <span id="enemy-count">0</span></div>
+        <div class="stat sandbox-only">🏗️ Termitas: <span id="termite-count">0</span></div>
+        <div class="stat stat-enemy sandbox-only">☠️ Enemigos: <span id="enemy-count">0</span></div>
+        <div class="stat stat-egg normal-only" style="display:none;">🥚 Huevos: <span id="egg-count">0</span></div>
         <div class="stat">🏰 Nidos: <span id="nest-count">0</span></div>
-        <div class="stat">🥚 Cría: <span id="spawn-progress">0/10 🍓</span></div>
+        <div class="stat sandbox-only">🥚 Cría: <span id="spawn-progress">0/10 🍓</span></div>
         <button id="btn-speed">Velocidad: 1x</button>
-        <button id="btn-clear" class="btn-danger">Reiniciar Bosque</button>
+        <button id="btn-clear" class="btn-danger">Reiniciar</button>
+        <button id="btn-back-menu" class="btn-menu-back" onclick="showMainMenu()">Menú</button>
     </div>
 
-    <div class="toolbar">
-        <button id="tool-nest" class="active" onclick="setTool('nest')">🏠 Nido Hormigas</button>
-        <button id="tool-termite_nest" class="btn-termite" onclick="setTool('termite_nest')">🏰 Nido Termitas</button>
-        <button id="tool-beetle" class="btn-beetle" onclick="setTool('beetle')">🪲 Escarabajo Pelotero</button>
-        <button id="tool-food" onclick="setTool('food')">🍓 Soltar Comida</button>
-        <button id="tool-spider" class="btn-predator" onclick="setTool('spider')">🕷️ Araña Teje-redes</button>
-        <button id="tool-mantis" class="btn-predator" onclick="setTool('mantis')">🦗 Mantis Alfa</button>
+    <!-- Barra de herramientas Sandbox -->
+    <div class="toolbar" id="toolbar-sandbox">
+        <button id="tool-nest" class="tool-btn active" onclick="setTool('nest')">🏠 Nido Hormigas</button>
+        <button id="tool-termite_nest" class="tool-btn btn-termite" onclick="setTool('termite_nest')">🏰 Nido Termitas</button>
+        <button id="tool-beetle" class="tool-btn btn-beetle" onclick="setTool('beetle')">🪲 Escarabajo Pelotero</button>
+        <button id="tool-food" class="tool-btn" onclick="setTool('food')">🍓 Soltar Comida</button>
+        <button id="tool-spider" class="tool-btn btn-predator" onclick="setTool('spider')">🕷️ Araña Teje-redes</button>
+        <button id="tool-mantis" class="tool-btn btn-predator" onclick="setTool('mantis')">🦗 Mantis Alfa</button>
     </div>
 
-    <!-- Mapa Masivo 2200x1300 con perspectiva inclinada 2.5D -->
+    <!-- Barra de herramientas Modo Normal (Historia) -->
+    <div class="toolbar" id="toolbar-normal" style="display:none;">
+        <button id="tool-queen" class="tool-btn btn-queen active" onclick="setTool('queen')">👑 Colocar Reina</button>
+        <button id="tool-normal_nest" class="tool-btn" onclick="setTool('normal_nest')" disabled>🏠 Colocar Colonia (0/1)</button>
+    </div>
+
     <canvas id="gameCanvas" width="2200" height="1300"></canvas>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
+        const startScreen = document.getElementById('start-screen');
+        const modeBadge = document.getElementById('mode-badge');
         const foodEl = document.getElementById('food-count');
         const antEl = document.getElementById('ant-count');
         const termiteEl = document.getElementById('termite-count');
         const enemyEl = document.getElementById('enemy-count');
+        const eggEl = document.getElementById('egg-count');
         const nestEl = document.getElementById('nest-count');
         const progressEl = document.getElementById('spawn-progress');
         const statusEl = document.getElementById('status-msg');
         const btnSpeed = document.getElementById('btn-speed');
 
-        // Factor de perspectiva inclinada 2.5D (achata el eje Y para dar ángulo de visión)
         const TILT = 0.78;
 
+        let gameMode = 'sandbox'; // 'normal' o 'sandbox'
         let currentTool = 'nest';
         let storedFood = 100;
         let foodSpawnCounter = 0;
+
+        let queen = null;
+        let queenTarget = null; // Punto destino al hacer clic en modo normal
+        let eggs = []; // Huevos puestos por la reina (30s para eclosionar)
+
         let antNests = [];
         let termiteNests = [];
         let ants = [];
@@ -159,6 +254,18 @@
         let particles = [];
         let gameSpeed = 1;
         let mousePos = { x: -100, y: -100 };
+
+        // Controles de teclado para la Reina
+        const keysPressed = {};
+        window.addEventListener('keydown', (e) => {
+            keysPressed[e.key.toLowerCase()] = true;
+            if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(e.key.toLowerCase())) {
+                if (gameMode === 'normal' && queen) e.preventDefault();
+            }
+        });
+        window.addEventListener('keyup', (e) => {
+            keysPressed[e.key.toLowerCase()] = false;
+        });
 
         let grassBlades = [];
         let dirtPatches = [];
@@ -174,20 +281,50 @@
         const toolDescriptions = {
             nest: "🏠 Colocar Hormiguero (Crecimiento automático al recolectar comida)",
             termite_nest: "🏰 Colocar Termitero (Montículo arcilloso 3D)",
-            beetle: "🪲 Invocar Escarabajo Pelotero (Tanque pacífico que recolecta bolas de comida; los mobs lo atacan)",
+            beetle: "🪲 Invocar Escarabajo Pelotero (Tanque pacífico que recolecta bolas de comida)",
             food: "🍓 Soltar Comida (Bayas y néctar del bosque)",
             spider: "🕷️ Invocar Araña (Lanza telarañas que inmovilizan presas)",
-            mantis: "🦗 Invocar Mantis Alfa (Depredador letal de gran tamaño)"
+            mantis: "🦗 Invocar Mantis Alfa (Depredador letal de gran tamaño)",
+            queen: "👑 Haz clic en el suelo del bosque para colocar a tu Hormiga Reina",
+            normal_nest: "🏠 Haz clic en un lugar despejado para fundar tu única Colonia",
+            control_queen: "👑 Controla a la Reina (WASD / Flechas o Clic en el mapa): Recoge comida 🍓 y llévala a tu colonia para poner huevos (30s)"
         };
+
+        function showMainMenu() {
+            startScreen.style.display = 'flex';
+        }
+
+        function startGame(mode) {
+            gameMode = mode;
+            startScreen.style.display = 'none';
+
+            if (mode === 'normal') {
+                modeBadge.textContent = "[Modo Normal]";
+                document.getElementById('toolbar-sandbox').style.display = 'none';
+                document.getElementById('toolbar-normal').style.display = 'flex';
+                document.querySelectorAll('.sandbox-only').forEach(el => el.style.display = 'none');
+                document.querySelectorAll('.normal-only').forEach(el => el.style.display = 'block');
+            } else {
+                modeBadge.textContent = "[Modo Sandbox]";
+                document.getElementById('toolbar-sandbox').style.display = 'flex';
+                document.getElementById('toolbar-normal').style.display = 'none';
+                document.querySelectorAll('.sandbox-only').forEach(el => el.style.display = 'block');
+                document.querySelectorAll('.normal-only').forEach(el => el.style.display = 'none');
+            }
+
+            init();
+        }
 
         function setTool(tool) {
             currentTool = tool;
-            document.querySelectorAll('.toolbar button').forEach(b => b.classList.remove('active'));
-            if(document.getElementById(`tool-${tool}`)) {
+            document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+            if (document.getElementById(`tool-${tool}`)) {
                 document.getElementById(`tool-${tool}`).classList.add('active');
             }
-            statusEl.textContent = toolDescriptions[tool];
-            statusEl.style.background = "linear-gradient(90deg, #2d6a4f, #40916c)";
+            if (toolDescriptions[tool]) {
+                statusEl.textContent = toolDescriptions[tool];
+                statusEl.style.background = "linear-gradient(90deg, #2d6a4f, #40916c)";
+            }
         }
 
         function spawnHitParticles(x, y, color = '#fff', count = 5) {
@@ -220,7 +357,7 @@
 
         function canPlaceAt(x, y, tool) {
             if (x < 45 || x > canvas.width - 45 || y < 45 || y > canvas.height - 45) return false;
-            const reqRadius = (tool === 'nest' || tool === 'termite_nest') ? 28 : (tool === 'mantis') ? 22 : (tool === 'spider' || tool === 'beetle') ? 16 : 12;
+            const reqRadius = (tool === 'nest' || tool === 'termite_nest' || tool === 'normal_nest') ? 28 : (tool === 'mantis') ? 22 : (tool === 'spider' || tool === 'beetle' || tool === 'queen') ? 16 : 12;
 
             for (let r of rocks) {
                 if (Math.hypot(x - r.x, (y - r.y) / TILT) < r.radius + reqRadius) return false;
@@ -248,13 +385,11 @@
             return false;
         }
 
-        // Movimiento suave con evasión inteligente de obstáculos (Steering)
         function moveEntitySmooth(entity, speed, radius) {
             let nextX = entity.x + Math.cos(entity.angle) * speed;
             let nextY = entity.y + Math.sin(entity.angle) * speed * TILT;
 
             if (checkObstacleCollision(nextX, nextY, radius)) {
-                // Probar ángulos alternativos suavemente en lugar de rebotar brusco
                 const offsets = [0.4, -0.4, 0.85, -0.85, 1.4, -1.4, Math.PI];
                 for (let off of offsets) {
                     let testAngle = entity.angle + off;
@@ -272,12 +407,211 @@
             entity.x = nextX;
             entity.y = nextY;
 
-            // Rebote suave en los bordes del bosque
             const margin = 22;
             if (entity.x < margin) { entity.x = margin; entity.angle = Math.PI - entity.angle; }
             if (entity.x > canvas.width - margin) { entity.x = canvas.width - margin; entity.angle = Math.PI - entity.angle; }
             if (entity.y < margin) { entity.y = margin; entity.angle = -entity.angle; }
             if (entity.y > canvas.height - margin) { entity.y = canvas.height - margin; entity.angle = -entity.angle; }
+        }
+
+        // Clase Hormiga Reina (Controlable en Modo Normal)
+        class QueenAnt {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.radius = 16;
+                this.angle = 0;
+                this.speed = 2.6;
+                this.hp = 300;
+                this.maxHp = 300;
+                this.hasFood = false;
+                this.walkCycle = 0;
+                this.isMoving = false;
+            }
+
+            update() {
+                this.isMoving = false;
+                let moveX = 0;
+                let moveY = 0;
+
+                // Movimiento por teclado (WASD o Flechas)
+                if (keysPressed['w'] || keysPressed['arrowup']) moveY -= 1;
+                if (keysPressed['s'] || keysPressed['arrowdown']) moveY += 1;
+                if (keysPressed['a'] || keysPressed['arrowleft']) moveX -= 1;
+                if (keysPressed['d'] || keysPressed['arrowright']) moveX += 1;
+
+                if (moveX !== 0 || moveY !== 0) {
+                    queenTarget = null; // El teclado cancela el movimiento por clic
+                    const desiredAngle = Math.atan2(moveY, moveX);
+                    this.angle = this.lerpAngle(this.angle, desiredAngle, 0.25);
+                    this.isMoving = true;
+                } else if (queenTarget) {
+                    const dx = queenTarget.x - this.x;
+                    const dy = (queenTarget.y - this.y) / TILT;
+                    const dist = Math.hypot(dx, dy);
+
+                    if (dist > 6) {
+                        const desiredAngle = Math.atan2(dy, dx);
+                        this.angle = this.lerpAngle(this.angle, desiredAngle, 0.22);
+                        this.isMoving = true;
+                    } else {
+                        queenTarget = null;
+                    }
+                }
+
+                if (this.isMoving) {
+                    this.walkCycle += this.speed * 0.28;
+                    let nextX = this.x + Math.cos(this.angle) * this.speed;
+                    let nextY = this.y + Math.sin(this.angle) * this.speed * TILT;
+
+                    // Deslizamiento suave contra obstáculos para control del jugador
+                    if (!checkObstacleCollision(nextX, nextY, 8)) {
+                        this.x = nextX;
+                        this.y = nextY;
+                    } else if (!checkObstacleCollision(nextX, this.y, 8)) {
+                        this.x = nextX;
+                    } else if (!checkObstacleCollision(this.x, nextY, 8)) {
+                        this.y = nextY;
+                    }
+
+                    const margin = 25;
+                    this.x = Math.max(margin, Math.min(canvas.width - margin, this.x));
+                    this.y = Math.max(margin, Math.min(canvas.height - margin, this.y));
+                }
+
+                // Recoger comida al pasar cerca
+                if (!this.hasFood) {
+                    for (let i = foods.length - 1; i >= 0; i--) {
+                        let f = foods[i];
+                        let dist = Math.hypot(f.x - this.x, (f.y - this.y) / TILT);
+                        if (dist < 18) {
+                            this.hasFood = true;
+                            f.amount--;
+                            if (f.amount <= 0) foods.splice(i, 1);
+                            spawnHitParticles(this.x, this.y, '#ffccd5', 6);
+                            statusEl.textContent = "🍓 ¡Comida recogida! Llévala a tu Colonia para poner un huevo";
+                            break;
+                        }
+                    }
+                } else if (antNests.length > 0) {
+                    // Entregar comida en la colonia para poner un huevo de 30 segundos
+                    let nest = antNests[0];
+                    let dist = Math.hypot(nest.x - this.x, (nest.y - this.y) / TILT);
+                    if (dist < nest.radius + 8) {
+                        this.hasFood = false;
+                        storedFood += 1;
+                        // Colocar huevo dentro de la colonia (tarda 30 segundos = 1800 frames a 60fps)
+                        const offsetAngle = Math.random() * Math.PI * 2;
+                        const offsetR = Math.random() * 12;
+                        eggs.push({
+                            x: nest.x + Math.cos(offsetAngle) * offsetR,
+                            y: nest.y + Math.sin(offsetAngle) * offsetR * TILT,
+                            nest: nest,
+                            timer: 30, // 30 segundos
+                            maxTimer: 30
+                        });
+                        spawnHitParticles(nest.x, nest.y, '#ffd166', 10);
+                        statusEl.textContent = "🥚 ¡Huevo puesto! Eclosionará en 30 segundos";
+                        updateUI();
+                    }
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+
+                // Anillo indicador de selección bajo la Reina
+                ctx.strokeStyle = 'rgba(255, 209, 102, 0.7)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.ellipse(0, 2, 20, 20 * TILT, 0, 0, Math.PI * 2);
+                ctx.stroke();
+
+                // Sombra 2.5D
+                ctx.fillStyle = 'rgba(0,0,0,0.42)';
+                ctx.beginPath();
+                ctx.ellipse(3, 6, 13, 6.5, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.scale(1, TILT);
+                ctx.rotate(this.angle);
+
+                // Patas más largas y robustas que las obreras
+                ctx.strokeStyle = '#1f0c06';
+                ctx.lineWidth = 2;
+                let legSwing = this.isMoving ? Math.sin(this.walkCycle) * 5 : 0;
+                ctx.beginPath();
+                ctx.moveTo(-4, -5); ctx.lineTo(-9 + legSwing, -18);
+                ctx.moveTo(0, -5); ctx.lineTo(2 - legSwing, -20);
+                ctx.moveTo(4, -5); ctx.lineTo(10 + legSwing, -18);
+                ctx.moveTo(-4, 5); ctx.lineTo(-9 - legSwing, 18);
+                ctx.moveTo(0, 5); ctx.lineTo(2 + legSwing, 20);
+                ctx.moveTo(4, 5); ctx.lineTo(10 - legSwing, 18);
+                ctx.stroke();
+
+                // Abdomen real grande (gaster)
+                ctx.fillStyle = '#3d1308';
+                ctx.beginPath();
+                ctx.ellipse(-9, 0, 8.5, 5.2, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Franjas doradas en el abdomen real
+                ctx.strokeStyle = '#e09f3e';
+                ctx.lineWidth = 1.4;
+                ctx.beginPath();
+                ctx.moveTo(-9, -4.5); ctx.lineTo(-9, 4.5);
+                ctx.moveTo(-12, -3.8); ctx.lineTo(-12, 3.8);
+                ctx.stroke();
+
+                // Tórax robusto
+                ctx.fillStyle = '#5e2110';
+                ctx.beginPath();
+                ctx.ellipse(0, 0, 4.8, 3.6, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Cabeza real
+                ctx.fillStyle = '#4a1c0e';
+                ctx.beginPath();
+                ctx.ellipse(7.5, 0, 4.2, 3.8, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Pequeña corona dorada sobre la cabeza
+                ctx.fillStyle = '#ffd166';
+                ctx.beginPath();
+                ctx.moveTo(6, -3);
+                ctx.lineTo(8, -6);
+                ctx.lineTo(9.5, -3);
+                ctx.lineTo(11, -5.5);
+                ctx.lineTo(11, 0);
+                ctx.lineTo(6, 0);
+                ctx.closePath();
+                ctx.fill();
+
+                // Comida transportada
+                if (this.hasFood) {
+                    ctx.fillStyle = '#ff2a55';
+                    ctx.beginPath();
+                    ctx.arc(14, 0, 4.8, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#ffccd5';
+                    ctx.beginPath();
+                    ctx.arc(12.5, -1.5, 1.6, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                ctx.restore();
+            }
+
+            normalizeAngle(a) {
+                while (a > Math.PI) a -= Math.PI * 2;
+                while (a < -Math.PI) a += Math.PI * 2;
+                return a;
+            }
+            lerpAngle(a, b, t) {
+                const diff = this.normalizeAngle(b - a);
+                return a + diff * t;
+            }
         }
 
         class Ant {
@@ -305,7 +639,6 @@
                 let target = null;
                 let minDist = 105;
 
-                // Las hormigas atacan termitas, depredadores y también escarabajos si no llevan comida
                 if (!this.hasFood) {
                     for (let t of termites) {
                         let d = Math.hypot(t.x - this.x, (t.y - this.y) / TILT);
@@ -331,7 +664,6 @@
                         if (Math.random() < 0.2) spawnHitParticles(target.x, target.y, '#ffccd5', 2);
                     }
                 } else {
-                    // Movimiento orgánico fluido (wander suavizado)
                     this.wanderOffset += (Math.random() - 0.5) * 0.14;
                     this.wanderOffset = Math.max(-0.25, Math.min(0.25, this.wanderOffset));
                     this.angle += this.wanderOffset;
@@ -352,8 +684,10 @@
                         if (dist < this.nest.radius) {
                             this.hasFood = false;
                             storedFood += 2;
-                            foodSpawnCounter += 2;
-                            checkAutoSpawn();
+                            if (gameMode === 'sandbox') {
+                                foodSpawnCounter += 2;
+                                checkAutoSpawn();
+                            }
                             this.hp = Math.min(this.maxHp, this.hp + 6);
                             this.angle += Math.PI;
                             updateUI();
@@ -409,7 +743,6 @@
                 ctx.save();
                 ctx.translate(this.x, this.y);
 
-                // Sombra proyectada en perspectiva 2.5D
                 ctx.fillStyle = 'rgba(0,0,0,0.35)';
                 ctx.beginPath();
                 ctx.ellipse(2, 4, 6, 3, 0, 0, Math.PI * 2);
@@ -418,7 +751,6 @@
                 ctx.scale(1, TILT);
                 ctx.rotate(this.angle);
 
-                // Patas articuladas animadas
                 ctx.strokeStyle = '#1f0c06';
                 ctx.lineWidth = 1.3;
                 let legSwing = Math.sin(this.walkCycle) * 3.5;
@@ -431,7 +763,6 @@
                 ctx.moveTo(2, 3); ctx.lineTo(6 - legSwing, 11);
                 ctx.stroke();
 
-                // Cuerpo con volumen y brillo estilo Wild Forest
                 ctx.fillStyle = '#4a1c0e';
                 ctx.beginPath();
                 ctx.ellipse(-5, 0, 4.2, 2.7, 0, 0, Math.PI * 2);
@@ -439,7 +770,6 @@
                 ctx.ellipse(4.2, 0, 2.6, 2.3, 0, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Reflejo dorsal
                 ctx.fillStyle = '#8c3b20';
                 ctx.beginPath();
                 ctx.ellipse(-5, -0.7, 2.5, 1.1, 0, 0, Math.PI * 2);
@@ -583,7 +913,6 @@
                 ctx.scale(1, TILT);
                 ctx.rotate(this.angle);
 
-                // Patas
                 ctx.strokeStyle = '#7f4f24';
                 ctx.lineWidth = 1.2;
                 let legSwing = Math.sin(this.walkCycle) * 3;
@@ -594,13 +923,11 @@
                 ctx.moveTo(1, 3); ctx.lineTo(3 + legSwing, 10);
                 ctx.stroke();
 
-                // Abdomen pálido con segmentos
                 ctx.fillStyle = '#f8edeb';
                 ctx.beginPath();
                 ctx.ellipse(-4, 0, 5.2, 3.2, 0, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Cabeza cobriza blindada
                 ctx.fillStyle = '#bc6c25';
                 ctx.beginPath();
                 ctx.arc(3.8, 0, 3.4, 0, Math.PI * 2);
@@ -642,7 +969,7 @@
                 this.radius = 15;
                 this.angle = Math.random() * Math.PI * 2;
                 this.speed = 1.4;
-                this.hp = 240; // Gran resistencia
+                this.hp = 240;
                 this.maxHp = 240;
                 this.hasBall = false;
                 this.ballSize = 14;
@@ -654,7 +981,6 @@
                 this.walkCycle += this.speed * 0.22;
                 if (this.hasBall) this.ballSpin += 0.1;
 
-                // Detectar amenazas cercanas (depredadores o enjambres atacando)
                 let threat = null;
                 let minThreatDist = 140;
                 for (let en of enemies) {
@@ -671,7 +997,6 @@
                 if (threat) {
                     const fleeAngle = Math.atan2((this.y - threat.y) / TILT, this.x - threat.x);
                     this.angle = this.lerpAngle(this.angle, fleeAngle, 0.18);
-                    // Si suelta la bola al huir, deja comida en el suelo
                     if (this.hasBall && minThreatDist < 55) {
                         this.hasBall = false;
                         spawnFoodCluster(this.x, this.y, 3);
@@ -707,7 +1032,6 @@
                 ctx.save();
                 ctx.translate(this.x, this.y);
 
-                // Barra de salud si ha recibido daño
                 if (this.hp < this.maxHp) {
                     ctx.fillStyle = 'rgba(0,0,0,0.65)';
                     ctx.fillRect(-16, -24, 32, 4);
@@ -715,7 +1039,6 @@
                     ctx.fillRect(-16, -24, 32 * Math.max(0, this.hp / this.maxHp), 4);
                 }
 
-                // Sombra proyectada 2.5D
                 ctx.fillStyle = 'rgba(0,0,0,0.42)';
                 ctx.beginPath();
                 ctx.ellipse(3, 6, 16, 9, 0, 0, Math.PI * 2);
@@ -724,7 +1047,6 @@
                 ctx.scale(1, TILT);
                 ctx.rotate(this.angle);
 
-                // Patas robustas
                 ctx.strokeStyle = '#1b2618';
                 ctx.lineWidth = 2;
                 let swing = Math.sin(this.walkCycle) * 3;
@@ -737,7 +1059,6 @@
                 ctx.moveTo(7, 6); ctx.lineTo(11 - swing, 14);
                 ctx.stroke();
 
-                // Caparazón iridiscente verde-bronce estilo Wild Forest
                 ctx.fillStyle = '#283618';
                 ctx.beginPath();
                 ctx.ellipse(0, 0, 15, 11, 0, 0, Math.PI * 2);
@@ -748,19 +1069,16 @@
                 ctx.ellipse(-2, -1, 12, 8, 0, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Brillo metálico en el caparazón
                 ctx.fillStyle = 'rgba(181, 228, 140, 0.35)';
                 ctx.beginPath();
                 ctx.ellipse(-2, -3.5, 8, 3, -0.2, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Cuerno frontal pequeño
                 ctx.fillStyle = '#132a13';
                 ctx.beginPath();
                 ctx.moveTo(13, -3); ctx.lineTo(19, 0); ctx.lineTo(13, 3);
                 ctx.fill();
 
-                // Bola de comida/estiércol rodando detrás
                 if (this.hasBall) {
                     ctx.save();
                     ctx.translate(-21, 0);
@@ -770,13 +1088,12 @@
                     ctx.arc(0, 0, this.ballSize, 0, Math.PI * 2);
                     ctx.fill();
 
-                    // Textura orgánica de la bola
                     ctx.fillStyle = '#3d1e00';
                     ctx.beginPath();
                     ctx.arc(-4, -3, 3.5, 0, Math.PI * 2);
                     ctx.arc(5, 4, 3, 0, Math.PI * 2);
                     ctx.fill();
-                    ctx.fillStyle = '#e63946'; // Trozo de baya incrustado
+                    ctx.fillStyle = '#e63946';
                     ctx.beginPath();
                     ctx.arc(2, -5, 2.5, 0, Math.PI * 2);
                     ctx.fill();
@@ -830,7 +1147,6 @@
                 let target = null;
                 let minDist = this.sight;
 
-                // Ataca a otros enemigos distintos, hormigas, termitas Y al escarabajo pelotero
                 for (let other of enemies) {
                     if (other !== this && other.type !== this.type) {
                         let d = Math.hypot(other.x - this.x, (other.y - this.y) / TILT);
@@ -861,7 +1177,6 @@
 
                     if (minDist < this.radius + (target.radius || 5) + 4) {
                         target.hp -= this.damage;
-                        // Retroceso (knockback) potente
                         target.x += Math.cos(targetAngle) * 4.5;
                         target.y += Math.sin(targetAngle) * 4.5 * TILT;
                         if (Math.random() < 0.35) spawnHitParticles(target.x, target.y, '#ffbe0b', 3);
@@ -879,14 +1194,12 @@
                 ctx.save();
                 ctx.translate(this.x, this.y);
 
-                // Barra de salud flotante
                 const barWidth = this.radius * 2.2;
                 ctx.fillStyle = 'rgba(0,0,0,0.65)';
                 ctx.fillRect(-barWidth / 2, -this.radius - 16, barWidth, 4.5);
                 ctx.fillStyle = this.type === 'mantis' ? '#ffbe0b' : '#ff4d6d';
                 ctx.fillRect(-barWidth / 2, -this.radius - 16, barWidth * Math.max(0, this.hp / this.maxHp), 4.5);
 
-                // Sombra proyectada 2.5D
                 ctx.fillStyle = 'rgba(0,0,0,0.45)';
                 ctx.beginPath();
                 ctx.ellipse(4, 8, this.radius * 1.1, this.radius * 0.6, 0, 0, Math.PI * 2);
@@ -896,7 +1209,6 @@
                 ctx.rotate(this.angle);
 
                 if (this.type === 'mantis') {
-                    // Patas traseras articuladas
                     ctx.strokeStyle = '#1b4332';
                     ctx.lineWidth = 2.6;
                     let swing = Math.sin(this.walkCycle) * 4;
@@ -907,7 +1219,6 @@
                     ctx.moveTo(0, 5); ctx.lineTo(-3 + swing, 18);
                     ctx.stroke();
 
-                    // Guadañas delanteras afiladas
                     ctx.strokeStyle = '#40916c';
                     ctx.lineWidth = 4.2;
                     ctx.beginPath();
@@ -915,7 +1226,6 @@
                     ctx.moveTo(10, 4); ctx.lineTo(28, 17); ctx.lineTo(21, 3);
                     ctx.stroke();
 
-                    // Cuerpo estilizado en capas
                     ctx.fillStyle = '#1b4332';
                     ctx.beginPath();
                     ctx.ellipse(-8, 0, 17, 8, 0, 0, Math.PI * 2);
@@ -926,7 +1236,6 @@
                     ctx.ellipse(9, 0, 12, 6, 0, 0, Math.PI * 2);
                     ctx.fill();
 
-                    // Cabeza triangular y ojos dorados
                     ctx.fillStyle = '#74c69d';
                     ctx.beginPath();
                     ctx.arc(21, 0, 6.5, 0, Math.PI * 2);
@@ -938,7 +1247,6 @@
                     ctx.arc(23, 4.5, 2.6, 0, Math.PI * 2);
                     ctx.fill();
                 } else {
-                    // Araña teje-redes articulada
                     ctx.strokeStyle = '#0f0f0f';
                     ctx.lineWidth = 2.4;
                     let swing = Math.sin(this.walkCycle) * 3.5;
@@ -957,13 +1265,11 @@
                     ctx.arc(7, 0, 7.8, 0, Math.PI * 2);
                     ctx.fill();
 
-                    // Marca roja de peligro en el abdomen
                     ctx.fillStyle = '#d90429';
                     ctx.beginPath();
                     ctx.moveTo(-8, -4); ctx.lineTo(-3, 0); ctx.lineTo(-8, 4); ctx.lineTo(-13, 0);
                     ctx.fill();
 
-                    // Ojos brillantes
                     ctx.fillStyle = '#ff0054';
                     ctx.fillRect(13, -3.5, 2.2, 2.2);
                     ctx.fillRect(13, 1.3, 2.2, 2.2);
@@ -984,6 +1290,7 @@
         }
 
         function checkAutoSpawn() {
+            if (gameMode === 'normal') return; // En modo normal los nacimientos son por huevos de la reina
             if (foodSpawnCounter >= 10) {
                 foodSpawnCounter -= 10;
                 let spawnAnts = antNests.length > 0 && (termiteNests.length === 0 || Math.random() > 0.5);
@@ -1134,18 +1441,34 @@
             webs = [];
             pheromones = [];
             particles = [];
-            storedFood = 100;
+            eggs = [];
+            queen = null;
+            queenTarget = null;
             foodSpawnCounter = 0;
             generateEnvironment();
+
+            if (gameMode === 'normal') {
+                storedFood = 0;
+                const btnQueen = document.getElementById('tool-queen');
+                const btnNormalNest = document.getElementById('tool-normal_nest');
+                btnQueen.disabled = false;
+                btnNormalNest.disabled = true;
+                btnNormalNest.textContent = "🏠 Colocar Colonia (0/1)";
+                setTool('queen');
+            } else {
+                storedFood = 100;
+                setTool('nest');
+            }
             updateUI();
-            setTool('nest');
         }
 
         function placeNest(x, y, type) {
             let newNest = { x, y, radius: 26 };
             if (type === 'ant') {
                 antNests.push(newNest);
-                for (let i = 0; i < 8; i++) ants.push(new Ant(x, y, newNest));
+                if (gameMode === 'sandbox') {
+                    for (let i = 0; i < 8; i++) ants.push(new Ant(x, y, newNest));
+                }
             } else {
                 termiteNests.push(newNest);
                 for (let i = 0; i < 6; i++) termites.push(new Termite(x, y, newNest));
@@ -1167,9 +1490,10 @@
 
         function updateUI() {
             foodEl.textContent = storedFood;
-            antEl.textContent = ants.length;
+            antEl.textContent = ants.length + (queen ? 1 : 0);
             termiteEl.textContent = termites.length;
             enemyEl.textContent = enemies.length;
+            eggEl.textContent = eggs.length;
             nestEl.textContent = antNests.length + termiteNests.length;
             progressEl.textContent = `${foodSpawnCounter}/10 🍓`;
         }
@@ -1185,6 +1509,46 @@
             const clickX = (e.clientX - rect.left) * (canvas.width / rect.width);
             const clickY = (e.clientY - rect.top) * (canvas.height / rect.height);
 
+            // Lógica en Modo Normal (Historia)
+            if (gameMode === 'normal') {
+                if (currentTool === 'queen' && !queen) {
+                    if (!canPlaceAt(clickX, clickY, 'queen')) {
+                        statusEl.textContent = "⚠️ No puedes colocar a la Reina encima de rocas o troncos";
+                        statusEl.style.background = "linear-gradient(90deg, #9b2226, #ae2012)";
+                        return;
+                    }
+                    queen = new QueenAnt(clickX, clickY);
+                    document.getElementById('tool-queen').disabled = true;
+                    const btnNormalNest = document.getElementById('tool-normal_nest');
+                    btnNormalNest.disabled = false;
+                    setTool('normal_nest');
+                    updateUI();
+                    return;
+                }
+
+                if (currentTool === 'normal_nest' && antNests.length === 0) {
+                    if (!canPlaceAt(clickX, clickY, 'normal_nest')) {
+                        statusEl.textContent = "⚠️ Espacio bloqueado para fundar la Colonia";
+                        statusEl.style.background = "linear-gradient(90deg, #9b2226, #ae2012)";
+                        return;
+                    }
+                    placeNest(clickX, clickY, 'ant');
+                    const btnNormalNest = document.getElementById('tool-normal_nest');
+                    btnNormalNest.disabled = true;
+                    btnNormalNest.textContent = "🏠 Colonia Fundada (1/1)";
+                    setTool('control_queen');
+                    return;
+                }
+
+                // Si ya existe la Reina y se hace clic en el mapa, mover la Reina allí
+                if (queen) {
+                    queenTarget = { x: clickX, y: clickY };
+                    spawnHitParticles(clickX, clickY, '#ffd166', 4);
+                }
+                return;
+            }
+
+            // Lógica en Modo Sandbox
             if (!canPlaceAt(clickX, clickY, currentTool)) {
                 statusEl.textContent = "⚠️ Espacio bloqueado por obstáculos o entidades";
                 statusEl.style.background = "linear-gradient(90deg, #9b2226, #ae2012)";
@@ -1218,7 +1582,6 @@
         document.getElementById('btn-clear').addEventListener('click', init);
 
         function drawEnvironmentBase() {
-            // Suelo base rico estilo Wild Forest
             ctx.fillStyle = '#345822';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -1281,25 +1644,21 @@
                 ctx.scale(1, TILT);
                 ctx.rotate(l.angle);
 
-                // Sombra proyectada
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
                 ctx.beginPath();
                 ctx.roundRect(-l.w/2 + 8, -l.h/2 + 10, l.w, l.h, 8);
                 ctx.fill();
 
-                // Tronco cilíndrico con corteza
                 ctx.fillStyle = '#432818';
                 ctx.beginPath();
                 ctx.roundRect(-l.w/2, -l.h/2, l.w, l.h, 8);
                 ctx.fill();
 
-                // Cara cortada en perspectiva
                 ctx.fillStyle = '#bb9457';
                 ctx.beginPath();
                 ctx.ellipse(l.w/2 - 2, 0, 6, l.h/2 - 1, 0, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Musgo encima del tronco
                 ctx.fillStyle = '#386641';
                 ctx.beginPath();
                 ctx.ellipse(-10, -l.h/3, l.w * 0.32, 6, 0, 0, Math.PI * 2);
@@ -1321,12 +1680,10 @@
                 ctx.fill();
             }
 
-            // Rocas con volumen 2.5D (base oscura + cara iluminada)
             for (let r of rocks) {
                 ctx.save();
                 ctx.translate(r.x, r.y);
 
-                // Sombra proyectada
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
                 ctx.beginPath();
                 ctx.moveTo(r.points[0].x + 8, r.points[0].y + 12);
@@ -1334,7 +1691,6 @@
                 ctx.closePath();
                 ctx.fill();
 
-                // Base lateral 3D de la roca
                 ctx.fillStyle = '#3d4542';
                 ctx.beginPath();
                 ctx.moveTo(r.points[0].x, r.points[0].y + 6);
@@ -1342,7 +1698,6 @@
                 ctx.closePath();
                 ctx.fill();
 
-                // Cara superior de la roca
                 ctx.fillStyle = '#6c757d';
                 ctx.beginPath();
                 ctx.moveTo(r.points[0].x, r.points[0].y - 3);
@@ -1390,12 +1745,10 @@
                 ctx.restore();
             }
 
-            // Árboles en 2.5D con tronco vertical visible y copa elevada
             for (let t of trees) {
                 ctx.save();
                 ctx.translate(t.x, t.y);
 
-                // Sombra en el suelo
                 ctx.fillStyle = 'rgba(4, 12, 2, 0.42)';
                 for (let lob of t.lobes) {
                     ctx.beginPath();
@@ -1403,14 +1756,12 @@
                     ctx.fill();
                 }
 
-                // Tronco vertical visible desde ángulo inclinado
                 ctx.fillStyle = '#3d1e00';
                 ctx.fillRect(-10, -25, 20, 32);
                 ctx.beginPath();
                 ctx.ellipse(0, 7, 13, 7, 0, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Copa elevada en Y (-25px)
                 ctx.fillStyle = 'rgba(18, 53, 20, 0.9)';
                 for (let lob of t.lobes) {
                     ctx.beginPath();
@@ -1433,6 +1784,21 @@
             let needsUIUpdate = false;
 
             for (let s = 0; s < gameSpeed; s++) {
+                // Actualizar Reina en Modo Normal
+                if (queen) queen.update();
+
+                // Actualizar huevos (30 segundos = 1/60s por frame)
+                for (let i = eggs.length - 1; i >= 0; i--) {
+                    eggs[i].timer -= 1 / 60;
+                    if (eggs[i].timer <= 0) {
+                        const hatched = eggs.splice(i, 1)[0];
+                        ants.push(new Ant(hatched.nest.x, hatched.nest.y, hatched.nest));
+                        spawnHitParticles(hatched.nest.x, hatched.nest.y, '#b5e48c', 12);
+                        statusEl.textContent = "🐜 ¡Un huevo ha eclosionado! Nació una nueva hormiga obrera";
+                        needsUIUpdate = true;
+                    }
+                }
+
                 for (let i = pheromones.length - 1; i >= 0; i--) {
                     pheromones[i].life--;
                     if (pheromones[i].life <= 0) pheromones.splice(i, 1);
@@ -1516,7 +1882,7 @@
 
             if (needsUIUpdate) updateUI();
 
-            // 1. Dibujar el suelo y relieves 2.5D
+            // 1. Suelo y relieves 2.5D
             drawEnvironmentBase();
 
             // 2. Feromonas
@@ -1527,7 +1893,16 @@
                 ctx.fill();
             }
 
-            // 3. Comida con volumen 3D
+            // 3. Marcador destino de la Reina (si el jugador hizo clic)
+            if (queen && queenTarget) {
+                ctx.strokeStyle = 'rgba(255, 209, 102, 0.85)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.ellipse(queenTarget.x, queenTarget.y, 10, 10 * TILT, 0, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+
+            // 4. Comida con volumen 3D
             for (let f of foods) {
                 let r = 2.8 + f.amount * 0.55;
                 ctx.fillStyle = 'rgba(0,0,0,0.35)';
@@ -1546,7 +1921,7 @@
                 ctx.fill();
             }
 
-            // 4. Telarañas
+            // 5. Telarañas
             for (let w of webs) {
                 ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
                 ctx.lineWidth = 1.8;
@@ -1555,7 +1930,7 @@
                 ctx.stroke();
             }
 
-            // 5. Hormigueros en relieve 2.5D
+            // 6. Hormigueros en relieve 2.5D
             for (let n of antNests) {
                 ctx.fillStyle = 'rgba(0,0,0,0.45)';
                 ctx.beginPath();
@@ -1578,7 +1953,21 @@
                 ctx.fill();
             }
 
-            // 6. Termiteros elevados estilo catedral de arcilla
+            // 7. Huevos dentro de la Colonia y contador de 30s
+            for (let egg of eggs) {
+                ctx.fillStyle = '#fefae0';
+                ctx.beginPath();
+                ctx.ellipse(egg.x, egg.y - 3, 4.5, 3.2, 0.2, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Barra circular/texto de cuenta atrás
+                ctx.fillStyle = '#ffd166';
+                ctx.font = 'bold 11px Segoe UI';
+                ctx.textAlign = 'center';
+                ctx.fillText(`${Math.ceil(egg.timer)}s`, egg.x, egg.y - 10);
+            }
+
+            // 8. Termiteros
             for (let n of termiteNests) {
                 ctx.fillStyle = 'rgba(0,0,0,0.45)';
                 ctx.beginPath();
@@ -1590,7 +1979,6 @@
                 ctx.ellipse(n.x, n.y, n.radius + 9, (n.radius + 9) * TILT, 0, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Torre central elevada
                 ctx.fillStyle = '#9c6644';
                 ctx.beginPath();
                 ctx.ellipse(n.x - 2, n.y - 9, n.radius * 0.65, n.radius * 0.85, 0, 0, Math.PI * 2);
@@ -1603,12 +1991,13 @@
                 ctx.fill();
             }
 
-            // 7. Ordenar entidades por eje Y (Depth Sorting) para perspectiva 2.5D realista
+            // 9. Ordenar entidades por profundidad Y
             let allEntities = [...ants, ...termites, ...beetles, ...enemies];
+            if (queen) allEntities.push(queen);
             allEntities.sort((a, b) => a.y - b.y);
             for (let ent of allEntities) ent.draw();
 
-            // 8. Partículas de combate
+            // 10. Partículas
             for (let pt of particles) {
                 ctx.fillStyle = pt.color;
                 ctx.globalAlpha = pt.life / pt.maxLife;
@@ -1618,34 +2007,38 @@
             }
             ctx.globalAlpha = 1.0;
 
-            // 9. Copas de árboles y arbustos
+            // 11. Copas de árboles y arbustos
             drawCanopyLayer();
 
-            // 10. Iluminación cálida del bosque (Wild Forest Atmosphere)
+            // 12. Iluminación del bosque
             let sunGrad = ctx.createRadialGradient(canvas.width * 0.3, canvas.height * 0.2, 100, canvas.width * 0.5, canvas.height * 0.5, canvas.width * 0.8);
             sunGrad.addColorStop(0, 'rgba(255, 243, 176, 0.08)');
             sunGrad.addColorStop(1, 'rgba(6, 15, 5, 0.32)');
             ctx.fillStyle = sunGrad;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // 11. Previsualización del cursor en perspectiva
-            const validPlacement = canPlaceAt(mousePos.x, mousePos.y, currentTool);
-            const previewRadius = (currentTool === 'nest' || currentTool === 'termite_nest') ? 28 : (currentTool === 'mantis') ? 22 : (currentTool === 'spider' || currentTool === 'beetle') ? 16 : 14;
+            // 13. Previsualización del cursor (solo cuando toca colocar algo)
+            const showCursorPreview = (gameMode === 'sandbox') || (currentTool === 'queen' && !queen) || (currentTool === 'normal_nest' && antNests.length === 0);
+            if (showCursorPreview) {
+                const validPlacement = canPlaceAt(mousePos.x, mousePos.y, currentTool);
+                const previewRadius = (currentTool === 'nest' || currentTool === 'termite_nest' || currentTool === 'normal_nest') ? 28 : (currentTool === 'mantis') ? 22 : (currentTool === 'spider' || currentTool === 'beetle' || currentTool === 'queen') ? 16 : 14;
 
-            ctx.strokeStyle = validPlacement ? 'rgba(181, 228, 140, 0.95)' : 'rgba(255, 77, 109, 0.98)';
-            ctx.fillStyle = validPlacement ? 'rgba(181, 228, 140, 0.2)' : 'rgba(255, 77, 109, 0.3)';
-            ctx.setLineDash([5, 4]);
-            ctx.lineWidth = 2.2;
-            ctx.beginPath();
-            ctx.ellipse(mousePos.x, mousePos.y, previewRadius, previewRadius * TILT, 0, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.stroke();
-            ctx.setLineDash([]);
+                ctx.strokeStyle = validPlacement ? 'rgba(181, 228, 140, 0.95)' : 'rgba(255, 77, 109, 0.98)';
+                ctx.fillStyle = validPlacement ? 'rgba(181, 228, 140, 0.2)' : 'rgba(255, 77, 109, 0.3)';
+                ctx.setLineDash([5, 4]);
+                ctx.lineWidth = 2.2;
+                ctx.beginPath();
+                ctx.ellipse(mousePos.x, mousePos.y, previewRadius, previewRadius * TILT, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
 
             requestAnimationFrame(loop);
         }
 
-        init();
+        // Generar entorno de fondo mientras se muestra la pantalla de título
+        generateEnvironment();
         loop();
     </script>
 </body>
