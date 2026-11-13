@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ecosistema Gigante: Hormigas vs Termitas</title>
+    <title>Ecosistema Detallado: Hormigas vs Termitas</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            background-color: #121810;
+            background-color: #10160e;
             color: #eef5db;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
@@ -25,17 +25,18 @@
             font-size: 0.85rem;
             color: #f2e8cf;
             background: #386641;
-            padding: 4px 12px;
+            padding: 4px 14px;
             border-radius: 20px;
             display: inline-block;
             margin-top: 3px;
             font-weight: bold;
+            transition: background 0.2s;
         }
         
         .hud {
             display: flex;
             gap: 12px;
-            background: #202b1d;
+            background: #1d271a;
             padding: 6px 14px;
             border-radius: 8px;
             border: 1px solid #4f6d45;
@@ -59,7 +60,7 @@
             background-color: #4a7c36;
             color: white;
             border: none;
-            padding: 6px 10px;
+            padding: 6px 11px;
             border-radius: 5px;
             font-weight: bold;
             font-size: 0.8rem;
@@ -70,14 +71,13 @@
         button:active { transform: scale(0.95); }
         button.active {
             background-color: #bc4749;
-            box-shadow: 0 0 6px rgba(255,255,255,0.4);
+            box-shadow: 0 0 8px rgba(255,255,255,0.5);
         }
         button:disabled {
-            background-color: #333b30;
-            color: #6c7867;
+            background-color: #2f382c;
+            color: #657360;
             cursor: not-allowed;
         }
-        .btn-ant { background-color: #386641; }
         .btn-termite { background-color: #bc6c25; }
         .btn-termite:hover { background-color: #dda15e; }
         .btn-predator { background-color: #6a040f; }
@@ -85,11 +85,11 @@
         .btn-danger { background-color: #780000; }
 
         canvas {
-            background-color: #3f6b2b;
-            border: 4px solid #23381a;
+            background-color: #3a6327;
+            border: 4px solid #203318;
             border-radius: 8px;
             cursor: crosshair;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.8);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.85);
             max-width: 100%;
         }
     </style>
@@ -97,8 +97,8 @@
 <body>
 
     <header>
-        <h1>🌿 Ecosistema Expandido: Hormigas vs Termitas y Depredadores</h1>
-        <div id="status-msg">🛠️ Herramienta: Colocar Hormiguero (Hormigas)</div>
+        <h1>🌿 Ecosistema Forestal: Hormigas vs Termitas</h1>
+        <div id="status-msg">🏠 Colocar Nido de Hormigas (Haz clic en terreno despejado)</div>
     </header>
 
     <div class="hud">
@@ -109,12 +109,12 @@
         <button id="btn-spawn-ant" disabled>Crear Hormiga (10 🍓)</button>
         <button id="btn-spawn-termite" disabled>Crear Termita (10 🍓)</button>
         <button id="btn-speed">Velocidad: 1x</button>
-        <button id="btn-clear" class="btn-danger">Reiniciar Mapa</button>
+        <button id="btn-clear" class="btn-danger">Nuevo Mapa</button>
     </div>
 
     <div class="toolbar">
         <button id="tool-nest" class="active" onclick="setTool('nest')">🏠 Nido Hormigas</button>
-        <button id="tool-termite-nest" class="btn-termite" onclick="setTool('termite_nest')">🏰 Nido Termitas</button>
+        <button id="tool-termite_nest" class="btn-termite" onclick="setTool('termite_nest')">🏰 Nido Termitas</button>
         <button id="tool-food" onclick="setTool('food')">🍓 Soltar Comida</button>
         <button id="tool-spider" class="btn-predator" onclick="setTool('spider')">🕷️ Araña</button>
         <button id="tool-mantis" class="btn-predator" onclick="setTool('mantis')">🦗 Mantis (Jefe)</button>
@@ -152,25 +152,98 @@
         // Entorno detallado
         let grassBlades = [];
         let dirtPatches = [];
+        let pebbles = [];
+        let ferns = [];
         let logs = [];
         let rocks = [];
         let bushes = [];
         let trees = [];
         let flowers = [];
 
+        const toolDescriptions = {
+            nest: "🏠 Colocar Nido de Hormigas (Haz clic en terreno despejado)",
+            termite_nest: "🏰 Colocar Nido de Termitas (Montículo de arcilla)",
+            food: "🍓 Soltar Comida (Alimenta a las colonias)",
+            spider: "🕷️ Invocar Araña (Depredador letal)",
+            mantis: "🦗 Invocar Mantis Religiosa (Depredador alfa gigante)"
+        };
+
         function setTool(tool) {
             currentTool = tool;
             document.querySelectorAll('.toolbar button').forEach(b => b.classList.remove('active'));
             document.getElementById(`tool-${tool}`).classList.add('active');
+            statusEl.textContent = toolDescriptions[tool];
+            statusEl.style.background = "#386641";
+        }
 
-            const names = {
-                nest: "🏠 Colocar Nido de Hormigas (Haz clic en el césped)",
-                termite_nest: "🏰 Colocar Nido de Termitas (Estructura de arcilla y chimeneas)",
-                food: "🍓 Soltar Comida (Alimenta a las colonias)",
-                spider: "🕷️ Invocar Araña (Depredador letal)",
-                mantis: "🦗 Invocar Mantis Religiosa (Depredador alfa gigante)"
-            };
-            statusEl.textContent = names[tool];
+        // Verifica colisión con troncos rotados
+        function isCollidingWithLog(x, y, margin) {
+            for (let l of logs) {
+                const dx = x - l.x;
+                const dy = y - l.y;
+                const cos = Math.cos(-l.angle);
+                const sin = Math.sin(-l.angle);
+                const localX = dx * cos - dy * sin;
+                const localY = dx * sin + dy * cos;
+
+                if (Math.abs(localX) < l.w / 2 + margin && Math.abs(localY) < l.h / 2 + margin) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // Valida si se puede colocar un elemento en (x, y)
+        function canPlaceAt(x, y, tool) {
+            // Margen con bordes del mapa
+            if (x < 35 || x > canvas.width - 35 || y < 35 || y > canvas.height - 35) return false;
+
+            const reqRadius = (tool === 'nest' || tool === 'termite_nest') ? 26 :
+                              (tool === 'mantis') ? 22 :
+                              (tool === 'spider') ? 16 : 12;
+
+            // 1. Verificar rocas
+            for (let r of rocks) {
+                if (Math.hypot(x - r.x, y - r.y) < r.radius + reqRadius) return false;
+            }
+
+            // 2. Verificar troncos caídos
+            if (isCollidingWithLog(x, y, reqRadius)) return false;
+
+            // 3. Verificar otros nidos
+            for (let n of antNests) {
+                if (Math.hypot(x - n.x, y - n.y) < n.radius + reqRadius + 8) return false;
+            }
+            for (let n of termiteNests) {
+                if (Math.hypot(x - n.x, y - n.y) < n.radius + reqRadius + 8) return false;
+            }
+
+            // 4. Si colocamos nido o enemigo, no permitir encima de enemigos existentes
+            if (tool !== 'food') {
+                for (let en of enemies) {
+                    if (Math.hypot(x - en.x, y - en.y) < en.radius + reqRadius + 4) return false;
+                }
+            }
+
+            // 5. Si colocamos un nido, no permitir encima de hormigas o termitas
+            if (tool === 'nest' || tool === 'termite_nest') {
+                for (let a of ants) {
+                    if (Math.hypot(x - a.x, y - a.y) < reqRadius) return false;
+                }
+                for (let t of termites) {
+                    if (Math.hypot(x - t.x, y - t.y) < reqRadius) return false;
+                }
+            }
+
+            return true;
+        }
+
+        function checkObstacleCollision(x, y, radius) {
+            for (let rock of rocks) {
+                if (Math.hypot(x - rock.x, y - rock.y) < rock.radius + radius) return true;
+            }
+            if (isCollidingWithLog(x, y, radius)) return true;
+            return false;
         }
 
         class Ant {
@@ -188,7 +261,6 @@
             }
 
             update() {
-                // Atacar termitas o depredadores cercanos
                 let target = null;
                 let minDist = 90;
 
@@ -280,13 +352,10 @@
                 let nextX = this.x + Math.cos(this.angle) * this.speed;
                 let nextY = this.y + Math.sin(this.angle) * this.speed;
 
-                for (let rock of rocks) {
-                    if (Math.hypot(nextX - rock.x, nextY - rock.y) < rock.radius + 4) {
-                        this.angle += Math.PI / 2;
-                        nextX = this.x + Math.cos(this.angle) * this.speed;
-                        nextY = this.y + Math.sin(this.angle) * this.speed;
-                        break;
-                    }
+                if (checkObstacleCollision(nextX, nextY, 4)) {
+                    this.angle += (Math.random() > 0.5 ? 1 : -1) * (Math.PI / 2);
+                    nextX = this.x + Math.cos(this.angle) * this.speed;
+                    nextY = this.y + Math.sin(this.angle) * this.speed;
                 }
 
                 this.x = nextX;
@@ -345,7 +414,6 @@
             }
 
             update() {
-                // Atacar hormigas o depredadores cercanos
                 let target = null;
                 let minDist = 85;
 
@@ -386,7 +454,6 @@
                             updateUI();
                         }
                     } else {
-                        // Buscar comida
                         for (let i = foods.length - 1; i >= 0; i--) {
                             let f = foods[i];
                             let dist = Math.hypot(f.x - this.x, f.y - this.y);
@@ -409,13 +476,10 @@
                 let nextX = this.x + Math.cos(this.angle) * this.speed;
                 let nextY = this.y + Math.sin(this.angle) * this.speed;
 
-                for (let rock of rocks) {
-                    if (Math.hypot(nextX - rock.x, nextY - rock.y) < rock.radius + 4) {
-                        this.angle += Math.PI / 2;
-                        nextX = this.x + Math.cos(this.angle) * this.speed;
-                        nextY = this.y + Math.sin(this.angle) * this.speed;
-                        break;
-                    }
+                if (checkObstacleCollision(nextX, nextY, 4)) {
+                    this.angle += (Math.random() > 0.5 ? 1 : -1) * (Math.PI / 2);
+                    nextX = this.x + Math.cos(this.angle) * this.speed;
+                    nextY = this.y + Math.sin(this.angle) * this.speed;
                 }
 
                 this.x = nextX;
@@ -432,7 +496,6 @@
                 ctx.translate(this.x, this.y);
                 ctx.rotate(this.angle);
 
-                // Cuerpo claro de termita y cabeza grande mandibulada
                 ctx.fillStyle = '#e3d5ca';
                 ctx.beginPath();
                 ctx.ellipse(-3, 0, 4, 2.5, 0, 0, Math.PI * 2);
@@ -469,7 +532,7 @@
             constructor(x, y, type) {
                 this.x = x;
                 this.y = y;
-                this.type = type; // 'spider', 'mantis'
+                this.type = type;
                 this.angle = Math.random() * Math.PI * 2;
                 
                 if (type === 'mantis') {
@@ -479,7 +542,7 @@
                     this.maxHp = 150;
                     this.damage = 3.5;
                     this.sight = 250;
-                } else { // spider
+                } else {
                     this.speed = 1.6;
                     this.radius = 14;
                     this.hp = 70;
@@ -493,7 +556,14 @@
                 let target = null;
                 let minDist = this.sight;
 
-                // Buscar hormigas o termitas
+                // Atacar otros enemigos de distinta especie
+                for (let other of enemies) {
+                    if (other !== this && other.type !== this.type) {
+                        let d = Math.hypot(other.x - this.x, other.y - this.y);
+                        if (d < minDist) { minDist = d; target = other; }
+                    }
+                }
+
                 for (let ant of ants) {
                     let d = Math.hypot(ant.x - this.x, ant.y - this.y);
                     if (d < minDist) { minDist = d; target = ant; }
@@ -507,7 +577,7 @@
                     let targetAngle = Math.atan2(target.y - this.y, target.x - this.x);
                     this.angle = this.lerpAngle(this.angle, targetAngle, 0.16);
 
-                    if (minDist < this.radius + target.radius + 4) {
+                    if (minDist < this.radius + (target.radius || 4) + 4) {
                         target.hp -= this.damage;
                         if (target.hp <= 0) {
                             this.hp = Math.min(this.maxHp, this.hp + 15);
@@ -520,13 +590,10 @@
                 let nextX = this.x + Math.cos(this.angle) * this.speed;
                 let nextY = this.y + Math.sin(this.angle) * this.speed;
 
-                for (let rock of rocks) {
-                    if (Math.hypot(nextX - rock.x, nextY - rock.y) < rock.radius + this.radius * 0.7) {
-                        this.angle += Math.PI / 2;
-                        nextX = this.x + Math.cos(this.angle) * this.speed;
-                        nextY = this.y + Math.sin(this.angle) * this.speed;
-                        break;
-                    }
+                if (checkObstacleCollision(nextX, nextY, this.radius * 0.7)) {
+                    this.angle += (Math.random() > 0.5 ? 1 : -1) * (Math.PI / 2);
+                    nextX = this.x + Math.cos(this.angle) * this.speed;
+                    nextY = this.y + Math.sin(this.angle) * this.speed;
                 }
 
                 this.x = nextX;
@@ -625,6 +692,8 @@
         function generateEnvironment() {
             grassBlades = [];
             dirtPatches = [];
+            pebbles = [];
+            ferns = [];
             logs = [];
             rocks = [];
             bushes = [];
@@ -632,45 +701,77 @@
             flowers = [];
             foods = [];
 
-            // Parches de tierra variados
-            for (let i = 0; i < 15; i++) {
+            // Parches de tierra húmeda y senderos naturales
+            for (let i = 0; i < 22; i++) {
                 dirtPatches.push({
                     x: Math.random() * canvas.width,
                     y: Math.random() * canvas.height,
-                    radius: 40 + Math.random() * 50
-                });
-            }
-
-            for (let i = 0; i < 1200; i++) {
-                grassBlades.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    h: 4 + Math.random() * 6,
-                    color: Math.random() > 0.5 ? '#365e24' : '#477d30'
-                });
-            }
-
-            // Troncos caídos decorativos y de obstáculo
-            for (let i = 0; i < 6; i++) {
-                logs.push({
-                    x: 100 + Math.random() * (canvas.width - 200),
-                    y: 100 + Math.random() * (canvas.height - 200),
-                    w: 70 + Math.random() * 50,
-                    h: 22 + Math.random() * 10,
+                    rx: 40 + Math.random() * 60,
+                    ry: 30 + Math.random() * 45,
                     angle: Math.random() * Math.PI
                 });
             }
 
-            for (let i = 0; i < 16; i++) {
-                rocks.push({
-                    x: 80 + Math.random() * (canvas.width - 160),
-                    y: 80 + Math.random() * (canvas.height - 160),
-                    radius: 18 + Math.random() * 22
+            // Piedritas decorativas en el suelo
+            for (let i = 0; i < 140; i++) {
+                pebbles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    r: 1.5 + Math.random() * 2.5,
+                    color: Math.random() > 0.5 ? '#5c6360' : '#8a918e'
                 });
             }
 
-            const flowerColors = ['#ffbe0b', '#ff006e', '#ffffff', '#fb5607', '#9d4edd'];
-            for (let i = 0; i < 80; i++) {
+            // Briznas de hierba en 3 tonos
+            const grassColors = ['#2d521e', '#467a2f', '#58943c'];
+            for (let i = 0; i < 1600; i++) {
+                grassBlades.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    h: 4 + Math.random() * 7,
+                    lean: (Math.random() - 0.5) * 4,
+                    color: grassColors[Math.floor(Math.random() * grassColors.length)]
+                });
+            }
+
+            // Helechos detallados
+            for (let i = 0; i < 28; i++) {
+                ferns.push({
+                    x: 40 + Math.random() * (canvas.width - 80),
+                    y: 40 + Math.random() * (canvas.height - 80),
+                    size: 14 + Math.random() * 10,
+                    angle: Math.random() * Math.PI * 2
+                });
+            }
+
+            // Troncos caídos (obstáculos reales)
+            for (let i = 0; i < 7; i++) {
+                logs.push({
+                    x: 120 + Math.random() * (canvas.width - 240),
+                    y: 120 + Math.random() * (canvas.height - 240),
+                    w: 80 + Math.random() * 55,
+                    h: 24 + Math.random() * 10,
+                    angle: Math.random() * Math.PI
+                });
+            }
+
+            // Rocas con relieve (obstáculos reales)
+            for (let i = 0; i < 15; i++) {
+                let rx = 90 + Math.random() * (canvas.width - 180);
+                let ry = 90 + Math.random() * (canvas.height - 180);
+                if (!isCollidingWithLog(rx, ry, 45)) {
+                    rocks.push({
+                        x: rx,
+                        y: ry,
+                        radius: 20 + Math.random() * 22,
+                        hasMoss: Math.random() > 0.4
+                    });
+                }
+            }
+
+            // Flores con pétalos
+            const flowerColors = ['#ffbe0b', '#ff006e', '#ffffff', '#fb5607', '#c77dff'];
+            for (let i = 0; i < 75; i++) {
                 flowers.push({
                     x: 30 + Math.random() * (canvas.width - 60),
                     y: 30 + Math.random() * (canvas.height - 60),
@@ -678,18 +779,20 @@
                 });
             }
 
+            // Arbustos frondosos con comida alrededor
             for (let i = 0; i < 14; i++) {
-                const bx = 60 + Math.random() * (canvas.width - 120);
-                const by = 60 + Math.random() * (canvas.height - 120);
-                bushes.push({ x: bx, y: by, radius: 28 + Math.random() * 14 });
-                spawnFoodCluster(bx + (Math.random() - 0.5) * 50, by + (Math.random() - 0.5) * 50, 10);
+                const bx = 70 + Math.random() * (canvas.width - 140);
+                const by = 70 + Math.random() * (canvas.height - 140);
+                bushes.push({ x: bx, y: by, radius: 26 + Math.random() * 12 });
+                spawnFoodCluster(bx + (Math.random() - 0.5) * 50, by + (Math.random() - 0.5) * 50, 9);
             }
 
+            // Árboles altos
             for (let i = 0; i < 11; i++) {
                 trees.push({
-                    x: 100 + Math.random() * (canvas.width - 200),
-                    y: 100 + Math.random() * (canvas.height - 200),
-                    radius: 55 + Math.random() * 22
+                    x: 110 + Math.random() * (canvas.width - 220),
+                    y: 110 + Math.random() * (canvas.height - 220),
+                    radius: 58 + Math.random() * 22
                 });
             }
         }
@@ -708,10 +811,6 @@
         }
 
         function placeNest(x, y, type) {
-            for (let rock of rocks) {
-                if (Math.hypot(x - rock.x, y - rock.y) < rock.radius + 25) return;
-            }
-
             let newNest = { x, y, radius: 24 };
             if (type === 'ant') {
                 antNests.push(newNest);
@@ -727,11 +826,11 @@
             for (let i = 0; i < count; i++) {
                 const offsetX = (Math.random() - 0.5) * 45;
                 const offsetY = (Math.random() - 0.5) * 45;
-                foods.push({
-                    x: Math.max(20, Math.min(canvas.width - 20, x + offsetX)),
-                    y: Math.max(20, Math.min(canvas.height - 20, y + offsetY)),
-                    amount: 5
-                });
+                let fx = Math.max(20, Math.min(canvas.width - 20, x + offsetX));
+                let fy = Math.max(20, Math.min(canvas.height - 20, y + offsetY));
+                if (!checkObstacleCollision(fx, fy, 4)) {
+                    foods.push({ x: fx, y: fy, amount: 5 });
+                }
             }
         }
 
@@ -754,6 +853,16 @@
             const rect = canvas.getBoundingClientRect();
             const clickX = (e.clientX - rect.left) * (canvas.width / rect.width);
             const clickY = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+            if (!canPlaceAt(clickX, clickY, currentTool)) {
+                statusEl.textContent = "⚠️ No puedes colocar esto encima de obstáculos, nidos o enemigos";
+                statusEl.style.background = "#9b2226";
+                return;
+            }
+
+            // Restaurar mensaje normal si estaba en error
+            statusEl.textContent = toolDescriptions[currentTool];
+            statusEl.style.background = "#386641";
 
             if (currentTool === 'nest') {
                 placeNest(clickX, clickY, 'ant');
@@ -795,88 +904,179 @@
         document.getElementById('btn-clear').addEventListener('click', init);
 
         function drawEnvironmentBase() {
-            ctx.fillStyle = '#3f6b2b';
+            // Césped base rico
+            ctx.fillStyle = '#3a6327';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Parches de tierra orgánica
+            // Parches de tierra con borde suave
             for (let d of dirtPatches) {
-                ctx.fillStyle = 'rgba(74, 53, 33, 0.35)';
+                ctx.save();
+                ctx.translate(d.x, d.y);
+                ctx.rotate(d.angle);
+                ctx.fillStyle = 'rgba(72, 50, 30, 0.35)';
                 ctx.beginPath();
-                ctx.arc(d.x, d.y, d.radius, 0, Math.PI * 2);
+                ctx.ellipse(0, 0, d.rx, d.ry, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+
+            // Piedritas
+            for (let p of pebbles) {
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
                 ctx.fill();
             }
 
+            // Briznas de hierba
             for (let g of grassBlades) {
                 ctx.strokeStyle = g.color;
-                ctx.lineWidth = 1.5;
+                ctx.lineWidth = 1.4;
                 ctx.beginPath();
                 ctx.moveTo(g.x, g.y);
-                ctx.lineTo(g.x + 2, g.y - g.h);
+                ctx.lineTo(g.x + g.lean, g.y - g.h);
                 ctx.stroke();
             }
 
-            // Troncos caídos
+            // Helechos
+            for (let fn of ferns) {
+                ctx.save();
+                ctx.translate(fn.x, fn.y);
+                ctx.rotate(fn.angle);
+                ctx.strokeStyle = '#264d19';
+                ctx.lineWidth = 2;
+                for (let i = 0; i < 6; i++) {
+                    ctx.rotate(Math.PI / 3);
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0);
+                    ctx.lineTo(fn.size, 0);
+                    ctx.stroke();
+                }
+                ctx.restore();
+            }
+
+            // Troncos caídos detallados con corteza, anillos y musgo
             for (let l of logs) {
                 ctx.save();
                 ctx.translate(l.x, l.y);
                 ctx.rotate(l.angle);
-                ctx.fillStyle = '#4a2e18';
+
+                // Sombra
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+                ctx.beginPath();
+                ctx.roundRect(-l.w/2 + 4, -l.h/2 + 5, l.w, l.h, 6);
+                ctx.fill();
+
+                // Cuerpo del tronco
+                ctx.fillStyle = '#4e3018';
                 ctx.beginPath();
                 ctx.roundRect(-l.w/2, -l.h/2, l.w, l.h, 6);
                 ctx.fill();
-                ctx.strokeStyle = '#2b190d';
-                ctx.lineWidth = 2;
+
+                // Líneas de corteza
+                ctx.strokeStyle = '#2d1a0b';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(-l.w/2 + 8, -l.h/4); ctx.lineTo(l.w/2 - 8, -l.h/4);
+                ctx.moveTo(-l.w/2 + 12, l.h/4); ctx.lineTo(l.w/2 - 12, l.h/4);
                 ctx.stroke();
+
+                // Corte transversal (madera clara con anillos)
+                ctx.fillStyle = '#c69c6d';
+                ctx.beginPath();
+                ctx.ellipse(l.w/2 - 2, 0, 4, l.h/2 - 1, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Musgo en la parte superior
+                ctx.fillStyle = '#4a7c36';
+                ctx.beginPath();
+                ctx.ellipse(-5, -l.h/3, l.w * 0.25, 4, 0, 0, Math.PI * 2);
+                ctx.fill();
+
                 ctx.restore();
             }
 
+            // Flores detalladas con pétalos
             for (let fl of flowers) {
                 ctx.fillStyle = fl.color;
+                for (let a = 0; a < Math.PI * 2; a += Math.PI / 2.5) {
+                    ctx.beginPath();
+                    ctx.arc(fl.x + Math.cos(a) * 2.2, fl.y + Math.sin(a) * 2.2, 1.6, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.fillStyle = '#3d2600';
                 ctx.beginPath();
-                ctx.arc(fl.x, fl.y, 2.5, 0, Math.PI * 2);
+                ctx.arc(fl.x, fl.y, 1.3, 0, Math.PI * 2);
                 ctx.fill();
             }
 
+            // Rocas con volumen y musgo
             for (let r of rocks) {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
                 ctx.beginPath();
-                ctx.arc(r.x + 4, r.y + 5, r.radius, 0, Math.PI * 2);
+                ctx.arc(r.x + 5, r.y + 6, r.radius, 0, Math.PI * 2);
                 ctx.fill();
 
-                ctx.fillStyle = '#6b7270';
+                ctx.fillStyle = '#686e6c';
                 ctx.beginPath();
                 ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
                 ctx.fill();
+
+                // Iluminación superior
+                ctx.fillStyle = '#868e8b';
+                ctx.beginPath();
+                ctx.arc(r.x - r.radius * 0.25, r.y - r.radius * 0.25, r.radius * 0.65, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Parche de musgo
+                if (r.hasMoss) {
+                    ctx.fillStyle = '#3e6e29';
+                    ctx.beginPath();
+                    ctx.arc(r.x + r.radius * 0.2, r.y - r.radius * 0.3, r.radius * 0.4, 0, Math.PI * 2);
+                    ctx.fill();
+                }
             }
         }
 
         function drawCanopyLayer() {
+            // Arbustos con múltiples capas de hojas
             for (let b of bushes) {
-                ctx.fillStyle = 'rgba(0,0,0,0.22)';
+                ctx.fillStyle = 'rgba(0,0,0,0.25)';
                 ctx.beginPath();
-                ctx.arc(b.x + 4, b.y + 4, b.radius, 0, Math.PI * 2);
+                ctx.arc(b.x + 5, b.y + 5, b.radius, 0, Math.PI * 2);
                 ctx.fill();
 
-                ctx.fillStyle = '#22481d';
+                ctx.fillStyle = '#1f421a';
                 ctx.beginPath();
                 ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
                 ctx.fill();
+
+                ctx.fillStyle = '#2d5e26';
+                ctx.beginPath();
+                ctx.arc(b.x - 4, b.y - 4, b.radius * 0.72, 0, Math.PI * 2);
+                ctx.fill();
             }
 
+            // Árboles frondosos en capas
             for (let t of trees) {
-                ctx.fillStyle = 'rgba(10, 20, 8, 0.28)';
+                ctx.fillStyle = 'rgba(8, 18, 6, 0.3)';
                 ctx.beginPath();
-                ctx.arc(t.x + 18, t.y + 20, t.radius, 0, Math.PI * 2);
+                ctx.arc(t.x + 20, t.y + 22, t.radius, 0, Math.PI * 2);
                 ctx.fill();
 
                 ctx.fillStyle = '#332010';
                 ctx.beginPath();
-                ctx.arc(t.x, t.y, 9, 0, Math.PI * 2);
+                ctx.arc(t.x, t.y, 10, 0, Math.PI * 2);
                 ctx.fill();
 
-                ctx.fillStyle = 'rgba(24, 58, 20, 0.8)';
+                ctx.fillStyle = 'rgba(22, 54, 18, 0.82)';
                 ctx.beginPath();
                 ctx.arc(t.x, t.y, t.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = 'rgba(38, 84, 31, 0.72)';
+                ctx.beginPath();
+                ctx.arc(t.x - 10, t.y - 10, t.radius * 0.68, 0, Math.PI * 2);
                 ctx.fill();
             }
         }
@@ -894,7 +1094,6 @@
                 for (let t of termites) t.update();
                 for (let en of enemies) en.update();
 
-                // Hormigas derrotadas
                 for (let i = ants.length - 1; i >= 0; i--) {
                     if (ants[i].hp <= 0) {
                         foods.push({ x: ants[i].x, y: ants[i].y, amount: 2 });
@@ -903,7 +1102,6 @@
                     }
                 }
 
-                // Termitas derrotadas
                 for (let i = termites.length - 1; i >= 0; i--) {
                     if (termites[i].hp <= 0) {
                         foods.push({ x: termites[i].x, y: termites[i].y, amount: 3 });
@@ -912,7 +1110,6 @@
                     }
                 }
 
-                // Depredadores derrotados
                 for (let i = enemies.length - 1; i >= 0; i--) {
                     if (enemies[i].hp <= 0) {
                         let drop = enemies[i].type === 'mantis' ? 25 : 12;
@@ -939,6 +1136,10 @@
                 ctx.beginPath();
                 ctx.arc(f.x, f.y, 2.2 + f.amount * 0.55, 0, Math.PI * 2);
                 ctx.fill();
+                ctx.fillStyle = '#ffccd5';
+                ctx.beginPath();
+                ctx.arc(f.x - 1, f.y - 1, 1, 0, Math.PI * 2);
+                ctx.fill();
             }
 
             // Dibujar Nidos de Hormigas
@@ -953,7 +1154,7 @@
                 ctx.fill();
             }
 
-            // Dibujar Nidos de Termitas (Montículos de arcilla con chimeneas)
+            // Dibujar Nidos de Termitas
             for (let n of termiteNests) {
                 ctx.fillStyle = '#8d5524';
                 ctx.beginPath();
@@ -965,7 +1166,6 @@
                 ctx.arc(n.x - 4, n.y - 4, n.radius * 0.65, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Chimeneas características del nido de termitas
                 ctx.fillStyle = '#5c3a21';
                 ctx.beginPath();
                 ctx.arc(n.x + 3, n.y + 3, 5, 0, Math.PI * 2);
@@ -973,22 +1173,27 @@
                 ctx.fill();
             }
 
-            // Previsualizador de colocación
-            if (currentTool === 'nest' || currentTool === 'termite_nest') {
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
-                ctx.setLineDash([4, 4]);
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.arc(mousePos.x, mousePos.y, 24, 0, Math.PI * 2);
-                ctx.stroke();
-                ctx.setLineDash([]);
-            }
-
             for (let ant of ants) ant.draw();
             for (let t of termites) t.draw();
             for (let en of enemies) en.draw();
 
             drawCanopyLayer();
+
+            // Indicador de colocación (Verde = válido, Rojo = bloqueado)
+            const validPlacement = canPlaceAt(mousePos.x, mousePos.y, currentTool);
+            const previewRadius = (currentTool === 'nest' || currentTool === 'termite_nest') ? 24 :
+                                  (currentTool === 'mantis') ? 20 :
+                                  (currentTool === 'spider') ? 14 : 16;
+
+            ctx.strokeStyle = validPlacement ? 'rgba(167, 201, 87, 0.9)' : 'rgba(230, 57, 70, 0.95)';
+            ctx.fillStyle = validPlacement ? 'rgba(167, 201, 87, 0.15)' : 'rgba(230, 57, 70, 0.25)';
+            ctx.setLineDash([5, 4]);
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(mousePos.x, mousePos.y, previewRadius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            ctx.setLineDash([]);
 
             requestAnimationFrame(loop);
         }
