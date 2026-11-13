@@ -3,55 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ecosistema Detallado: Hormigas vs Termitas</title>
+    <title>Ecosistema Gigante: Guerra de Insectos</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            background-color: #10160e;
+            background-color: #0c100a;
             color: #eef5db;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            padding: 10px;
+            padding: 8px;
         }
         header {
             text-align: center;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
-        h1 { font-size: 1.4rem; color: #a7c957; }
+        h1 { font-size: 1.3rem; color: #a7c957; }
         #status-msg {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: #f2e8cf;
             background: #386641;
-            padding: 4px 14px;
+            padding: 3px 12px;
             border-radius: 20px;
             display: inline-block;
-            margin-top: 3px;
+            margin-top: 2px;
             font-weight: bold;
             transition: background 0.2s;
         }
         
         .hud {
             display: flex;
-            gap: 12px;
-            background: #1d271a;
-            padding: 6px 14px;
+            gap: 10px;
+            background: #172114;
+            padding: 5px 12px;
             border-radius: 8px;
             border: 1px solid #4f6d45;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             align-items: center;
             flex-wrap: wrap;
             justify-content: center;
         }
-        .stat { font-weight: bold; font-size: 0.9rem; }
+        .stat { font-weight: bold; font-size: 0.85rem; }
         .stat span { color: #a7c957; }
         
         .toolbar {
             display: flex;
-            gap: 6px;
-            margin-bottom: 8px;
+            gap: 5px;
+            margin-bottom: 6px;
             flex-wrap: wrap;
             justify-content: center;
         }
@@ -60,10 +60,10 @@
             background-color: #4a7c36;
             color: white;
             border: none;
-            padding: 6px 11px;
+            padding: 5px 10px;
             border-radius: 5px;
             font-weight: bold;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             cursor: pointer;
             transition: transform 0.1s, background 0.2s;
         }
@@ -71,11 +71,11 @@
         button:active { transform: scale(0.95); }
         button.active {
             background-color: #bc4749;
-            box-shadow: 0 0 8px rgba(255,255,255,0.5);
+            box-shadow: 0 0 6px rgba(255,255,255,0.5);
         }
         button:disabled {
-            background-color: #2f382c;
-            color: #657360;
+            background-color: #262e24;
+            color: #5c6658;
             cursor: not-allowed;
         }
         .btn-termite { background-color: #bc6c25; }
@@ -85,11 +85,11 @@
         .btn-danger { background-color: #780000; }
 
         canvas {
-            background-color: #3a6327;
-            border: 4px solid #203318;
+            background-color: #355823;
+            border: 3px solid #1c2b14;
             border-radius: 8px;
             cursor: crosshair;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.85);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.9);
             max-width: 100%;
         }
     </style>
@@ -97,12 +97,12 @@
 <body>
 
     <header>
-        <h1>🌿 Ecosistema Forestal: Hormigas vs Termitas</h1>
+        <h1>🌿 Ecosistema Masivo: Hormigas vs Termitas y Arañas Teje-redes</h1>
         <div id="status-msg">🏠 Colocar Nido de Hormigas (Haz clic en terreno despejado)</div>
     </header>
 
     <div class="hud">
-        <div class="stat">🍓 Comida: <span id="food-count">60</span></div>
+        <div class="stat">🍓 Comida: <span id="food-count">80</span></div>
         <div class="stat">🐜 Hormigas: <span id="ant-count">0</span></div>
         <div class="stat">🏗️ Termitas: <span id="termite-count">0</span></div>
         <div class="stat">🏰 Nidos: <span id="nest-count">0</span></div>
@@ -116,17 +116,17 @@
         <button id="tool-nest" class="active" onclick="setTool('nest')">🏠 Nido Hormigas</button>
         <button id="tool-termite_nest" class="btn-termite" onclick="setTool('termite_nest')">🏰 Nido Termitas</button>
         <button id="tool-food" onclick="setTool('food')">🍓 Soltar Comida</button>
-        <button id="tool-spider" class="btn-predator" onclick="setTool('spider')">🕷️ Araña</button>
-        <button id="tool-mantis" class="btn-predator" onclick="setTool('mantis')">🦗 Mantis (Jefe)</button>
+        <button id="tool-spider" class="btn-predator" onclick="setTool('spider')">🕷️ Araña (Teje-redes)</button>
+        <button id="tool-mantis" class="btn-predator" onclick="setTool('mantis')">🦗 Mantis Alfa</button>
     </div>
 
-    <canvas id="gameCanvas" width="1500" height="900"></canvas>
+    <!-- Mapa Gigante 2000x1200 -->
+    <canvas id="gameCanvas" width="2000" height="1200"></canvas>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
-        // UI
         const foodEl = document.getElementById('food-count');
         const antEl = document.getElementById('ant-count');
         const termiteEl = document.getElementById('termite-count');
@@ -136,20 +136,19 @@
         const btnSpawnTermite = document.getElementById('btn-spawn-termite');
         const btnSpeed = document.getElementById('btn-speed');
 
-        // Estado
         let currentTool = 'nest';
-        let storedFood = 60;
+        let storedFood = 80;
         let antNests = [];
         let termiteNests = [];
         let ants = [];
         let termites = [];
         let enemies = [];
+        let webs = []; // Proyectiles de telaraña
         let foods = [];
         let pheromones = [];
         let gameSpeed = 1;
         let mousePos = { x: -100, y: -100 };
 
-        // Entorno detallado
         let grassBlades = [];
         let dirtPatches = [];
         let pebbles = [];
@@ -164,7 +163,7 @@
             nest: "🏠 Colocar Nido de Hormigas (Haz clic en terreno despejado)",
             termite_nest: "🏰 Colocar Nido de Termitas (Montículo de arcilla)",
             food: "🍓 Soltar Comida (Alimenta a las colonias)",
-            spider: "🕷️ Invocar Araña (Depredador letal)",
+            spider: "🕷️ Invocar Araña (Lanza telarañas para atrapar presas)",
             mantis: "🦗 Invocar Mantis Religiosa (Depredador alfa gigante)"
         };
 
@@ -176,7 +175,6 @@
             statusEl.style.background = "#386641";
         }
 
-        // Verifica colisión con troncos rotados
         function isCollidingWithLog(x, y, margin) {
             for (let l of logs) {
                 const dx = x - l.x;
@@ -185,47 +183,30 @@
                 const sin = Math.sin(-l.angle);
                 const localX = dx * cos - dy * sin;
                 const localY = dx * sin + dy * cos;
-
-                if (Math.abs(localX) < l.w / 2 + margin && Math.abs(localY) < l.h / 2 + margin) {
-                    return true;
-                }
+                if (Math.abs(localX) < l.w / 2 + margin && Math.abs(localY) < l.h / 2 + margin) return true;
             }
             return false;
         }
 
-        // Valida si se puede colocar un elemento en (x, y)
         function canPlaceAt(x, y, tool) {
-            // Margen con bordes del mapa
-            if (x < 35 || x > canvas.width - 35 || y < 35 || y > canvas.height - 35) return false;
+            if (x < 40 || x > canvas.width - 40 || y < 40 || y > canvas.height - 40) return false;
+            const reqRadius = (tool === 'nest' || tool === 'termite_nest') ? 26 : (tool === 'mantis') ? 22 : (tool === 'spider') ? 16 : 12;
 
-            const reqRadius = (tool === 'nest' || tool === 'termite_nest') ? 26 :
-                              (tool === 'mantis') ? 22 :
-                              (tool === 'spider') ? 16 : 12;
-
-            // 1. Verificar rocas
             for (let r of rocks) {
                 if (Math.hypot(x - r.x, y - r.y) < r.radius + reqRadius) return false;
             }
-
-            // 2. Verificar troncos caídos
             if (isCollidingWithLog(x, y, reqRadius)) return false;
-
-            // 3. Verificar otros nidos
             for (let n of antNests) {
                 if (Math.hypot(x - n.x, y - n.y) < n.radius + reqRadius + 8) return false;
             }
             for (let n of termiteNests) {
                 if (Math.hypot(x - n.x, y - n.y) < n.radius + reqRadius + 8) return false;
             }
-
-            // 4. Si colocamos nido o enemigo, no permitir encima de enemigos existentes
             if (tool !== 'food') {
                 for (let en of enemies) {
                     if (Math.hypot(x - en.x, y - en.y) < en.radius + reqRadius + 4) return false;
                 }
             }
-
-            // 5. Si colocamos un nido, no permitir encima de hormigas o termitas
             if (tool === 'nest' || tool === 'termite_nest') {
                 for (let a of ants) {
                     if (Math.hypot(x - a.x, y - a.y) < reqRadius) return false;
@@ -234,7 +215,6 @@
                     if (Math.hypot(x - t.x, y - t.y) < reqRadius) return false;
                 }
             }
-
             return true;
         }
 
@@ -258,9 +238,13 @@
                 this.damage = 0.65;
                 this.hasFood = false;
                 this.pheromoneTimer = 0;
+                this.slowTimer = 0; // Efecto de telaraña
             }
 
             update() {
+                let currentSpeed = this.slowTimer > 0 ? this.speed * 0.35 : this.speed;
+                if (this.slowTimer > 0) this.slowTimer--;
+
                 let target = null;
                 let minDist = 90;
 
@@ -349,13 +333,13 @@
                     }
                 }
 
-                let nextX = this.x + Math.cos(this.angle) * this.speed;
-                let nextY = this.y + Math.sin(this.angle) * this.speed;
+                let nextX = this.x + Math.cos(this.angle) * currentSpeed;
+                let nextY = this.y + Math.sin(this.angle) * currentSpeed;
 
                 if (checkObstacleCollision(nextX, nextY, 4)) {
                     this.angle += (Math.random() > 0.5 ? 1 : -1) * (Math.PI / 2);
-                    nextX = this.x + Math.cos(this.angle) * this.speed;
-                    nextY = this.y + Math.sin(this.angle) * this.speed;
+                    nextX = this.x + Math.cos(this.angle) * currentSpeed;
+                    nextY = this.y + Math.sin(this.angle) * currentSpeed;
                 }
 
                 this.x = nextX;
@@ -372,19 +356,47 @@
                 ctx.translate(this.x, this.y);
                 ctx.rotate(this.angle);
 
+                // Patas articuladas detalladas
+                ctx.strokeStyle = '#140804';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(-2, -3); ctx.lineTo(-4, -9);
+                ctx.moveTo(0, -3); ctx.lineTo(1, -10);
+                ctx.moveTo(2, -3); ctx.lineTo(5, -9);
+                ctx.moveTo(-2, 3); ctx.lineTo(-4, 9);
+                ctx.moveTo(0, 3); ctx.lineTo(1, 10);
+                ctx.moveTo(2, 3); ctx.lineTo(5, 9);
+                ctx.stroke();
+
+                // Cuerpo de hormiga estilizado
                 ctx.fillStyle = '#2b120a';
                 ctx.beginPath();
-                ctx.ellipse(-4, 0, 3.2, 2.1, 0, 0, Math.PI * 2);
-                ctx.ellipse(0, 0, 2.2, 1.5, 0, 0, Math.PI * 2);
-                ctx.ellipse(3.5, 0, 2, 1.8, 0, 0, Math.PI * 2);
+                ctx.ellipse(-4.5, 0, 3.5, 2.2, 0, 0, Math.PI * 2); // Abdomen
+                ctx.ellipse(0, 0, 2.2, 1.5, 0, 0, Math.PI * 2);   // Tórax
+                ctx.ellipse(3.8, 0, 2.2, 1.9, 0, 0, Math.PI * 2); // Cabeza
+                ctx.fill();
+
+                // Brillo en el abdomen
+                ctx.fillStyle = 'rgba(255,255,255,0.2)';
+                ctx.beginPath();
+                ctx.ellipse(-5, -0.8, 1.5, 0.8, 0, 0, Math.PI * 2);
                 ctx.fill();
 
                 if (this.hasFood) {
                     ctx.fillStyle = '#e63946';
                     ctx.beginPath();
-                    ctx.arc(6.5, 0, 2.8, 0, Math.PI * 2);
+                    ctx.arc(7, 0, 3, 0, Math.PI * 2);
                     ctx.fill();
                 }
+
+                if (this.slowTimer > 0) {
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+                    ctx.lineWidth = 1.2;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, 8, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+
                 ctx.restore();
             }
 
@@ -393,7 +405,6 @@
                 while (a < -Math.PI) a += Math.PI * 2;
                 return a;
             }
-
             lerpAngle(a, b, t) {
                 const diff = this.normalizeAngle(b - a);
                 return a + diff * t;
@@ -411,9 +422,13 @@
                 this.maxHp = 25;
                 this.damage = 0.7;
                 this.hasFood = false;
+                this.slowTimer = 0;
             }
 
             update() {
+                let currentSpeed = this.slowTimer > 0 ? this.speed * 0.35 : this.speed;
+                if (this.slowTimer > 0) this.slowTimer--;
+
                 let target = null;
                 let minDist = 85;
 
@@ -473,13 +488,13 @@
                     }
                 }
 
-                let nextX = this.x + Math.cos(this.angle) * this.speed;
-                let nextY = this.y + Math.sin(this.angle) * this.speed;
+                let nextX = this.x + Math.cos(this.angle) * currentSpeed;
+                let nextY = this.y + Math.sin(this.angle) * currentSpeed;
 
                 if (checkObstacleCollision(nextX, nextY, 4)) {
                     this.angle += (Math.random() > 0.5 ? 1 : -1) * (Math.PI / 2);
-                    nextX = this.x + Math.cos(this.angle) * this.speed;
-                    nextY = this.y + Math.sin(this.angle) * this.speed;
+                    nextX = this.x + Math.cos(this.angle) * currentSpeed;
+                    nextY = this.y + Math.sin(this.angle) * currentSpeed;
                 }
 
                 this.x = nextX;
@@ -496,21 +511,38 @@
                 ctx.translate(this.x, this.y);
                 ctx.rotate(this.angle);
 
+                // Diseño detallado de termita
                 ctx.fillStyle = '#e3d5ca';
                 ctx.beginPath();
-                ctx.ellipse(-3, 0, 4, 2.5, 0, 0, Math.PI * 2);
+                ctx.ellipse(-3.5, 0, 4.5, 2.8, 0, 0, Math.PI * 2);
                 ctx.fill();
 
                 ctx.fillStyle = '#bc6c25';
                 ctx.beginPath();
-                ctx.arc(3, 0, 2.8, 0, Math.PI * 2);
+                ctx.arc(3.2, 0, 3, 0, Math.PI * 2);
                 ctx.fill();
+
+                // Mandíbulas prominentes
+                ctx.strokeStyle = '#7f4f24';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(6, -2); ctx.lineTo(9, -4);
+                ctx.moveTo(6, 2); ctx.lineTo(9, 4);
+                ctx.stroke();
 
                 if (this.hasFood) {
                     ctx.fillStyle = '#e63946';
                     ctx.beginPath();
-                    ctx.arc(6, 0, 2.5, 0, Math.PI * 2);
+                    ctx.arc(7, 0, 2.8, 0, Math.PI * 2);
                     ctx.fill();
+                }
+
+                if (this.slowTimer > 0) {
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+                    ctx.lineWidth = 1.2;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, 8, 0, Math.PI * 2);
+                    ctx.stroke();
                 }
 
                 ctx.restore();
@@ -521,7 +553,6 @@
                 while (a < -Math.PI) a += Math.PI * 2;
                 return a;
             }
-
             lerpAngle(a, b, t) {
                 const diff = this.normalizeAngle(b - a);
                 return a + diff * t;
@@ -534,36 +565,37 @@
                 this.y = y;
                 this.type = type;
                 this.angle = Math.random() * Math.PI * 2;
+                this.attackCooldown = 0;
                 
                 if (type === 'mantis') {
                     this.speed = 2.1;
                     this.radius = 20;
-                    this.hp = 150;
-                    this.maxHp = 150;
-                    this.damage = 3.5;
-                    this.sight = 250;
-                } else {
+                    this.hp = 160;
+                    this.maxHp = 160;
+                    this.damage = 3.8;
+                    this.sight = 260;
+                } else { // spider teje-redes
                     this.speed = 1.6;
-                    this.radius = 14;
-                    this.hp = 70;
-                    this.maxHp = 70;
-                    this.damage = 1.8;
-                    this.sight = 190;
+                    this.radius = 15;
+                    this.hp = 80;
+                    this.maxHp = 80;
+                    this.damage = 2.0;
+                    this.sight = 240;
                 }
             }
 
             update() {
+                if (this.attackCooldown > 0) this.attackCooldown--;
+
                 let target = null;
                 let minDist = this.sight;
 
-                // Atacar otros enemigos de distinta especie
                 for (let other of enemies) {
                     if (other !== this && other.type !== this.type) {
                         let d = Math.hypot(other.x - this.x, other.y - this.y);
                         if (d < minDist) { minDist = d; target = other; }
                     }
                 }
-
                 for (let ant of ants) {
                     let d = Math.hypot(ant.x - this.x, ant.y - this.y);
                     if (d < minDist) { minDist = d; target = ant; }
@@ -577,10 +609,22 @@
                     let targetAngle = Math.atan2(target.y - this.y, target.x - this.x);
                     this.angle = this.lerpAngle(this.angle, targetAngle, 0.16);
 
+                    // Si es araña y el objetivo está a distancia media, dispara telaraña
+                    if (this.type === 'spider' && minDist < 200 && minDist > 45 && this.attackCooldown === 0) {
+                        webs.push({
+                            x: this.x,
+                            y: this.y,
+                            angle: targetAngle,
+                            speed: 4.5,
+                            life: 70
+                        });
+                        this.attackCooldown = 90; // Cada 1.5 segundos aprox
+                    }
+
                     if (minDist < this.radius + (target.radius || 4) + 4) {
                         target.hp -= this.damage;
                         if (target.hp <= 0) {
-                            this.hp = Math.min(this.maxHp, this.hp + 15);
+                            this.hp = Math.min(this.maxHp, this.hp + 20);
                         }
                     }
                 } else {
@@ -611,67 +655,81 @@
 
                 const barWidth = this.radius * 2;
                 ctx.fillStyle = 'rgba(0,0,0,0.5)';
-                ctx.fillRect(-barWidth / 2, -this.radius - 10, barWidth, 4);
+                ctx.fillRect(-barWidth / 2, -this.radius - 12, barWidth, 4);
                 ctx.fillStyle = this.type === 'mantis' ? '#ffbe0b' : '#e63946';
-                ctx.fillRect(-barWidth / 2, -this.radius - 10, barWidth * Math.max(0, this.hp / this.maxHp), 4);
+                ctx.fillRect(-barWidth / 2, -this.radius - 12, barWidth * Math.max(0, this.hp / this.maxHp), 4);
 
                 ctx.rotate(this.angle);
 
                 if (this.type === 'mantis') {
-                    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                    // Sombra
+                    ctx.fillStyle = 'rgba(0,0,0,0.35)';
                     ctx.beginPath();
-                    ctx.ellipse(-2, 4, 22, 8, 0, 0, Math.PI * 2);
+                    ctx.ellipse(-2, 5, 24, 9, 0, 0, Math.PI * 2);
                     ctx.fill();
 
+                    // Guadañas delanteras detalladas
                     ctx.strokeStyle = '#52b788';
-                    ctx.lineWidth = 3;
+                    ctx.lineWidth = 3.5;
                     ctx.beginPath();
-                    ctx.moveTo(8, -4); ctx.lineTo(22, -12); ctx.lineTo(16, -3);
-                    ctx.moveTo(8, 4); ctx.lineTo(22, 12); ctx.lineTo(16, 3);
+                    ctx.moveTo(8, -4); ctx.lineTo(24, -14); ctx.lineTo(18, -3);
+                    ctx.moveTo(8, 4); ctx.lineTo(24, 14); ctx.lineTo(18, 3);
                     ctx.stroke();
 
+                    // Cuerpo estilizado verde
                     ctx.fillStyle = '#2d6a4f';
                     ctx.beginPath();
-                    ctx.ellipse(-6, 0, 14, 6, 0, 0, Math.PI * 2);
+                    ctx.ellipse(-6, 0, 15, 6.5, 0, 0, Math.PI * 2);
                     ctx.fill();
 
                     ctx.fillStyle = '#40916c';
                     ctx.beginPath();
-                    ctx.ellipse(8, 0, 9, 4.5, 0, 0, Math.PI * 2);
+                    ctx.ellipse(8, 0, 10, 5, 0, 0, Math.PI * 2);
                     ctx.fill();
 
                     ctx.fillStyle = '#74c69d';
                     ctx.beginPath();
-                    ctx.arc(17, 0, 5, 0, Math.PI * 2);
+                    ctx.arc(18, 0, 5.5, 0, Math.PI * 2);
                     ctx.fill();
 
+                    // Ojos compuestos amarillos
                     ctx.fillStyle = '#ffb703';
                     ctx.beginPath();
-                    ctx.arc(19, -3.5, 2, 0, Math.PI * 2);
-                    ctx.arc(19, 3.5, 2, 0, Math.PI * 2);
+                    ctx.arc(20, -4, 2.2, 0, Math.PI * 2);
+                    ctx.arc(20, 4, 2.2, 0, Math.PI * 2);
                     ctx.fill();
                 } else {
+                    // Patas de araña detalladas con articulaciones
                     ctx.strokeStyle = '#111';
                     ctx.lineWidth = 2;
                     for (let i = -1; i <= 1; i += 2) {
                         ctx.beginPath();
-                        ctx.moveTo(0, 0); ctx.lineTo(-12, i * 16);
-                        ctx.moveTo(0, 0); ctx.lineTo(-4, i * 18);
-                        ctx.moveTo(0, 0); ctx.lineTo(5, i * 17);
-                        ctx.moveTo(0, 0); ctx.lineTo(12, i * 14);
+                        ctx.moveTo(-2, 0); ctx.lineTo(-14, i * 18);
+                        ctx.moveTo(0, 0); ctx.lineTo(-6, i * 20);
+                        ctx.moveTo(2, 0); ctx.lineTo(8, i * 19);
+                        ctx.moveTo(4, 0); ctx.lineTo(15, i * 15);
                         ctx.stroke();
                     }
 
-                    ctx.fillStyle = '#1a1a1a';
+                    // Abdomen y cefalotórax con textura de pelusa/brillo
+                    ctx.fillStyle = '#1c1c1c';
                     ctx.beginPath();
-                    ctx.arc(-5, 0, 9, 0, Math.PI * 2);
-                    ctx.arc(5, 0, 6, 0, Math.PI * 2);
+                    ctx.arc(-6, 0, 10, 0, Math.PI * 2);
+                    ctx.arc(6, 0, 7, 0, Math.PI * 2);
                     ctx.fill();
 
+                    // Reloj de arena rojo característico de araña letal
                     ctx.fillStyle = '#d90429';
                     ctx.beginPath();
-                    ctx.arc(-5, 0, 3, 0, Math.PI * 2);
+                    ctx.moveTo(-7, -3); ctx.lineTo(-4, 0); ctx.lineTo(-7, 3); ctx.lineTo(-10, 0);
                     ctx.fill();
+
+                    // Múltiples ojos brillantes
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(11, -3, 2, 2);
+                    ctx.fillRect(11, 1, 2, 2);
+                    ctx.fillStyle = '#ff0000';
+                    ctx.fillRect(10, -1, 1.5, 1.5);
                 }
 
                 ctx.restore();
@@ -682,7 +740,6 @@
                 while (a < -Math.PI) a += Math.PI * 2;
                 return a;
             }
-
             lerpAngle(a, b, t) {
                 const diff = this.normalizeAngle(b - a);
                 return a + diff * t;
@@ -701,98 +758,89 @@
             flowers = [];
             foods = [];
 
-            // Parches de tierra húmeda y senderos naturales
-            for (let i = 0; i < 22; i++) {
+            for (let i = 0; i < 35; i++) {
                 dirtPatches.push({
                     x: Math.random() * canvas.width,
                     y: Math.random() * canvas.height,
-                    rx: 40 + Math.random() * 60,
-                    ry: 30 + Math.random() * 45,
+                    rx: 50 + Math.random() * 70,
+                    ry: 35 + Math.random() * 50,
                     angle: Math.random() * Math.PI
                 });
             }
 
-            // Piedritas decorativas en el suelo
-            for (let i = 0; i < 140; i++) {
+            for (let i = 0; i < 250; i++) {
                 pebbles.push({
                     x: Math.random() * canvas.width,
                     y: Math.random() * canvas.height,
-                    r: 1.5 + Math.random() * 2.5,
-                    color: Math.random() > 0.5 ? '#5c6360' : '#8a918e'
+                    r: 1.5 + Math.random() * 3,
+                    color: Math.random() > 0.5 ? '#555d5a' : '#828a87'
                 });
             }
 
-            // Briznas de hierba en 3 tonos
-            const grassColors = ['#2d521e', '#467a2f', '#58943c'];
-            for (let i = 0; i < 1600; i++) {
+            const grassColors = ['#254417', '#3c6827', '#4b8231'];
+            for (let i = 0; i < 3200; i++) {
                 grassBlades.push({
                     x: Math.random() * canvas.width,
                     y: Math.random() * canvas.height,
-                    h: 4 + Math.random() * 7,
-                    lean: (Math.random() - 0.5) * 4,
+                    h: 4 + Math.random() * 8,
+                    lean: (Math.random() - 0.5) * 5,
                     color: grassColors[Math.floor(Math.random() * grassColors.length)]
                 });
             }
 
-            // Helechos detallados
-            for (let i = 0; i < 28; i++) {
+            for (let i = 0; i < 45; i++) {
                 ferns.push({
-                    x: 40 + Math.random() * (canvas.width - 80),
-                    y: 40 + Math.random() * (canvas.height - 80),
-                    size: 14 + Math.random() * 10,
+                    x: 50 + Math.random() * (canvas.width - 100),
+                    y: 50 + Math.random() * (canvas.height - 100),
+                    size: 16 + Math.random() * 12,
                     angle: Math.random() * Math.PI * 2
                 });
             }
 
-            // Troncos caídos (obstáculos reales)
-            for (let i = 0; i < 7; i++) {
+            for (let i = 0; i < 12; i++) {
                 logs.push({
-                    x: 120 + Math.random() * (canvas.width - 240),
-                    y: 120 + Math.random() * (canvas.height - 240),
-                    w: 80 + Math.random() * 55,
-                    h: 24 + Math.random() * 10,
+                    x: 150 + Math.random() * (canvas.width - 300),
+                    y: 150 + Math.random() * (canvas.height - 300),
+                    w: 90 + Math.random() * 60,
+                    h: 26 + Math.random() * 12,
                     angle: Math.random() * Math.PI
                 });
             }
 
-            // Rocas con relieve (obstáculos reales)
-            for (let i = 0; i < 15; i++) {
-                let rx = 90 + Math.random() * (canvas.width - 180);
-                let ry = 90 + Math.random() * (canvas.height - 180);
-                if (!isCollidingWithLog(rx, ry, 45)) {
+            for (let i = 0; i < 24; i++) {
+                let rx = 100 + Math.random() * (canvas.width - 200);
+                let ry = 100 + Math.random() * (canvas.height - 200);
+                if (!isCollidingWithLog(rx, ry, 50)) {
                     rocks.push({
                         x: rx,
                         y: ry,
-                        radius: 20 + Math.random() * 22,
-                        hasMoss: Math.random() > 0.4
+                        radius: 22 + Math.random() * 25,
+                        hasMoss: Math.random() > 0.35
                     });
                 }
             }
 
-            // Flores con pétalos
-            const flowerColors = ['#ffbe0b', '#ff006e', '#ffffff', '#fb5607', '#c77dff'];
-            for (let i = 0; i < 75; i++) {
+            const flowerColors = ['#ffbe0b', '#ff006e', '#ffffff', '#fb5607', '#c77dff', '#4cc9f0'];
+            for (let i = 0; i < 120; i++) {
                 flowers.push({
-                    x: 30 + Math.random() * (canvas.width - 60),
-                    y: 30 + Math.random() * (canvas.height - 60),
+                    x: 40 + Math.random() * (canvas.width - 80),
+                    y: 40 + Math.random() * (canvas.height - 80),
                     color: flowerColors[Math.floor(Math.random() * flowerColors.length)]
                 });
             }
 
-            // Arbustos frondosos con comida alrededor
-            for (let i = 0; i < 14; i++) {
-                const bx = 70 + Math.random() * (canvas.width - 140);
-                const by = 70 + Math.random() * (canvas.height - 140);
-                bushes.push({ x: bx, y: by, radius: 26 + Math.random() * 12 });
-                spawnFoodCluster(bx + (Math.random() - 0.5) * 50, by + (Math.random() - 0.5) * 50, 9);
+            for (let i = 0; i < 22; i++) {
+                const bx = 80 + Math.random() * (canvas.width - 160);
+                const by = 80 + Math.random() * (canvas.height - 160);
+                bushes.push({ x: bx, y: by, radius: 28 + Math.random() * 14 });
+                spawnFoodCluster(bx + (Math.random() - 0.5) * 60, by + (Math.random() - 0.5) * 60, 10);
             }
 
-            // Árboles altos
-            for (let i = 0; i < 11; i++) {
+            for (let i = 0; i < 18; i++) {
                 trees.push({
-                    x: 110 + Math.random() * (canvas.width - 220),
-                    y: 110 + Math.random() * (canvas.height - 220),
-                    radius: 58 + Math.random() * 22
+                    x: 120 + Math.random() * (canvas.width - 240),
+                    y: 120 + Math.random() * (canvas.height - 240),
+                    radius: 60 + Math.random() * 25
                 });
             }
         }
@@ -803,8 +851,9 @@
             ants = [];
             termites = [];
             enemies = [];
+            webs = [];
             pheromones = [];
-            storedFood = 60;
+            storedFood = 80;
             generateEnvironment();
             updateUI();
             setTool('nest');
@@ -824,10 +873,10 @@
 
         function spawnFoodCluster(x, y, count = 12) {
             for (let i = 0; i < count; i++) {
-                const offsetX = (Math.random() - 0.5) * 45;
-                const offsetY = (Math.random() - 0.5) * 45;
-                let fx = Math.max(20, Math.min(canvas.width - 20, x + offsetX));
-                let fy = Math.max(20, Math.min(canvas.height - 20, y + offsetY));
+                const offsetX = (Math.random() - 0.5) * 50;
+                const offsetY = (Math.random() - 0.5) * 50;
+                let fx = Math.max(25, Math.min(canvas.width - 25, x + offsetX));
+                let fy = Math.max(25, Math.min(canvas.height - 25, y + offsetY));
                 if (!checkObstacleCollision(fx, fy, 4)) {
                     foods.push({ x: fx, y: fy, amount: 5 });
                 }
@@ -860,7 +909,6 @@
                 return;
             }
 
-            // Restaurar mensaje normal si estaba en error
             statusEl.textContent = toolDescriptions[currentTool];
             statusEl.style.background = "#386641";
 
@@ -904,23 +952,20 @@
         document.getElementById('btn-clear').addEventListener('click', init);
 
         function drawEnvironmentBase() {
-            // Césped base rico
-            ctx.fillStyle = '#3a6327';
+            ctx.fillStyle = '#355823';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Parches de tierra con borde suave
             for (let d of dirtPatches) {
                 ctx.save();
                 ctx.translate(d.x, d.y);
                 ctx.rotate(d.angle);
-                ctx.fillStyle = 'rgba(72, 50, 30, 0.35)';
+                ctx.fillStyle = 'rgba(64, 43, 25, 0.38)';
                 ctx.beginPath();
                 ctx.ellipse(0, 0, d.rx, d.ry, 0, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.restore();
             }
 
-            // Piedritas
             for (let p of pebbles) {
                 ctx.fillStyle = p.color;
                 ctx.beginPath();
@@ -928,7 +973,6 @@
                 ctx.fill();
             }
 
-            // Briznas de hierba
             for (let g of grassBlades) {
                 ctx.strokeStyle = g.color;
                 ctx.lineWidth = 1.4;
@@ -938,12 +982,11 @@
                 ctx.stroke();
             }
 
-            // Helechos
             for (let fn of ferns) {
                 ctx.save();
                 ctx.translate(fn.x, fn.y);
                 ctx.rotate(fn.angle);
-                ctx.strokeStyle = '#264d19';
+                ctx.strokeStyle = '#224a15';
                 ctx.lineWidth = 2;
                 for (let i = 0; i < 6; i++) {
                     ctx.rotate(Math.PI / 3);
@@ -955,48 +998,41 @@
                 ctx.restore();
             }
 
-            // Troncos caídos detallados con corteza, anillos y musgo
             for (let l of logs) {
                 ctx.save();
                 ctx.translate(l.x, l.y);
                 ctx.rotate(l.angle);
 
-                // Sombra
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
                 ctx.beginPath();
-                ctx.roundRect(-l.w/2 + 4, -l.h/2 + 5, l.w, l.h, 6);
+                ctx.roundRect(-l.w/2 + 5, -l.h/2 + 6, l.w, l.h, 6);
                 ctx.fill();
 
-                // Cuerpo del tronco
-                ctx.fillStyle = '#4e3018';
+                ctx.fillStyle = '#422813';
                 ctx.beginPath();
                 ctx.roundRect(-l.w/2, -l.h/2, l.w, l.h, 6);
                 ctx.fill();
 
-                // Líneas de corteza
-                ctx.strokeStyle = '#2d1a0b';
+                ctx.strokeStyle = '#211207';
                 ctx.lineWidth = 1.5;
                 ctx.beginPath();
-                ctx.moveTo(-l.w/2 + 8, -l.h/4); ctx.lineTo(l.w/2 - 8, -l.h/4);
-                ctx.moveTo(-l.w/2 + 12, l.h/4); ctx.lineTo(l.w/2 - 12, l.h/4);
+                ctx.moveTo(-l.w/2 + 10, -l.h/4); ctx.lineTo(l.w/2 - 10, -l.h/4);
+                ctx.moveTo(-l.w/2 + 15, l.h/4); ctx.lineTo(l.w/2 - 15, l.h/4);
                 ctx.stroke();
 
-                // Corte transversal (madera clara con anillos)
-                ctx.fillStyle = '#c69c6d';
+                ctx.fillStyle = '#b89062';
                 ctx.beginPath();
-                ctx.ellipse(l.w/2 - 2, 0, 4, l.h/2 - 1, 0, 0, Math.PI * 2);
+                ctx.ellipse(l.w/2 - 2, 0, 4.5, l.h/2 - 1, 0, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Musgo en la parte superior
-                ctx.fillStyle = '#4a7c36';
+                ctx.fillStyle = '#3c6e27';
                 ctx.beginPath();
-                ctx.ellipse(-5, -l.h/3, l.w * 0.25, 4, 0, 0, Math.PI * 2);
+                ctx.ellipse(-6, -l.h/3, l.w * 0.28, 4.5, 0, 0, Math.PI * 2);
                 ctx.fill();
 
                 ctx.restore();
             }
 
-            // Flores detalladas con pétalos
             for (let fl of flowers) {
                 ctx.fillStyle = fl.color;
                 for (let a = 0; a < Math.PI * 2; a += Math.PI / 2.5) {
@@ -1004,33 +1040,30 @@
                     ctx.arc(fl.x + Math.cos(a) * 2.2, fl.y + Math.sin(a) * 2.2, 1.6, 0, Math.PI * 2);
                     ctx.fill();
                 }
-                ctx.fillStyle = '#3d2600';
+                ctx.fillStyle = '#2b1a00';
                 ctx.beginPath();
                 ctx.arc(fl.x, fl.y, 1.3, 0, Math.PI * 2);
                 ctx.fill();
             }
 
-            // Rocas con volumen y musgo
             for (let r of rocks) {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
                 ctx.beginPath();
-                ctx.arc(r.x + 5, r.y + 6, r.radius, 0, Math.PI * 2);
+                ctx.arc(r.x + 5, r.y + 7, r.radius, 0, Math.PI * 2);
                 ctx.fill();
 
-                ctx.fillStyle = '#686e6c';
+                ctx.fillStyle = '#5f6664';
                 ctx.beginPath();
                 ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Iluminación superior
-                ctx.fillStyle = '#868e8b';
+                ctx.fillStyle = '#7a827f';
                 ctx.beginPath();
                 ctx.arc(r.x - r.radius * 0.25, r.y - r.radius * 0.25, r.radius * 0.65, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Parche de musgo
                 if (r.hasMoss) {
-                    ctx.fillStyle = '#3e6e29';
+                    ctx.fillStyle = '#356322';
                     ctx.beginPath();
                     ctx.arc(r.x + r.radius * 0.2, r.y - r.radius * 0.3, r.radius * 0.4, 0, Math.PI * 2);
                     ctx.fill();
@@ -1039,44 +1072,42 @@
         }
 
         function drawCanopyLayer() {
-            // Arbustos con múltiples capas de hojas
             for (let b of bushes) {
-                ctx.fillStyle = 'rgba(0,0,0,0.25)';
+                ctx.fillStyle = 'rgba(0,0,0,0.3)';
                 ctx.beginPath();
-                ctx.arc(b.x + 5, b.y + 5, b.radius, 0, Math.PI * 2);
+                ctx.arc(b.x + 6, b.y + 6, b.radius, 0, Math.PI * 2);
                 ctx.fill();
 
-                ctx.fillStyle = '#1f421a';
+                ctx.fillStyle = '#173613';
                 ctx.beginPath();
                 ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
                 ctx.fill();
 
-                ctx.fillStyle = '#2d5e26';
+                ctx.fillStyle = '#234f1e';
                 ctx.beginPath();
-                ctx.arc(b.x - 4, b.y - 4, b.radius * 0.72, 0, Math.PI * 2);
+                ctx.arc(b.x - 5, b.y - 5, b.radius * 0.72, 0, Math.PI * 2);
                 ctx.fill();
             }
 
-            // Árboles frondosos en capas
             for (let t of trees) {
-                ctx.fillStyle = 'rgba(8, 18, 6, 0.3)';
+                ctx.fillStyle = 'rgba(6, 14, 4, 0.35)';
                 ctx.beginPath();
-                ctx.arc(t.x + 20, t.y + 22, t.radius, 0, Math.PI * 2);
+                ctx.arc(t.x + 22, t.y + 25, t.radius, 0, Math.PI * 2);
                 ctx.fill();
 
-                ctx.fillStyle = '#332010';
+                ctx.fillStyle = '#2b1b0c';
                 ctx.beginPath();
-                ctx.arc(t.x, t.y, 10, 0, Math.PI * 2);
+                ctx.arc(t.x, t.y, 11, 0, Math.PI * 2);
                 ctx.fill();
 
-                ctx.fillStyle = 'rgba(22, 54, 18, 0.82)';
+                ctx.fillStyle = 'rgba(16, 43, 13, 0.85)';
                 ctx.beginPath();
                 ctx.arc(t.x, t.y, t.radius, 0, Math.PI * 2);
                 ctx.fill();
 
-                ctx.fillStyle = 'rgba(38, 84, 31, 0.72)';
+                ctx.fillStyle = 'rgba(28, 69, 23, 0.75)';
                 ctx.beginPath();
-                ctx.arc(t.x - 10, t.y - 10, t.radius * 0.68, 0, Math.PI * 2);
+                ctx.arc(t.x - 12, t.y - 12, t.radius * 0.68, 0, Math.PI * 2);
                 ctx.fill();
             }
         }
@@ -1088,6 +1119,37 @@
                 for (let i = pheromones.length - 1; i >= 0; i--) {
                     pheromones[i].life--;
                     if (pheromones[i].life <= 0) pheromones.splice(i, 1);
+                }
+
+                // Actualizar telarañas proyectiles
+                for (let i = webs.length - 1; i >= 0; i--) {
+                    let w = webs[i];
+                    w.x += Math.cos(w.angle) * w.speed;
+                    w.y += Math.sin(w.angle) * w.speed;
+                    w.life--;
+
+                    // Colisión con hormigas o termitas
+                    let hit = false;
+                    for (let ant of ants) {
+                        if (Math.hypot(ant.x - w.x, ant.y - w.y) < 12) {
+                            ant.slowTimer = 180; // 3 segundos ralentizada
+                            hit = true;
+                            break;
+                        }
+                    }
+                    if (!hit) {
+                        for (let t of termites) {
+                            if (Math.hypot(t.x - w.x, t.y - w.y) < 12) {
+                                t.slowTimer = 180;
+                                hit = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (hit || w.life <= 0 || checkObstacleCollision(w.x, w.y, 2)) {
+                        webs.splice(i, 1);
+                    }
                 }
 
                 for (let ant of ants) ant.update();
@@ -1142,31 +1204,38 @@
                 ctx.fill();
             }
 
-            // Dibujar Nidos de Hormigas
+            // Dibujar Telarañas voladoras
+            for (let w of webs) {
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.arc(w.x, w.y, 4, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+
             for (let n of antNests) {
-                ctx.fillStyle = '#65422d';
+                ctx.fillStyle = '#593825';
                 ctx.beginPath();
                 ctx.arc(n.x, n.y, n.radius + 7, 0, Math.PI * 2);
                 ctx.fill();
-                ctx.fillStyle = '#170e09';
+                ctx.fillStyle = '#120a06';
                 ctx.beginPath();
                 ctx.arc(n.x, n.y, n.radius - 5, 0, Math.PI * 2);
                 ctx.fill();
             }
 
-            // Dibujar Nidos de Termitas
             for (let n of termiteNests) {
-                ctx.fillStyle = '#8d5524';
+                ctx.fillStyle = '#7d481e';
                 ctx.beginPath();
                 ctx.arc(n.x, n.y, n.radius + 8, 0, Math.PI * 2);
                 ctx.fill();
 
-                ctx.fillStyle = '#b07d62';
+                ctx.fillStyle = '#9e6c50';
                 ctx.beginPath();
                 ctx.arc(n.x - 4, n.y - 4, n.radius * 0.65, 0, Math.PI * 2);
                 ctx.fill();
 
-                ctx.fillStyle = '#5c3a21';
+                ctx.fillStyle = '#4a2e1a';
                 ctx.beginPath();
                 ctx.arc(n.x + 3, n.y + 3, 5, 0, Math.PI * 2);
                 ctx.arc(n.x - 6, n.y + 4, 4, 0, Math.PI * 2);
@@ -1179,11 +1248,8 @@
 
             drawCanopyLayer();
 
-            // Indicador de colocación (Verde = válido, Rojo = bloqueado)
             const validPlacement = canPlaceAt(mousePos.x, mousePos.y, currentTool);
-            const previewRadius = (currentTool === 'nest' || currentTool === 'termite_nest') ? 24 :
-                                  (currentTool === 'mantis') ? 20 :
-                                  (currentTool === 'spider') ? 14 : 16;
+            const previewRadius = (currentTool === 'nest' || currentTool === 'termite_nest') ? 24 : (currentTool === 'mantis') ? 20 : (currentTool === 'spider') ? 14 : 16;
 
             ctx.strokeStyle = validPlacement ? 'rgba(167, 201, 87, 0.9)' : 'rgba(230, 57, 70, 0.95)';
             ctx.fillStyle = validPlacement ? 'rgba(167, 201, 87, 0.15)' : 'rgba(230, 57, 70, 0.25)';
