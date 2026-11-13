@@ -102,7 +102,7 @@
         
         .hud {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             background: rgba(20, 30, 18, 0.92);
             padding: 7px 16px;
             border-radius: 10px;
@@ -113,7 +113,7 @@
             justify-content: center;
             box-shadow: 0 4px 15px rgba(0,0,0,0.6);
         }
-        .stat { font-weight: bold; font-size: 0.83rem; }
+        .stat { font-weight: bold; font-size: 0.82rem; }
         .stat span { color: #b5e48c; }
         .stat-enemy span { color: #ff758f; }
         .stat-egg span { color: #ffd166; }
@@ -172,7 +172,7 @@
     <!-- Pantalla de Título -->
     <div id="start-screen">
         <h1>🐜 Ants Empires and Colony</h1>
-        <p>Explora un vasto bosque con niebla de guerra. Elige un modo de juego:</p>
+        <p>Construye tu imperio con gráficos 2.5D detallados y exploración circular. Elige un modo:</p>
         <div class="menu-buttons">
             <button class="menu-btn btn-mode-normal" onclick="startGame('normal')">👑 Modo Normal (Historia)</button>
             <button class="menu-btn btn-mode-sandbox" onclick="startGame('sandbox')">🌿 Modo Sandbox</button>
@@ -210,13 +210,13 @@
         <button id="tool-mantis" class="tool-btn btn-predator" onclick="setTool('mantis')">🦗 Mantis Alfa</button>
     </div>
 
-    <!-- Barra de herramientas Modo Normal (Historia) -->
+    <!-- Barra de herramientas Modo Normal -->
     <div class="toolbar" id="toolbar-normal" style="display:none;">
         <button id="tool-queen" class="tool-btn btn-queen active" onclick="setTool('queen')">👑 Colocar Reina</button>
         <button id="tool-normal_nest" class="tool-btn" onclick="setTool('normal_nest')" disabled>🏠 Colocar Colonia (0/1)</button>
     </div>
 
-    <!-- Mapa Ampliado 3000x1800 -->
+    <!-- Mapa 3000x1800 -->
     <canvas id="gameCanvas" width="3000" height="1800"></canvas>
 
     <script>
@@ -244,40 +244,29 @@
         let natureFoodTimer = 300; 
         let zoom = 1;
 
-        // Niebla de guerra (Fog of war)
-        const FOG_CELL_SIZE = 50;
-        let fogCols = Math.ceil(canvas.width / FOG_CELL_SIZE);
-        let fogRows = Math.ceil(canvas.height / FOG_CELL_SIZE);
-        let fogGrid = [];
+        // Canvas auxiliar para la niebla de guerra circular permanente (estilo mapa de Minecraft)
+        let fogCanvas = document.createElement('canvas');
+        fogCanvas.width = 3000;
+        fogCanvas.height = 1800;
+        let fogCtx = fogCanvas.getContext('2d');
 
         function initFog() {
-            fogGrid = [];
-            for (let r = 0; r < fogRows; r++) {
-                let row = [];
-                for (let c = 0; c < fogCols; c++) {
-                    // En sandbox todo está visible (true), en normal empieza oculto (false)
-                    row.push(gameMode !== 'normal');
-                }
-                fogGrid.push(row);
-            }
+            fogCtx.globalCompositeOperation = 'source-over';
+            fogCtx.fillStyle = '#0b1109';
+            fogCtx.fillRect(0, 0, 3000, 1800);
         }
 
         function revealFog(x, y, radius) {
             if (gameMode !== 'normal') return;
-            let startCol = Math.max(0, Math.floor((x - radius) / FOG_CELL_SIZE));
-            let endCol = Math.min(fogCols - 1, Math.floor((x + radius) / FOG_CELL_SIZE));
-            let startRow = Math.max(0, Math.floor((y - radius) / FOG_CELL_SIZE));
-            let endRow = Math.min(fogRows - 1, Math.floor((y + radius) / FOG_CELL_SIZE));
-
-            for (let r = startRow; r <= endRow; r++) {
-                for (let c = startCol; c <= endCol; c++) {
-                    let cellCenterX = c * FOG_CELL_SIZE + FOG_CELL_SIZE / 2;
-                    let cellCenterY = r * FOG_CELL_SIZE + FOG_CELL_SIZE / 2;
-                    if (Math.hypot(cellCenterX - x, (cellCenterY - y) / TILT) <= radius) {
-                        fogGrid[r][c] = true;
-                    }
-                }
-            }
+            fogCtx.globalCompositeOperation = 'destination-out';
+            let grad = fogCtx.createRadialGradient(x, y, radius * 0.35, x, y, radius);
+            grad.addColorStop(0, 'rgba(0,0,0,1)');
+            grad.addColorStop(1, 'rgba(0,0,0,0)');
+            fogCtx.fillStyle = grad;
+            fogCtx.beginPath();
+            fogCtx.arc(x, y, radius, 0, Math.PI * 2);
+            fogCtx.fill();
+            fogCtx.globalCompositeOperation = 'source-over';
         }
 
         function adjustZoom(amount) {
@@ -681,7 +670,7 @@
                 if (this.slowTimer > 0) this.slowTimer--;
                 this.walkCycle += currentSpeed * 0.28;
 
-                // Revelar niebla de guerra en Modo Normal
+                // Revelar niebla circularmente al explorar
                 revealFog(this.x, this.y, 140);
 
                 let target = null;
@@ -712,7 +701,6 @@
                     }
                 } else {
                     if (this.hasFood) {
-                        // Volver a la colonia
                         const dx = this.nest.x - this.x;
                         const dy = (this.nest.y - this.y) / TILT;
                         const dist = Math.hypot(dx, dy);
@@ -737,7 +725,7 @@
                             updateUI();
                         }
                     } else {
-                        // BUSCAR LA COMIDA MÁS CERCANA EN TODO EL MAPA
+                        // Buscar la comida más cercana en todo el mapa
                         let closestFood = null;
                         let closestDist = Infinity;
                         for (let f of foods) {
@@ -761,9 +749,9 @@
                                 }
                             }
                         } else {
-                            // Si no hay comida en el mapa, caminar en línea recta en dirección aleatoria hasta detectar
+                            // Si no hay comida detectada, caminar en línea recta en dirección aleatoria hasta encontrar
                             if (this.straightTimer <= 0) {
-                                this.straightTimer = 120 + Math.random() * 150;
+                                this.straightTimer = 120 + Math.random() * 180;
                                 this.straightAngle = this.angle + (Math.random() - 0.5) * Math.PI * 1.5;
                             }
                             this.straightTimer--;
@@ -1361,7 +1349,6 @@
                 if (gameMode === 'sandbox') {
                     for (let i = 0; i < 8; i++) ants.push(new Ant(x, y, newNest));
                 } else {
-                    // Revelar zona inicial al colocar la colonia en modo normal
                     revealFog(x, y, 220);
                 }
             } else {
@@ -1408,7 +1395,6 @@
             const rawX = (e.clientX - rect.left) * (canvas.width / rect.width);
             const rawY = (e.clientY - rect.top) * (canvas.height / rect.height);
             
-            // Ajustar coordenadas del mouse según el zoom y la cámara
             if (gameMode === 'normal' && queen) {
                 mousePos.x = (rawX - canvas.width / 2) / zoom + queen.x;
                 mousePos.y = (rawY - canvas.height / 2) / zoom + queen.y;
@@ -1607,6 +1593,13 @@
                 ctx.closePath();
                 ctx.fill();
 
+                if (r.hasMoss) {
+                    ctx.fillStyle = '#386641';
+                    ctx.beginPath();
+                    ctx.ellipse(r.radius * 0.15, -r.radius * 0.25 * TILT - 3, r.radius * 0.42, r.radius * 0.28, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
                 ctx.restore();
             }
         }
@@ -1615,26 +1608,62 @@
             for (let b of bushes) {
                 ctx.save();
                 ctx.translate(b.x, b.y);
+
+                ctx.fillStyle = 'rgba(0,0,0,0.38)';
+                for (let lob of b.lobes) {
+                    ctx.beginPath();
+                    ctx.ellipse(lob.x + 8, lob.y + 12, lob.r, lob.r * TILT, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
                 ctx.fillStyle = '#1b4332';
                 for (let lob of b.lobes) {
                     ctx.beginPath();
                     ctx.ellipse(lob.x, lob.y, lob.r, lob.r * TILT, 0, 0, Math.PI * 2);
                     ctx.fill();
                 }
+
+                ctx.fillStyle = '#2d6a4f';
+                for (let lob of b.lobes) {
+                    ctx.beginPath();
+                    ctx.ellipse(lob.x - 3, lob.y - 5, lob.r * 0.72, lob.r * 0.72 * TILT, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
                 ctx.restore();
             }
 
             for (let t of trees) {
                 ctx.save();
                 ctx.translate(t.x, t.y);
+
+                ctx.fillStyle = 'rgba(4, 12, 2, 0.42)';
+                for (let lob of t.lobes) {
+                    ctx.beginPath();
+                    ctx.ellipse(lob.x + 28, lob.y + 34, lob.r, lob.r * TILT, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
                 ctx.fillStyle = '#3d1e00';
                 ctx.fillRect(-10, -25, 20, 32);
+                ctx.beginPath();
+                ctx.ellipse(0, 7, 13, 7, 0, 0, Math.PI * 2);
+                ctx.fill();
+
                 ctx.fillStyle = 'rgba(18, 53, 20, 0.9)';
                 for (let lob of t.lobes) {
                     ctx.beginPath();
                     ctx.ellipse(lob.x, lob.y - 25, lob.r, lob.r * TILT, 0, 0, Math.PI * 2);
                     ctx.fill();
                 }
+
+                ctx.fillStyle = 'rgba(45, 106, 79, 0.8)';
+                for (let lob of t.lobes) {
+                    ctx.beginPath();
+                    ctx.ellipse(lob.x - 8, lob.y - 32, lob.r * 0.7, lob.r * 0.7 * TILT, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
                 ctx.restore();
             }
         }
@@ -1696,7 +1725,6 @@
             ctx.save();
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Centrar zoom en el canvas (y seguir a la reina en Modo Normal)
             ctx.translate(canvas.width / 2, canvas.height / 2);
             ctx.scale(zoom, zoom);
             if (gameMode === 'normal' && queen) {
@@ -1709,13 +1737,28 @@
 
             for (let f of foods) {
                 let r = 2.8 + f.amount * 0.55;
+                ctx.fillStyle = 'rgba(0,0,0,0.35)';
+                ctx.beginPath();
+                ctx.ellipse(f.x + 1, f.y + 2, r, r * TILT, 0, 0, Math.PI * 2);
+                ctx.fill();
+
                 ctx.fillStyle = '#e63946';
                 ctx.beginPath();
                 ctx.arc(f.x, f.y - 1.5, r, 0, Math.PI * 2);
                 ctx.fill();
+
+                ctx.fillStyle = '#ffccd5';
+                ctx.beginPath();
+                ctx.arc(f.x - 1, f.y - 2.5, 1.3, 0, Math.PI * 2);
+                ctx.fill();
             }
 
             for (let n of antNests) {
+                ctx.fillStyle = 'rgba(0,0,0,0.45)';
+                ctx.beginPath();
+                ctx.ellipse(n.x + 4, n.y + 6, n.radius + 9, (n.radius + 9) * TILT, 0, 0, Math.PI * 2);
+                ctx.fill();
+
                 ctx.fillStyle = '#582f0e';
                 ctx.beginPath();
                 ctx.ellipse(n.x, n.y, n.radius + 8, (n.radius + 8) * TILT, 0, 0, Math.PI * 2);
@@ -1736,16 +1779,9 @@
 
             drawCanopyLayer();
 
-            // Niebla de guerra (Fog of War) en Modo Normal
+            // Dibujar la niebla de guerra circular permanente en Modo Normal
             if (gameMode === 'normal') {
-                ctx.fillStyle = '#0b1109';
-                for (let r = 0; r < fogRows; r++) {
-                    for (let c = 0; c < fogCols; c++) {
-                        if (!fogGrid[r][c]) {
-                            ctx.fillRect(c * FOG_CELL_SIZE, r * FOG_CELL_SIZE, FOG_CELL_SIZE, FOG_CELL_SIZE);
-                        }
-                    }
-                }
+                ctx.drawImage(fogCanvas, 0, 0);
             }
 
             ctx.restore();
