@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ants Empires and Colony - Ultimate Edition (5500x5500)</title>
+    <title>Ants Empires and Colony - Optimized Edition (5500x5500)</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -156,42 +156,6 @@
         .btn-danger { background: linear-gradient(180deg, #800f2f, #590d22) !important; border-color: #ff758f !important; }
         .btn-menu-back { background: linear-gradient(180deg, #495057, #212529) !important; border-color: #adb5bd !important; }
 
-        /* Panel de Mejoras Avanzado */
-        #upgrade-panel {
-            position: fixed;
-            top: 60px;
-            right: 15px;
-            background: rgba(14, 22, 12, 0.95);
-            border: 2px solid #52b788;
-            border-radius: 12px;
-            padding: 14px;
-            width: 240px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.8);
-            z-index: 500;
-        }
-        #upgrade-panel h3 {
-            color: #b5e48c;
-            font-size: 0.95rem;
-            margin-bottom: 8px;
-            text-align: center;
-        }
-        .upgrade-item {
-            margin-bottom: 8px;
-            font-size: 0.78rem;
-        }
-        .upgrade-item button {
-            width: 100%;
-            margin-top: 3px;
-            background: linear-gradient(180deg, #1b4332, #081c15);
-            border: 1px solid #52b788;
-            color: #f4f1de;
-            padding: 4px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .upgrade-item button:hover { background: linear-gradient(180deg, #2d6a4f, #1b4332); }
-
         canvas {
             background-color: #345822;
             border: 3px solid #1b2e11;
@@ -206,7 +170,7 @@
 
     <div id="start-screen">
         <h1>🐜 Ants Empires and Colony</h1>
-        <p>Imperio de Hormigas Definitivo: Mapa masivo de 5,500 x 5,500, Árbol de Tecnologías, Sonido Web API y Niebla Circular. Elige un modo:</p>
+        <p>Versión optimizada sin lag: Mapa masivo de 5,500 x 5,500, nidos realistas (Volcán y Cono de Termitas) y modelos 2.5D mejorados.</p>
         <div class="menu-buttons">
             <button class="menu-btn btn-mode-normal" onclick="startGame('normal')">👑 Modo Normal (Historia)</button>
             <button class="menu-btn btn-mode-sandbox" onclick="startGame('sandbox')">🌿 Modo Sandbox</button>
@@ -234,82 +198,23 @@
         <button class="btn-menu-back" onclick="showMainMenu()">Menú</button>
     </div>
 
-    <!-- Panel de Mejoras / Tecnología -->
-    <div id="upgrade-panel">
-        <h3>⚡ Tecnologías de Colonia</h3>
-        <div class="upgrade-item">
-            🏃‍♂️ Velocidad Obreras (<span id="upg-speed-lvl">Lv 1</span>)<br>
-            <button onclick="buyUpgrade('speed')">Mejorar (Coste: <span id="upg-speed-cost">15</span> 🍓)</button>
-        </div>
-        <div class="upgrade-item">
-            ⚔️ Fuerza de Ataque (<span id="upg-atk-lvl">Lv 1</span>)<br>
-            <button onclick="buyUpgrade('attack')">Mejorar (Coste: <span id="upg-atk-cost">20</span> 🍓)</button>
-        </div>
-        <div class="upgrade-item">
-            ☀️ Eficiencia de Visión (<span id="upg-vis-lvl">Lv 1</span>)<br>
-            <button onclick="buyUpgrade('vision')">Mejorar (Coste: <span id="upg-vis-cost">25</span> 🍓)</button>
-        </div>
-    </div>
-
-    <!-- Barra de herramientas Sandbox -->
     <div class="toolbar" id="toolbar-sandbox">
-        <button id="tool-nest" class="tool-btn active" onclick="setTool('nest')">🏠 Nido Hormigas</button>
-        <button id="tool-termite_nest" class="tool-btn btn-termite" onclick="setTool('termite_nest')">🏰 Nido Termitas</button>
+        <button id="tool-nest" class="tool-btn active" onclick="setTool('nest')">🏠 Hormiguero (Volcán)</button>
+        <button id="tool-termite_nest" class="tool-btn btn-termite" onclick="setTool('termite_nest')">🏰 Termitero (Cono)</button>
         <button id="tool-beetle" class="tool-btn btn-beetle" onclick="setTool('beetle')">🪲 Escarabajo Pelotero</button>
         <button id="tool-food" class="tool-btn" onclick="setTool('food')">🍓 Soltar Comida</button>
         <button id="tool-spider" class="tool-btn btn-predator" onclick="setTool('spider')">🕷️ Araña Teje-redes</button>
         <button id="tool-mantis" class="tool-btn btn-predator" onclick="setTool('mantis')">🦗 Mantis Alfa</button>
     </div>
 
-    <!-- Barra de herramientas Modo Normal -->
     <div class="toolbar" id="toolbar-normal" style="display:none;">
         <button id="tool-queen" class="tool-btn btn-queen active" onclick="setTool('queen')">👑 Colocar Reina</button>
         <button id="tool-normal_nest" class="tool-btn" onclick="setTool('normal_nest')" disabled>🏠 Colocar Colonia (0/1)</button>
     </div>
 
-    <!-- Mapa Gigante 5500x5500 -->
     <canvas id="gameCanvas" width="5500" height="5500"></canvas>
 
     <script>
-        /* ==========================================================
-         * SISTEMA DE AUDIO PROCEDURAL (WEB AUDIO API)
-         * ========================================================== */
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playSound(type) {
-            if (!audioCtx) return;
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            let osc = audioCtx.createOscillator();
-            let gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-
-            let now = audioCtx.currentTime;
-            if (type === 'collect') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(440, now);
-                osc.frequency.exponentialRampToValueAtTime(880, now + 0.12);
-                gain.gain.setValueAtTime(0.15, now);
-                gain.gain.linearRampToValueAtTime(0.01, now + 0.12);
-                osc.start(now);
-                osc.stop(now + 0.12);
-            } else if (type === 'hatch') {
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(220, now);
-                osc.frequency.linearRampToValueAtTime(550, now + 0.25);
-                gain.gain.setValueAtTime(0.2, now);
-                gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
-                osc.start(now);
-                osc.stop(now + 0.25);
-            } else if (type === 'click') {
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(300, now);
-                gain.gain.setValueAtTime(0.08, now);
-                gain.gain.linearRampToValueAtTime(0.01, now + 0.05);
-                osc.start(now);
-                osc.stop(now + 0.05);
-            }
-        }
-
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
@@ -335,31 +240,6 @@
         let foodSpawnCounter = 0;
         let natureFoodTimer = 300; 
         let zoom = 0.55;
-        let dayNightTimer = 0; // Ciclo de día y noche
-
-        // Sistema de Mejoras (Upgrades)
-        let upgrades = {
-            speed: { level: 1, cost: 15 },
-            attack: { level: 1, cost: 20 },
-            vision: { level: 1, cost: 25 }
-        };
-
-        function buyUpgrade(type) {
-            playSound('click');
-            let upg = upgrades[type];
-            if (storedFood >= upg.cost) {
-                storedFood -= upg.cost;
-                upg.level++;
-                upg.cost = Math.floor(upg.cost * 1.6);
-                
-                document.getElementById(`upg-${type}-lvl`).textContent = `Lv ${upg.level}`;
-                document.getElementById(`upg-${type}-cost`).textContent = upg.cost;
-                statusEl.textContent = `⚡ ¡Tecnología mejorada con éxito! (${type.toUpperCase()} Lv ${upg.level})`;
-                updateUI();
-            } else {
-                statusEl.textContent = "⚠️ Comida insuficiente para esta mejora tecnológica";
-            }
-        }
 
         let fogCanvas = document.createElement('canvas');
         fogCanvas.width = MAP_WIDTH;
@@ -374,14 +254,13 @@
 
         function revealFog(x, y, radius) {
             if (gameMode !== 'normal') return;
-            let effectiveRadius = radius * (1 + (upgrades.vision.level - 1) * 0.25);
             fogCtx.globalCompositeOperation = 'destination-out';
-            let grad = fogCtx.createRadialGradient(x, y, effectiveRadius * 0.4, x, y, effectiveRadius);
+            let grad = fogCtx.createRadialGradient(x, y, radius * 0.4, x, y, radius);
             grad.addColorStop(0, 'rgba(0,0,0,1)');
             grad.addColorStop(1, 'rgba(0,0,0,0)');
             fogCtx.fillStyle = grad;
             fogCtx.beginPath();
-            fogCtx.arc(x, y, effectiveRadius, 0, Math.PI * 2);
+            fogCtx.arc(x, y, radius, 0, Math.PI * 2);
             fogCtx.fill();
             fogCtx.globalCompositeOperation = 'source-over';
         }
@@ -433,15 +312,15 @@
         let flowers = [];
 
         const toolDescriptions = {
-            nest: "🏠 Colocar Hormiguero",
-            termite_nest: "🏰 Colocar Termitero",
-            beetle: "🪲 Invocar Escarabajo Pelotero",
+            nest: "🏠 Hormiguero (Forma de Mini Volcán)",
+            termite_nest: "🏰 Termitero (Cono Irregular de Barro)",
+            beetle: "🪲 Escarabajo Pelotero",
             food: "🍓 Soltar Comida",
-            spider: "🕷️ Invocar Araña",
-            mantis: "🦗 Invocar Mantis Alfa",
-            queen: "👑 Haz clic en el suelo para colocar a tu Hormiga Reina",
-            normal_nest: "🏠 Haz clic para fundar tu única Colonia",
-            control_queen: "👑 Controla a la Reina (WASD / Clic): Recoge 10 🍓 para poner huevos (30s)"
+            spider: "🕷️ Araña Teje-redes",
+            mantis: "🦗 Mantis Alfa",
+            queen: "👑 Coloca tu Hormiga Reina",
+            normal_nest: "🏠 Funda tu única Colonia",
+            control_queen: "👑 Controla a la Reina (WASD / Clic)"
         };
 
         function showMainMenu() {
@@ -452,7 +331,6 @@
             gameMode = mode;
             startScreen.style.display = 'none';
             initFog();
-            playSound('click');
 
             if (mode === 'normal') {
                 modeBadge.textContent = "[Modo Normal]";
@@ -474,7 +352,6 @@
 
         function setTool(tool) {
             currentTool = tool;
-            playSound('click');
             document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
             if (document.getElementById(`tool-${tool}`)) {
                 document.getElementById(`tool-${tool}`).classList.add('active');
@@ -514,7 +391,7 @@
 
         function canPlaceAt(x, y, tool) {
             if (x < 60 || x > MAP_WIDTH - 60 || y < 60 || y > MAP_HEIGHT - 60) return false;
-            const reqRadius = (tool === 'nest' || tool === 'termite_nest' || tool === 'normal_nest') ? 28 : (tool === 'mantis') ? 22 : (tool === 'spider' || tool === 'beetle' || tool === 'queen') ? 16 : 12;
+            const reqRadius = (tool === 'nest' || tool === 'termite_nest' || tool === 'normal_nest') ? 32 : (tool === 'mantis') ? 22 : (tool === 'spider' || tool === 'beetle' || tool === 'queen') ? 16 : 12;
 
             for (let r of rocks) {
                 if (Math.hypot(x - r.x, (y - r.y) / TILT) < r.radius + reqRadius) return false;
@@ -572,7 +449,7 @@
         }
 
         /* ==========================================================
-         * CLASES DE ENTIDADES (MODELO 1: MÁXIMA CALIDAD 2.5D)
+         * CLASES DE ENTIDADES (MODELOS 2.5D DE MÁXIMA CALIDAD)
          * ========================================================== */
         class QueenAnt {
             constructor(x, y) {
@@ -646,9 +523,8 @@
                             this.hasFood = true;
                             f.amount--;
                             if (f.amount <= 0) foods.splice(i, 1);
-                            playSound('collect');
                             spawnHitParticles(this.x, this.y, '#ffccd5', 6);
-                            statusEl.textContent = "🍓 ¡Comida recogida! Llévala a tu Colonia (10 🍓 para huevo)";
+                            statusEl.textContent = "🍓 ¡Comida recogida! Llévala a tu Colonia";
                             break;
                         }
                     }
@@ -671,9 +547,8 @@
                                 timer: 30,
                                 maxTimer: 30
                             });
-                            playSound('hatch');
                             spawnHitParticles(nest.x, nest.y, '#ffd166', 12);
-                            statusEl.textContent = "🥚 ¡10 🍓 entregadas! Huevo puesto (Eclosiona en 30s)";
+                            statusEl.textContent = "🥚 ¡10 🍓 entregadas! Huevo puesto";
                         } else {
                             statusEl.textContent = `🍓 Comida entregada (${storedFood}/10 🍓)`;
                         }
@@ -750,10 +625,6 @@
                     ctx.beginPath();
                     ctx.arc(15, 0, 5.2, 0, Math.PI * 2);
                     ctx.fill();
-                    ctx.fillStyle = '#ffccd5';
-                    ctx.beginPath();
-                    ctx.arc(13.5, -1.8, 1.8, 0, Math.PI * 2);
-                    ctx.fill();
                 }
 
                 ctx.restore();
@@ -776,10 +647,10 @@
                 this.y = y;
                 this.nest = nestRef;
                 this.angle = Math.random() * Math.PI * 2;
-                this.speed = 2.25 * (1 + (upgrades.speed.level - 1) * 0.15);
+                this.speed = 2.25;
                 this.hp = 26;
                 this.maxHp = 26;
-                this.damage = 0.75 * (1 + (upgrades.attack.level - 1) * 0.2);
+                this.damage = 0.75;
                 this.hasFood = false;
                 this.pheromoneTimer = 0;
                 this.slowTimer = 0;
@@ -838,7 +709,6 @@
                         if (dist < this.nest.radius) {
                             this.hasFood = false;
                             storedFood += 2;
-                            playSound('collect');
                             if (gameMode === 'sandbox') {
                                 foodSpawnCounter += 2;
                                 checkAutoSpawn();
@@ -924,10 +794,6 @@
                     ctx.fillStyle = '#ff2a55';
                     ctx.beginPath();
                     ctx.arc(8, 0, 3.5, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.fillStyle = '#ffccd5';
-                    ctx.beginPath();
-                    ctx.arc(7, -1, 1.2, 0, Math.PI * 2);
                     ctx.fill();
                 }
 
@@ -1040,38 +906,45 @@
                 ctx.save();
                 ctx.translate(this.x, this.y);
 
-                ctx.fillStyle = 'rgba(0,0,0,0.35)';
+                ctx.fillStyle = 'rgba(0,0,0,0.38)';
                 ctx.beginPath();
-                ctx.ellipse(2, 4, 6.5, 3.2, 0, 0, Math.PI * 2);
+                ctx.ellipse(2, 4, 7, 3.5, 0, 0, Math.PI * 2);
                 ctx.fill();
 
                 ctx.scale(1, TILT);
                 ctx.rotate(this.angle);
 
-                ctx.strokeStyle = '#7f4f24';
-                ctx.lineWidth = 1.2;
-                let legSwing = Math.sin(this.walkCycle) * 3;
+                ctx.strokeStyle = '#5a3d28';
+                ctx.lineWidth = 1.3;
+                let legSwing = Math.sin(this.walkCycle) * 3.5;
                 ctx.beginPath();
-                ctx.moveTo(-2, -3); ctx.lineTo(-4 + legSwing, -10);
-                ctx.moveTo(1, -3); ctx.lineTo(3 - legSwing, -10);
-                ctx.moveTo(-2, 3); ctx.lineTo(-4 - legSwing, 10);
-                ctx.moveTo(1, 3); ctx.lineTo(3 + legSwing, 10);
+                ctx.moveTo(-3, -3); ctx.lineTo(-7 + legSwing, -12);
+                ctx.moveTo(0, -3); ctx.lineTo(1 - legSwing, -13);
+                ctx.moveTo(3, -3); ctx.lineTo(8 + legSwing, -12);
+                ctx.moveTo(-3, 3); ctx.lineTo(-7 - legSwing, 12);
+                ctx.moveTo(0, 3); ctx.lineTo(1 + legSwing, 13);
+                ctx.moveTo(3, 3); ctx.lineTo(8 - legSwing, 12);
                 ctx.stroke();
 
                 ctx.fillStyle = '#f8edeb';
                 ctx.beginPath();
-                ctx.ellipse(-4, 0, 5.2, 3.2, 0, 0, Math.PI * 2);
+                ctx.ellipse(-6, 0, 5.5, 3.4, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#dda15e';
+                ctx.beginPath();
+                ctx.ellipse(0, 0, 3.5, 2.5, 0, 0, Math.PI * 2);
                 ctx.fill();
 
                 ctx.fillStyle = '#bc6c25';
                 ctx.beginPath();
-                ctx.arc(3.8, 0, 3.4, 0, Math.PI * 2);
+                ctx.arc(5, 0, 3.2, 0, Math.PI * 2);
                 ctx.fill();
 
                 if (this.hasFood) {
                     ctx.fillStyle = '#ff2a55';
                     ctx.beginPath();
-                    ctx.arc(8, 0, 3, 0, Math.PI * 2);
+                    ctx.arc(10, 0, 3.2, 0, Math.PI * 2);
                     ctx.fill();
                 }
 
@@ -1093,7 +966,7 @@
             constructor(x, y) {
                 this.x = x;
                 this.y = y;
-                this.radius = 15;
+                this.radius = 16;
                 this.angle = Math.random() * Math.PI * 2;
                 this.speed = 1.4;
                 this.hp = 240;
@@ -1119,7 +992,7 @@
                     let targetAngle = Math.atan2((closestFood.y - this.y) / TILT, closestFood.x - this.x);
                     this.angle = this.lerpAngle(this.angle, targetAngle, 0.15);
 
-                    if (minD < 14) {
+                    if (minD < 16) {
                         let idx = foods.indexOf(closestFood);
                         if (idx > -1) foods.splice(idx, 1);
                         this.hasBall = true;
@@ -1137,27 +1010,53 @@
 
                 if (this.hp < this.maxHp) {
                     ctx.fillStyle = 'rgba(0,0,0,0.65)';
-                    ctx.fillRect(-16, -24, 32, 4);
+                    ctx.fillRect(-16, -26, 32, 4);
                     ctx.fillStyle = '#80ed99';
-                    ctx.fillRect(-16, -24, 32 * Math.max(0, this.hp / this.maxHp), 4);
+                    ctx.fillRect(-16, -26, 32 * Math.max(0, this.hp / this.maxHp), 4);
                 }
 
-                ctx.fillStyle = 'rgba(0,0,0,0.42)';
+                ctx.fillStyle = 'rgba(0,0,0,0.45)';
                 ctx.beginPath();
-                ctx.ellipse(3, 6, 16, 9, 0, 0, Math.PI * 2);
+                ctx.ellipse(3, 7, 17, 10, 0, 0, Math.PI * 2);
                 ctx.fill();
 
                 ctx.scale(1, TILT);
                 ctx.rotate(this.angle);
 
+                ctx.strokeStyle = '#1b2e11';
+                ctx.lineWidth = 2.2;
+                let legSwing = Math.sin(this.walkCycle) * 3;
+                ctx.beginPath();
+                ctx.moveTo(-6, -4); ctx.lineTo(-11 + legSwing, -16);
+                ctx.moveTo(2, -4); ctx.lineTo(3 - legSwing, -18);
+                ctx.moveTo(8, -4); ctx.lineTo(13 + legSwing, -16);
+                ctx.moveTo(-6, 4); ctx.lineTo(-11 - legSwing, 16);
+                ctx.moveTo(2, 4); ctx.lineTo(3 + legSwing, 18);
+                ctx.moveTo(8, 4); ctx.lineTo(13 - legSwing, 16);
+                ctx.stroke();
+
+                ctx.fillStyle = '#386641';
+                ctx.beginPath();
+                ctx.ellipse(0, 0, 16, 12, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.strokeStyle = '#283618';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath(); ctx.moveTo(-16, 0); ctx.lineTo(16, 0); ctx.stroke();
+
+                ctx.fillStyle = 'rgba(255,255,255,0.22)';
+                ctx.beginPath();
+                ctx.ellipse(-4, -4, 7, 3.5, -0.3, 0, Math.PI * 2);
+                ctx.fill();
+
                 ctx.fillStyle = '#283618';
                 ctx.beginPath();
-                ctx.ellipse(0, 0, 15, 11, 0, 0, Math.PI * 2);
+                ctx.arc(12, 0, 5.5, 0, Math.PI * 2);
                 ctx.fill();
 
                 if (this.hasBall) {
                     ctx.save();
-                    ctx.translate(-21, 0);
+                    ctx.translate(-24, 0);
                     ctx.rotate(this.ballSpin);
                     ctx.fillStyle = '#583101';
                     ctx.beginPath();
@@ -1263,15 +1162,48 @@
                 ctx.rotate(this.angle);
 
                 if (this.type === 'mantis') {
+                    let swing = Math.sin(this.walkCycle) * 3;
+                    ctx.strokeStyle = '#1b4332'; ctx.lineWidth = 2.2;
+                    ctx.beginPath();
+                    ctx.moveTo(-10, -5); ctx.lineTo(-18 + swing, -18);
+                    ctx.moveTo(-10, 5); ctx.lineTo(-18 - swing, 18);
+                    ctx.stroke();
+
+                    ctx.fillStyle = '#2d6a4f';
+                    ctx.beginPath();
+                    ctx.ellipse(-6, 0, 14, 6, 0, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.fillStyle = '#52b788';
+                    ctx.beginPath();
+                    ctx.ellipse(10, 0, 13, 6.5, 0, 0, Math.PI * 2);
+                    ctx.fill();
+
                     ctx.fillStyle = '#1b4332';
                     ctx.beginPath();
-                    ctx.ellipse(-8, 0, 17, 8, 0, 0, Math.PI * 2);
+                    ctx.moveTo(-17, -4.5); ctx.lineTo(-24, 0); ctx.lineTo(-17, 4.5); ctx.closePath();
                     ctx.fill();
                 } else {
-                    ctx.fillStyle = '#161616';
-                    ctx.beginPath();
-                    ctx.arc(-7, 0, 11.5, 0, Math.PI * 2);
-                    ctx.fill();
+                    let legSwing = Math.sin(this.walkCycle) * 5;
+                    ctx.strokeStyle = '#111';
+                    ctx.lineWidth = 1.8;
+                    for (let i = 0; i < 4; i++) {
+                        let offset = (i - 1.5) * 6;
+                        let sgn = i < 2 ? -1 : 1;
+                        ctx.beginPath();
+                        ctx.moveTo(offset, 0);
+                        ctx.lineTo(offset * 2.2, sgn * (20 + legSwing * (i % 2 === 0 ? 1 : -1)));
+                        ctx.stroke();
+                    }
+
+                    ctx.fillStyle = '#2b2d42';
+                    ctx.beginPath(); ctx.arc(-4, 0, 10, 0, Math.PI * 2); ctx.fill();
+
+                    ctx.fillStyle = '#1f1f1f';
+                    ctx.beginPath(); ctx.ellipse(11, 0, 14, 11, 0, 0, Math.PI * 2); ctx.fill();
+
+                    ctx.fillStyle = '#e63946';
+                    ctx.beginPath(); ctx.arc(11, 0, 4.5, 0, Math.PI * 2); ctx.fill();
                 }
 
                 ctx.restore();
@@ -1464,7 +1396,7 @@
         }
 
         function placeNest(x, y, type) {
-            let newNest = { x, y, radius: 26 };
+            let newNest = { x, y, radius: 28 };
             if (type === 'ant') {
                 antNests.push(newNest);
                 if (gameMode === 'sandbox') {
@@ -1497,7 +1429,7 @@
                 let src = sources[Math.floor(Math.random() * sources.length)];
                 spawnFoodCluster(src.x, src.y, 8);
             }
-            statusEl.textContent = "🌿 ¡Los árboles y arbustos han producido nuevo alimento!";
+            statusEl.textContent = "🌿 ¡Los árboles han producido nuevo alimento!";
             spawnHitParticles(MAP_WIDTH / 2, MAP_HEIGHT / 2, '#b5e48c', 20);
         }
 
@@ -1532,7 +1464,7 @@
             if (gameMode === 'normal') {
                 if (currentTool === 'queen' && !queen) {
                     if (!canPlaceAt(clickX, clickY, 'queen')) {
-                        statusEl.textContent = "⚠️ No puedes colocar a la Reina encima de rocas o troncos";
+                        statusEl.textContent = "⚠️ No puedes colocar a la Reina sobre rocas o troncos";
                         statusEl.style.background = "linear-gradient(90deg, #9b2226, #ae2012)";
                         return;
                     }
@@ -1568,7 +1500,7 @@
             }
 
             if (!canPlaceAt(clickX, clickY, currentTool)) {
-                statusEl.textContent = "⚠️ Espacio bloqueado por obstáculos o entidades";
+                statusEl.textContent = "⚠️ Espacio bloqueado por obstáculos";
                 statusEl.style.background = "linear-gradient(90deg, #9b2226, #ae2012)";
                 return;
             }
@@ -1725,6 +1657,85 @@
             }
         }
 
+        /* ==========================================================
+         * RENDERIZADO DE NIDOS 2.5D REALISTAS
+         * ========================================================== */
+        function drawNests() {
+            // 1. HORMIGUERO (Forma de Mini Volcán 2.5D)
+            for (let n of antNests) {
+                ctx.save();
+                ctx.translate(n.x, n.y);
+
+                // Sombra base del cono
+                ctx.fillStyle = 'rgba(0,0,0,0.5)';
+                ctx.beginPath();
+                ctx.ellipse(6, 10, n.radius + 10, (n.radius + 6) * TILT, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Base del cono del volcán de tierra
+                ctx.fillStyle = '#582f0e';
+                ctx.beginPath();
+                ctx.ellipse(0, 0, n.radius + 6, (n.radius + 2) * TILT, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Elevación cónica superior (efecto 3D volcánico)
+                ctx.fillStyle = '#7f4f24';
+                ctx.beginPath();
+                ctx.ellipse(0, -6, n.radius * 0.75, (n.radius * 0.7) * TILT, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#a98467';
+                ctx.beginPath();
+                ctx.ellipse(0, -10, n.radius * 0.45, (n.radius * 0.4) * TILT, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Cráter central oscuro (entrada al hormiguero)
+                ctx.fillStyle = '#1e1005';
+                ctx.beginPath();
+                ctx.ellipse(0, -12, n.radius * 0.22, (n.radius * 0.2) * TILT, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.restore();
+            }
+
+            // 2. TERMITERO (Cono Irregular de Barro 2.5D)
+            for (let n of termiteNests) {
+                ctx.save();
+                ctx.translate(n.x, n.y);
+
+                // Sombra del termitero
+                ctx.fillStyle = 'rgba(0,0,0,0.5)';
+                ctx.beginPath();
+                ctx.ellipse(8, 12, n.radius + 12, (n.radius + 8) * TILT, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Montículo cónico irregular
+                ctx.fillStyle = '#8d6b4f';
+                ctx.beginPath();
+                ctx.ellipse(0, 0, n.radius + 8, (n.radius + 4) * TILT, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Torre cónica alta con crestas de barro
+                ctx.fillStyle = '#bc6c25';
+                ctx.beginPath();
+                ctx.ellipse(-3, -8, n.radius * 0.65, (n.radius * 0.6) * TILT, -0.2, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#dda15e';
+                ctx.beginPath();
+                ctx.ellipse(2, -15, n.radius * 0.35, (n.radius * 0.32) * TILT, 0.1, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Texturas y chimeneas de ventilación del termitero
+                ctx.fillStyle = '#603813';
+                ctx.beginPath();
+                ctx.ellipse(1, -18, n.radius * 0.12, (n.radius * 0.1) * TILT, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.restore();
+            }
+        }
+
         function drawCanopyLayer() {
             for (let b of bushes) {
                 ctx.save();
@@ -1794,7 +1805,6 @@
             let effectiveSpeed = gameMode === 'normal' ? 1 : gameSpeed;
 
             for (let s = 0; s < effectiveSpeed; s++) {
-                dayNightTimer += 0.0005; // Ciclo ambiental
                 natureFoodTimer -= 1 / 60;
                 if (natureFoodTimer <= 0) {
                     natureFoodTimer = 300;
@@ -1808,9 +1818,8 @@
                     if (eggs[i].timer <= 0) {
                         const hatched = eggs.splice(i, 1)[0];
                         ants.push(new Ant(hatched.nest.x, hatched.nest.y, hatched.nest));
-                        playSound('hatch');
                         spawnHitParticles(hatched.nest.x, hatched.nest.y, '#b5e48c', 12);
-                        statusEl.textContent = "🐜 ¡Un huevo ha eclosionado! Nació una nueva hormiga obrera";
+                        statusEl.textContent = "🐜 ¡Nació una nueva hormiga obrera!";
                         needsUIUpdate = true;
                     }
                 }
@@ -1844,7 +1853,6 @@
 
             if (needsUIUpdate) updateUI();
 
-            // RENDERIZADO CON ZOOM, CÁMARA Y ILUMINACIÓN DINÁMICA
             ctx.save();
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -1876,17 +1884,8 @@
                 ctx.fill();
             }
 
-            for (let n of antNests) {
-                ctx.fillStyle = 'rgba(0,0,0,0.45)';
-                ctx.beginPath();
-                ctx.ellipse(n.x + 4, n.y + 6, n.radius + 9, (n.radius + 9) * TILT, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#582f0e';
-                ctx.beginPath();
-                ctx.ellipse(n.x, n.y, n.radius + 8, (n.radius + 8) * TILT, 0, 0, Math.PI * 2);
-                ctx.fill();
-            }
+            // Dibujar nidos realistas (Volcán y Cono de Termitas)
+            drawNests();
 
             for (let egg of eggs) {
                 ctx.fillStyle = '#fefae0';
@@ -1902,7 +1901,6 @@
 
             drawCanopyLayer();
 
-            // Niebla de guerra circular permanente en Modo Normal
             if (gameMode === 'normal') {
                 ctx.drawImage(fogCanvas, 0, 0);
             }
