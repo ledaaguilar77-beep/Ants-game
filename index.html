@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ants Empires and Colony</title>
+    <title>Ants Empires and Colony - Massive 5500x5500</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -22,7 +22,7 @@
         #start-screen {
             position: fixed;
             inset: 0;
-            background: radial-gradient(circle at center, rgba(27, 46, 17, 0.94), rgba(6, 11, 5, 0.99));
+            background: radial-gradient(circle at center, rgba(27, 46, 17, 0.95), rgba(6, 11, 5, 0.99));
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -32,17 +32,17 @@
             padding: 20px;
         }
         #start-screen h1 {
-            font-size: 3.2rem;
+            font-size: 3.4rem;
             color: #b5e48c;
             text-shadow: 0 4px 20px rgba(0, 0, 0, 0.95), 0 0 25px rgba(181, 228, 140, 0.35);
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             letter-spacing: 1.5px;
         }
         #start-screen p {
             color: #d8f3dc;
-            font-size: 1.05rem;
-            max-width: 540px;
-            margin-bottom: 32px;
+            font-size: 1.1rem;
+            max-width: 580px;
+            margin-bottom: 35px;
             line-height: 1.5;
         }
         .menu-buttons {
@@ -52,8 +52,8 @@
             justify-content: center;
         }
         .menu-btn {
-            padding: 15px 34px;
-            font-size: 1.15rem;
+            padding: 16px 36px;
+            font-size: 1.2rem;
             border-radius: 12px;
             border: 2px solid #95d5b2;
             cursor: pointer;
@@ -82,16 +82,16 @@
             margin-bottom: 4px;
         }
         header h1 { 
-            font-size: 1.35rem; 
+            font-size: 1.4rem; 
             color: #b5e48c; 
             text-shadow: 0 2px 6px rgba(0,0,0,0.8);
             letter-spacing: 0.5px;
         }
         #status-msg {
-            font-size: 0.82rem;
+            font-size: 0.84rem;
             color: #fefae0;
             background: linear-gradient(90deg, #2d6a4f, #40916c);
-            padding: 4px 16px;
+            padding: 4px 18px;
             border-radius: 20px;
             display: inline-block;
             margin-top: 3px;
@@ -102,9 +102,9 @@
         
         .hud {
             display: flex;
-            gap: 10px;
-            background: rgba(20, 30, 18, 0.92);
-            padding: 7px 16px;
+            gap: 12px;
+            background: rgba(20, 30, 18, 0.94);
+            padding: 8px 18px;
             border-radius: 10px;
             border: 1px solid #52796f;
             margin-bottom: 6px;
@@ -113,7 +113,7 @@
             justify-content: center;
             box-shadow: 0 4px 15px rgba(0,0,0,0.6);
         }
-        .stat { font-weight: bold; font-size: 0.82rem; }
+        .stat { font-weight: bold; font-size: 0.84rem; }
         .stat span { color: #b5e48c; }
         .stat-enemy span { color: #ff758f; }
         .stat-egg span { color: #ffd166; }
@@ -130,10 +130,10 @@
             background: linear-gradient(180deg, #52b788, #2d6a4f);
             color: white;
             border: 1px solid #74c69d;
-            padding: 5px 10px;
+            padding: 6px 12px;
             border-radius: 6px;
             font-weight: bold;
-            font-size: 0.74rem;
+            font-size: 0.75rem;
             cursor: pointer;
             box-shadow: 0 2px 5px rgba(0,0,0,0.4);
             transition: transform 0.1s, filter 0.2s;
@@ -172,7 +172,7 @@
     <!-- Pantalla de Título -->
     <div id="start-screen">
         <h1>🐜 Ants Empires and Colony</h1>
-        <p>Construye tu imperio con gráficos 2.5D detallados y exploración circular. Elige un modo:</p>
+        <p>Explora un mapa gigante de 5,500 x 5,500 con gráficos detallados 2.5D y niebla circular estilo Minecraft. Elige un modo:</p>
         <div class="menu-buttons">
             <button class="menu-btn btn-mode-normal" onclick="startGame('normal')">👑 Modo Normal (Historia)</button>
             <button class="menu-btn btn-mode-sandbox" onclick="startGame('sandbox')">🌿 Modo Sandbox</button>
@@ -216,8 +216,8 @@
         <button id="tool-normal_nest" class="tool-btn" onclick="setTool('normal_nest')" disabled>🏠 Colocar Colonia (0/1)</button>
     </div>
 
-    <!-- Mapa 3000x1800 -->
-    <canvas id="gameCanvas" width="3000" height="1800"></canvas>
+    <!-- Mapa Gigante 5500x5500 -->
+    <canvas id="gameCanvas" width="5500" height="5500"></canvas>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
@@ -236,30 +236,32 @@
         const btnSpeed = document.getElementById('btn-speed');
 
         const TILT = 0.78;
+        const MAP_WIDTH = 5500;
+        const MAP_HEIGHT = 5500;
 
         let gameMode = 'sandbox';
         let currentTool = 'nest';
         let storedFood = 100;
         let foodSpawnCounter = 0;
         let natureFoodTimer = 300; 
-        let zoom = 1;
+        let zoom = 0.6; // Vista general óptima inicial para mapa gigante
 
-        // Canvas auxiliar para la niebla de guerra circular permanente (estilo mapa de Minecraft)
+        // Lienzo auxiliar para la niebla de guerra circular permanente estilo Minecraft
         let fogCanvas = document.createElement('canvas');
-        fogCanvas.width = 3000;
-        fogCanvas.height = 1800;
+        fogCanvas.width = MAP_WIDTH;
+        fogCanvas.height = MAP_HEIGHT;
         let fogCtx = fogCanvas.getContext('2d');
 
         function initFog() {
             fogCtx.globalCompositeOperation = 'source-over';
             fogCtx.fillStyle = '#0b1109';
-            fogCtx.fillRect(0, 0, 3000, 1800);
+            fogCtx.fillRect(0, 0, MAP_WIDTH, MAP_HEIGHT);
         }
 
         function revealFog(x, y, radius) {
             if (gameMode !== 'normal') return;
             fogCtx.globalCompositeOperation = 'destination-out';
-            let grad = fogCtx.createRadialGradient(x, y, radius * 0.35, x, y, radius);
+            let grad = fogCtx.createRadialGradient(x, y, radius * 0.4, x, y, radius);
             grad.addColorStop(0, 'rgba(0,0,0,1)');
             grad.addColorStop(1, 'rgba(0,0,0,0)');
             fogCtx.fillStyle = grad;
@@ -270,11 +272,11 @@
         }
 
         function adjustZoom(amount) {
-            zoom = Math.max(0.4, Math.min(2.5, zoom + amount));
+            zoom = Math.max(0.2, Math.min(2.0, zoom + amount));
         }
 
         function resetZoom() {
-            zoom = 1;
+            zoom = 0.6;
         }
 
         let queen = null;
@@ -395,7 +397,7 @@
         }
 
         function canPlaceAt(x, y, tool) {
-            if (x < 45 || x > canvas.width - 45 || y < 45 || y > canvas.height - 45) return false;
+            if (x < 60 || x > MAP_WIDTH - 60 || y < 60 || y > MAP_HEIGHT - 60) return false;
             const reqRadius = (tool === 'nest' || tool === 'termite_nest' || tool === 'normal_nest') ? 28 : (tool === 'mantis') ? 22 : (tool === 'spider' || tool === 'beetle' || tool === 'queen') ? 16 : 12;
 
             for (let r of rocks) {
@@ -446,13 +448,16 @@
             entity.x = nextX;
             entity.y = nextY;
 
-            const margin = 25;
+            const margin = 30;
             if (entity.x < margin) { entity.x = margin; entity.angle = Math.PI - entity.angle; }
-            if (entity.x > canvas.width - margin) { entity.x = canvas.width - margin; entity.angle = Math.PI - entity.angle; }
+            if (entity.x > MAP_WIDTH - margin) { entity.x = MAP_WIDTH - margin; entity.angle = Math.PI - entity.angle; }
             if (entity.y < margin) { entity.y = margin; entity.angle = -entity.angle; }
-            if (entity.y > canvas.height - margin) { entity.y = canvas.height - margin; entity.angle = -entity.angle; }
+            if (entity.y > MAP_HEIGHT - margin) { entity.y = MAP_HEIGHT - margin; entity.angle = -entity.angle; }
         }
 
+        /* ----------------------------------------------------
+         * MODELO 1: REINA (Alta Calidad 2.5D con corona y detalles)
+         * ---------------------------------------------------- */
         class QueenAnt {
             constructor(x, y) {
                 this.x = x;
@@ -510,12 +515,12 @@
                         this.y = nextY;
                     }
 
-                    const margin = 25;
-                    this.x = Math.max(margin, Math.min(canvas.width - margin, this.x));
-                    this.y = Math.max(margin, Math.min(canvas.height - margin, this.y));
+                    const margin = 30;
+                    this.x = Math.max(margin, Math.min(MAP_WIDTH - margin, this.x));
+                    this.y = Math.max(margin, Math.min(MAP_HEIGHT - margin, this.y));
                 }
 
-                revealFog(this.x, this.y, 180);
+                revealFog(this.x, this.y, 220);
 
                 if (!this.hasFood) {
                     for (let i = foods.length - 1; i >= 0; i--) {
@@ -566,12 +571,12 @@
                 ctx.strokeStyle = 'rgba(255, 209, 102, 0.7)';
                 ctx.lineWidth = 2;
                 ctx.beginPath();
-                ctx.ellipse(0, 2, 20, 20 * TILT, 0, 0, Math.PI * 2);
+                ctx.ellipse(0, 2, 22, 22 * TILT, 0, 0, Math.PI * 2);
                 ctx.stroke();
 
                 ctx.fillStyle = 'rgba(0,0,0,0.42)';
                 ctx.beginPath();
-                ctx.ellipse(3, 6, 13, 6.5, 0, 0, Math.PI * 2);
+                ctx.ellipse(3, 6, 14, 7, 0, 0, Math.PI * 2);
                 ctx.fill();
 
                 ctx.scale(1, TILT);
@@ -591,45 +596,45 @@
 
                 ctx.fillStyle = '#3d1308';
                 ctx.beginPath();
-                ctx.ellipse(-9, 0, 8.5, 5.2, 0, 0, Math.PI * 2);
+                ctx.ellipse(-9, 0, 9.5, 5.8, 0, 0, Math.PI * 2);
                 ctx.fill();
 
                 ctx.strokeStyle = '#e09f3e';
-                ctx.lineWidth = 1.4;
+                ctx.lineWidth = 1.5;
                 ctx.beginPath();
-                ctx.moveTo(-9, -4.5); ctx.lineTo(-9, 4.5);
-                ctx.moveTo(-12, -3.8); ctx.lineTo(-12, 3.8);
+                ctx.moveTo(-9, -5); ctx.lineTo(-9, 5);
+                ctx.moveTo(-13, -4); ctx.lineTo(-13, 4);
                 ctx.stroke();
 
                 ctx.fillStyle = '#5e2110';
                 ctx.beginPath();
-                ctx.ellipse(0, 0, 4.8, 3.6, 0, 0, Math.PI * 2);
+                ctx.ellipse(0, 0, 5.2, 4, 0, 0, Math.PI * 2);
                 ctx.fill();
 
                 ctx.fillStyle = '#4a1c0e';
                 ctx.beginPath();
-                ctx.ellipse(7.5, 0, 4.2, 3.8, 0, 0, Math.PI * 2);
+                ctx.ellipse(8, 0, 4.8, 4.2, 0, 0, Math.PI * 2);
                 ctx.fill();
 
                 ctx.fillStyle = '#ffd166';
                 ctx.beginPath();
-                ctx.moveTo(6, -3);
-                ctx.lineTo(8, -6);
-                ctx.lineTo(9.5, -3);
-                ctx.lineTo(11, -5.5);
-                ctx.lineTo(11, 0);
-                ctx.lineTo(6, 0);
+                ctx.moveTo(6.5, -3.5);
+                ctx.lineTo(9, -7);
+                ctx.lineTo(10.5, -3.5);
+                ctx.lineTo(12, -6);
+                ctx.lineTo(12, 0);
+                ctx.lineTo(6.5, 0);
                 ctx.closePath();
                 ctx.fill();
 
                 if (this.hasFood) {
                     ctx.fillStyle = '#ff2a55';
                     ctx.beginPath();
-                    ctx.arc(14, 0, 4.8, 0, Math.PI * 2);
+                    ctx.arc(15, 0, 5.2, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.fillStyle = '#ffccd5';
                     ctx.beginPath();
-                    ctx.arc(12.5, -1.5, 1.6, 0, Math.PI * 2);
+                    ctx.arc(13.5, -1.8, 1.8, 0, Math.PI * 2);
                     ctx.fill();
                 }
 
@@ -647,6 +652,9 @@
             }
         }
 
+        /* ----------------------------------------------------
+         * MODELO 1: HORMIGA OBRERA (Detallada 2.5D)
+         * ---------------------------------------------------- */
         class Ant {
             constructor(x, y, nestRef) {
                 this.x = x;
@@ -671,7 +679,7 @@
                 this.walkCycle += currentSpeed * 0.28;
 
                 // Revelar niebla circularmente al explorar
-                revealFog(this.x, this.y, 140);
+                revealFog(this.x, this.y, 150);
 
                 let target = null;
                 let minDist = 105;
@@ -725,7 +733,7 @@
                             updateUI();
                         }
                     } else {
-                        // Buscar la comida más cercana en todo el mapa
+                        // Buscar la comida más cercana en todo el mapa gigante
                         let closestFood = null;
                         let closestDist = Infinity;
                         for (let f of foods) {
@@ -751,7 +759,7 @@
                         } else {
                             // Si no hay comida detectada, caminar en línea recta en dirección aleatoria hasta encontrar
                             if (this.straightTimer <= 0) {
-                                this.straightTimer = 120 + Math.random() * 180;
+                                this.straightTimer = 150 + Math.random() * 200;
                                 this.straightAngle = this.angle + (Math.random() - 0.5) * Math.PI * 1.5;
                             }
                             this.straightTimer--;
@@ -767,9 +775,9 @@
                 ctx.save();
                 ctx.translate(this.x, this.y);
 
-                ctx.fillStyle = 'rgba(0,0,0,0.35)';
+                ctx.fillStyle = 'rgba(0,0,0,0.38)';
                 ctx.beginPath();
-                ctx.ellipse(2, 4, 6, 3, 0, 0, Math.PI * 2);
+                ctx.ellipse(2, 4, 6.5, 3.2, 0, 0, Math.PI * 2);
                 ctx.fill();
 
                 ctx.scale(1, TILT);
@@ -824,6 +832,9 @@
             }
         }
 
+        /* ----------------------------------------------------
+         * MODELO 1: TERMITAS (Alta calidad 2.5D)
+         * ---------------------------------------------------- */
         class Termite {
             constructor(x, y, nestRef) {
                 this.x = x;
@@ -968,6 +979,9 @@
             }
         }
 
+        /* ----------------------------------------------------
+         * MODELO 1: ESCARABAJO PELOTERO (Alta calidad 2.5D)
+         * ---------------------------------------------------- */
         class Beetle {
             constructor(x, y) {
                 this.x = x;
@@ -1059,6 +1073,9 @@
             }
         }
 
+        /* ----------------------------------------------------
+         * MODELO 1: ENEMIGOS (Araña y Mantis en Alta Calidad 2.5D)
+         * ---------------------------------------------------- */
         class Enemy {
             constructor(x, y, type) {
                 this.x = x;
@@ -1182,6 +1199,9 @@
             }
         }
 
+        /* ----------------------------------------------------
+         * GENERACIÓN DE ENTORNO MASIVO (5,500 x 5,500)
+         * ---------------------------------------------------- */
         function generateEnvironment() {
             grassBlades = [];
             dirtPatches = [];
@@ -1196,67 +1216,67 @@
             foods = [];
             beetles = [];
 
-            for (let i = 0; i < 75; i++) {
+            for (let i = 0; i < 220; i++) {
                 dirtPatches.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
+                    x: Math.random() * MAP_WIDTH,
+                    y: Math.random() * MAP_HEIGHT,
                     rx: 70 + Math.random() * 95,
                     ry: (50 + Math.random() * 70) * TILT,
                     angle: Math.random() * Math.PI
                 });
             }
 
-            for (let i = 0; i < 500; i++) {
+            for (let i = 0; i < 1500; i++) {
                 pebbles.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
+                    x: Math.random() * MAP_WIDTH,
+                    y: Math.random() * MAP_HEIGHT,
                     r: 1.5 + Math.random() * 3.5,
                     color: Math.random() > 0.5 ? '#58615d' : '#7f8a86'
                 });
             }
 
-            for (let i = 0; i < 45; i++) {
+            for (let i = 0; i < 130; i++) {
                 mushrooms.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
+                    x: Math.random() * MAP_WIDTH,
+                    y: Math.random() * MAP_HEIGHT,
                     color: Math.random() > 0.5 ? '#e76f51' : '#f4a261',
                     size: 3.5 + Math.random() * 3
                 });
             }
 
             const grassColors = ['#224215', '#346221', '#487d2e'];
-            for (let i = 0; i < 6500; i++) {
+            for (let i = 0; i < 18000; i++) {
                 grassBlades.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
+                    x: Math.random() * MAP_WIDTH,
+                    y: Math.random() * MAP_HEIGHT,
                     h: 6 + Math.random() * 9,
                     lean: (Math.random() - 0.5) * 6,
                     color: grassColors[Math.floor(Math.random() * grassColors.length)]
                 });
             }
 
-            for (let i = 0; i < 90; i++) {
+            for (let i = 0; i < 250; i++) {
                 ferns.push({
-                    x: 60 + Math.random() * (canvas.width - 120),
-                    y: 60 + Math.random() * (canvas.height - 120),
+                    x: 60 + Math.random() * (MAP_WIDTH - 120),
+                    y: 60 + Math.random() * (MAP_HEIGHT - 120),
                     size: 20 + Math.random() * 14,
                     angle: Math.random() * Math.PI * 2
                 });
             }
 
-            for (let i = 0; i < 22; i++) {
+            for (let i = 0; i < 65; i++) {
                 logs.push({
-                    x: 180 + Math.random() * (canvas.width - 360),
-                    y: 180 + Math.random() * (canvas.height - 360),
+                    x: 180 + Math.random() * (MAP_WIDTH - 360),
+                    y: 180 + Math.random() * (MAP_HEIGHT - 360),
                     w: 105 + Math.random() * 70,
                     h: 30 + Math.random() * 14,
                     angle: Math.random() * Math.PI
                 });
             }
 
-            for (let i = 0; i < 42; i++) {
-                let rx = 120 + Math.random() * (canvas.width - 240);
-                let ry = 120 + Math.random() * (canvas.height - 240);
+            for (let i = 0; i < 120; i++) {
+                let rx = 120 + Math.random() * (MAP_WIDTH - 240);
+                let ry = 120 + Math.random() * (MAP_HEIGHT - 240);
                 let radius = 26 + Math.random() * 28;
                 if (!isCollidingWithLog(rx, ry, 55)) {
                     let points = [];
@@ -1271,17 +1291,17 @@
             }
 
             const flowerColors = ['#ffb703', '#fb8500', '#ffffff', '#e0a96d', '#9b5de5', '#00bbf9'];
-            for (let i = 0; i < 220; i++) {
+            for (let i = 0; i < 600; i++) {
                 flowers.push({
-                    x: 50 + Math.random() * (canvas.width - 100),
-                    y: 50 + Math.random() * (canvas.height - 100),
+                    x: 50 + Math.random() * (MAP_WIDTH - 100),
+                    y: 50 + Math.random() * (MAP_HEIGHT - 100),
                     color: flowerColors[Math.floor(Math.random() * flowerColors.length)]
                 });
             }
 
-            for (let i = 0; i < 40; i++) {
-                const bx = 90 + Math.random() * (canvas.width - 180);
-                const by = 90 + Math.random() * (canvas.height - 180);
+            for (let i = 0; i < 110; i++) {
+                const bx = 90 + Math.random() * (MAP_WIDTH - 180);
+                const by = 90 + Math.random() * (MAP_HEIGHT - 180);
                 let radius = 32 + Math.random() * 16;
                 let lobes = [];
                 let numLobes = 4 + Math.floor(Math.random() * 3);
@@ -1294,9 +1314,9 @@
                 spawnFoodCluster(bx + (Math.random() - 0.5) * 65, by + (Math.random() - 0.5) * 65, 10);
             }
 
-            for (let i = 0; i < 30; i++) {
-                const tx = 140 + Math.random() * (canvas.width - 280);
-                const ty = 140 + Math.random() * (canvas.height - 280);
+            for (let i = 0; i < 85; i++) {
+                const tx = 140 + Math.random() * (MAP_WIDTH - 280);
+                const ty = 140 + Math.random() * (MAP_HEIGHT - 280);
                 let radius = 68 + Math.random() * 30;
                 let lobes = [];
                 let numLobes = 5 + Math.floor(Math.random() * 3);
@@ -1362,8 +1382,8 @@
             for (let i = 0; i < count; i++) {
                 const offsetX = (Math.random() - 0.5) * 60;
                 const offsetY = (Math.random() - 0.5) * 60 * TILT;
-                let fx = Math.max(30, Math.min(canvas.width - 30, x + offsetX));
-                let fy = Math.max(30, Math.min(canvas.height - 30, y + offsetY));
+                let fx = Math.max(30, Math.min(MAP_WIDTH - 30, x + offsetX));
+                let fy = Math.max(30, Math.min(MAP_HEIGHT - 30, y + offsetY));
                 if (!checkObstacleCollision(fx, fy, 4)) {
                     foods.push({ x: fx, y: fy, amount: 5 });
                 }
@@ -1372,12 +1392,12 @@
 
         function triggerNatureHarvest() {
             let sources = [...bushes, ...trees];
-            for (let i = 0; i < Math.min(12, sources.length); i++) {
+            for (let i = 0; i < Math.min(15, sources.length); i++) {
                 let src = sources[Math.floor(Math.random() * sources.length)];
                 spawnFoodCluster(src.x, src.y, 8);
             }
             statusEl.textContent = "🌿 ¡Los árboles y arbustos han producido nuevo alimento!";
-            spawnHitParticles(canvas.width / 2, canvas.height / 2, '#b5e48c', 20);
+            spawnHitParticles(MAP_WIDTH / 2, MAP_HEIGHT / 2, '#b5e48c', 20);
         }
 
         function updateUI() {
@@ -1416,7 +1436,7 @@
                         return;
                     }
                     queen = new QueenAnt(clickX, clickY);
-                    revealFog(clickX, clickY, 200);
+                    revealFog(clickX, clickY, 220);
                     document.getElementById('tool-queen').disabled = true;
                     const btnNormalNest = document.getElementById('tool-normal_nest');
                     btnNormalNest.disabled = false;
@@ -1483,7 +1503,7 @@
 
         function drawEnvironmentBase() {
             ctx.fillStyle = '#345822';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillRect(0, 0, MAP_WIDTH, MAP_HEIGHT);
 
             for (let d of dirtPatches) {
                 ctx.save();
@@ -1730,7 +1750,7 @@
             if (gameMode === 'normal' && queen) {
                 ctx.translate(-queen.x, -queen.y);
             } else {
-                ctx.translate(-canvas.width / 2, -canvas.height / 2);
+                ctx.translate(-MAP_WIDTH / 2, -MAP_HEIGHT / 2);
             }
 
             drawEnvironmentBase();
