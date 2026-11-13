@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ecosistema Natural Definitivo: Escarabajo Pelotero</title>
+    <title>Ecosistema Natural: Mapa Orgánico</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            background-color: #040604;
+            background-color: #060905;
             color: #eef5db;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
@@ -36,7 +36,7 @@
         .hud {
             display: flex;
             gap: 12px;
-            background: #11180e;
+            background: #141c11;
             padding: 6px 14px;
             border-radius: 8px;
             border: 1px solid #4f6d45;
@@ -44,7 +44,7 @@
             align-items: center;
             flex-wrap: wrap;
             justify-content: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
         }
         .stat { font-weight: bold; font-size: 0.85rem; }
         .stat span { color: #a7c957; }
@@ -76,18 +76,16 @@
         }
         .btn-termite { background-color: #bc6c25; }
         .btn-termite:hover { background-color: #dda15e; }
-        .btn-beetle { background-color: #588157; }
-        .btn-beetle:hover { background-color: #3a5a40; }
         .btn-predator { background-color: #6a040f; }
         .btn-predator:hover { background-color: #9d0208; }
         .btn-danger { background-color: #780000; }
 
         canvas {
-            background-color: #264218;
-            border: 3px solid #14210c;
+            background-color: #2b481c;
+            border: 3px solid #17260e;
             border-radius: 8px;
             cursor: crosshair;
-            box-shadow: 0 12px 35px rgba(0,0,0,0.95);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.95);
             max-width: 100%;
         }
     </style>
@@ -95,15 +93,15 @@
 <body>
 
     <header>
-        <h1>🌿 Ecosistema Visual Ultra: Escarabajos y Batallas Dinámicas</h1>
-        <div id="status-msg">🏠 Colocar Nido de Hormigas (Crecimiento autónomo cada 10 🍓)</div>
+        <h1>🌿 Ecosistema Orgánico: Simulación Natural</h1>
+        <div id="status-msg">🏠 Colocar Nido de Hormigas (Las colonias crecen automáticamente cada 10 🍓)</div>
     </header>
 
     <div class="hud">
         <div class="stat">🍓 Comida Global: <span id="food-count">100</span></div>
         <div class="stat">🐜 Hormigas: <span id="ant-count">0</span></div>
         <div class="stat">🏗️ Termitas: <span id="termite-count">0</span></div>
-        <div class="stat">🪲 Escarabajos: <span id="beetle-count">0</span></div>
+        <div class="stat">🏰 Nidos: <span id="nest-count">0</span></div>
         <div class="stat">📊 Progreso: <span id="spawn-progress">0/10 🍓</span></div>
         <button id="btn-speed">Velocidad: 1x</button>
         <button id="btn-clear" class="btn-danger">Reiniciar Mapa</button>
@@ -112,7 +110,6 @@
     <div class="toolbar">
         <button id="tool-nest" class="active" onclick="setTool('nest')">🏠 Nido Hormigas</button>
         <button id="tool-termite_nest" class="btn-termite" onclick="setTool('termite_nest')">🏰 Nido Termitas</button>
-        <button id="tool-beetle" class="btn-beetle" onclick="setTool('beetle')">🪲 Escarabajo Pelotero</button>
         <button id="tool-food" onclick="setTool('food')">🍓 Soltar Comida</button>
         <button id="tool-spider" class="btn-predator" onclick="setTool('spider')">🕷️ Araña Teje-redes</button>
         <button id="tool-mantis" class="btn-predator" onclick="setTool('mantis')">🦗 Mantis Alfa</button>
@@ -128,7 +125,7 @@
         const foodEl = document.getElementById('food-count');
         const antEl = document.getElementById('ant-count');
         const termiteEl = document.getElementById('termite-count');
-        const beetleEl = document.getElementById('beetle-count');
+        const nestEl = document.getElementById('nest-count');
         const progressEl = document.getElementById('spawn-progress');
         const statusEl = document.getElementById('status-msg');
         const btnSpeed = document.getElementById('btn-speed');
@@ -140,7 +137,6 @@
         let termiteNests = [];
         let ants = [];
         let termites = [];
-        let beetles = [];
         let enemies = [];
         let webs = [];
         let foods = [];
@@ -160,12 +156,11 @@
         let flowers = [];
 
         const toolDescriptions = {
-            nest: "🏠 Colocar Nido de Hormigas (Crecimiento automático con recursos)",
+            nest: "🏠 Colocar Nido de Hormigas (Crecimiento autónomo con recursos)",
             termite_nest: "🏰 Colocar Nido de Termitas (Montículo arcilloso natural)",
-            beetle: "🪲 Invocar Escarabajo Pelotero (Tanque pacífico que forma bolas de comida)",
             food: "🍓 Soltar Comida (Nutre a las colonias del bosque)",
-            spider: "🕷️ Invocar Araña (Teje-redes ralentizador con telarañas)",
-            mantis: "🦗 Invocar Mantis Alfa (Depredador supremo con gran poder)"
+            spider: "🕷️ Invocar Araña (Teje-redes ralentizador)",
+            mantis: "🦗 Invocar Mantis Alfa (Depredador supremo)"
         };
 
         function setTool(tool) {
@@ -193,7 +188,7 @@
 
         function canPlaceAt(x, y, tool) {
             if (x < 45 || x > canvas.width - 45 || y < 45 || y > canvas.height - 45) return false;
-            const reqRadius = (tool === 'nest' || tool === 'termite_nest') ? 28 : (tool === 'mantis') ? 22 : (tool === 'spider' || tool === 'beetle') ? 16 : 12;
+            const reqRadius = (tool === 'nest' || tool === 'termite_nest') ? 28 : (tool === 'mantis') ? 22 : (tool === 'spider') ? 16 : 12;
 
             for (let r of rocks) {
                 if (Math.hypot(x - r.x, y - r.y) < r.radius + reqRadius) return false;
@@ -234,13 +229,11 @@
                 this.hasFood = false;
                 this.pheromoneTimer = 0;
                 this.slowTimer = 0;
-                this.walkCycle = Math.random() * Math.PI * 2;
             }
 
             update() {
                 let currentSpeed = this.slowTimer > 0 ? this.speed * 0.35 : this.speed;
                 if (this.slowTimer > 0) this.slowTimer--;
-                this.walkCycle += currentSpeed * 0.25;
 
                 let target = null;
                 let minDist = 95;
@@ -259,11 +252,7 @@
                 if (target) {
                     const targetAngle = Math.atan2(target.y - this.y, target.x - this.x);
                     this.angle = this.lerpAngle(this.angle, targetAngle, 0.25);
-                    if (minDist < target.radius + 6) {
-                        target.hp -= this.damage;
-                        target.x += Math.cos(targetAngle) * 3;
-                        target.y += Math.sin(targetAngle) * 3;
-                    }
+                    if (minDist < target.radius + 6) target.hp -= this.damage;
                 } else {
                     this.angle += (Math.random() - 0.5) * 0.45;
 
@@ -354,24 +343,17 @@
             draw() {
                 ctx.save();
                 ctx.translate(this.x, this.y);
-
-                ctx.fillStyle = 'rgba(0,0,0,0.3)';
-                ctx.beginPath();
-                ctx.ellipse(0, 3, 5, 2.5, 0, 0, Math.PI * 2);
-                ctx.fill();
-
                 ctx.rotate(this.angle);
 
                 ctx.strokeStyle = '#1a0b06';
-                ctx.lineWidth = 1.2;
-                let legOffset = Math.sin(this.walkCycle) * 3;
+                ctx.lineWidth = 1.1;
                 ctx.beginPath();
-                ctx.moveTo(-2, -3); ctx.lineTo(-5 + legOffset, -11);
-                ctx.moveTo(0, -3); ctx.lineTo(1 - legOffset, -12);
-                ctx.moveTo(2, -3); ctx.lineTo(6 + legOffset, -11);
-                ctx.moveTo(-2, 3); ctx.lineTo(-5 - legOffset, 11);
-                ctx.moveTo(0, 3); ctx.lineTo(1 + legOffset, 12);
-                ctx.moveTo(2, 3); ctx.lineTo(6 - legOffset, 11);
+                ctx.moveTo(-2, -3); ctx.lineTo(-5, -10);
+                ctx.moveTo(0, -3); ctx.lineTo(1, -11);
+                ctx.moveTo(2, -3); ctx.lineTo(6, -10);
+                ctx.moveTo(-2, 3); ctx.lineTo(-5, 10);
+                ctx.moveTo(0, 3); ctx.lineTo(1, 11);
+                ctx.moveTo(2, 3); ctx.lineTo(6, 10);
                 ctx.stroke();
 
                 ctx.fillStyle = '#36150b';
@@ -422,13 +404,11 @@
                 this.damage = 0.75;
                 this.hasFood = false;
                 this.slowTimer = 0;
-                this.walkCycle = Math.random() * Math.PI * 2;
             }
 
             update() {
                 let currentSpeed = this.slowTimer > 0 ? this.speed * 0.35 : this.speed;
                 if (this.slowTimer > 0) this.slowTimer--;
-                this.walkCycle += currentSpeed * 0.25;
 
                 let target = null;
                 let minDist = 90;
@@ -447,11 +427,7 @@
                 if (target) {
                     const targetAngle = Math.atan2(target.y - this.y, target.x - this.x);
                     this.angle = this.lerpAngle(this.angle, targetAngle, 0.25);
-                    if (minDist < target.radius + 6) {
-                        target.hp -= this.damage;
-                        target.x += Math.cos(targetAngle) * 3;
-                        target.y += Math.sin(targetAngle) * 3;
-                    }
+                    if (minDist < target.radius + 6) target.hp -= this.damage;
                 } else {
                     this.angle += (Math.random() - 0.5) * 0.4;
 
@@ -513,12 +489,6 @@
             draw() {
                 ctx.save();
                 ctx.translate(this.x, this.y);
-
-                ctx.fillStyle = 'rgba(0,0,0,0.3)';
-                ctx.beginPath();
-                ctx.ellipse(0, 3, 5.5, 3, 0, 0, Math.PI * 2);
-                ctx.fill();
-
                 ctx.rotate(this.angle);
 
                 ctx.fillStyle = '#eddcd2';
@@ -544,119 +514,6 @@
                     ctx.beginPath();
                     ctx.arc(0, 0, 9, 0, Math.PI * 2);
                     ctx.stroke();
-                }
-
-                ctx.restore();
-            }
-
-            normalizeAngle(a) {
-                while (a > Math.PI) a -= Math.PI * 2;
-                while (a < -Math.PI) a += Math.PI * 2;
-                return a;
-            }
-            lerpAngle(a, b, t) {
-                const diff = this.normalizeAngle(b - a);
-                return a + diff * t;
-            }
-        }
-
-        class Beetle {
-            constructor(x, y) {
-                this.x = x;
-                this.y = y;
-                this.angle = Math.random() * Math.PI * 2;
-                this.speed = 1.3;
-                this.hp = 220;
-                this.maxHp = 220;
-                this.hasBall = false;
-                this.ballSize = 14;
-            }
-
-            update() {
-                let threat = null;
-                let minThreatDist = 120;
-                for (let en of enemies) {
-                    let d = Math.hypot(en.x - this.x, en.y - this.y);
-                    if (d < minThreatDist) { minThreatDist = d; threat = en; }
-                }
-
-                if (threat) {
-                    const fleeAngle = Math.atan2(this.y - threat.y, this.x - threat.x);
-                    this.angle = this.lerpAngle(this.angle, fleeAngle, 0.2);
-                    this.hasBall = false;
-                } else if (this.hasBall) {
-                    this.angle += (Math.random() - 0.5) * 0.1;
-                } else {
-                    let closestFood = null;
-                    let minD = 250;
-                    for (let f of foods) {
-                        let d = Math.hypot(f.x - this.x, f.y - this.y);
-                        if (d < minD) { minD = d; closestFood = f; }
-                    }
-
-                    if (closestFood) {
-                        let targetAngle = Math.atan2(closestFood.y - this.y, closestFood.x - this.x);
-                        this.angle = this.lerpAngle(this.angle, targetAngle, 0.15);
-
-                        if (minD < 12) {
-                            let idx = foods.indexOf(closestFood);
-                            if (idx > -1) foods.splice(idx, 1);
-                            this.hasBall = true;
-                        }
-                    } else {
-                        this.angle += (Math.random() - 0.5) * 0.3;
-                    }
-                }
-
-                let nextX = this.x + Math.cos(this.angle) * this.speed;
-                let nextY = this.y + Math.sin(this.angle) * this.speed;
-
-                if (checkObstacleCollision(nextX, nextY, 14)) {
-                    this.angle += Math.PI / 2;
-                    nextX = this.x + Math.cos(this.angle) * this.speed;
-                    nextY = this.y + Math.sin(this.angle) * this.speed;
-                }
-
-                this.x = nextX;
-                this.y = nextY;
-
-                if (this.x < 30) { this.x = 30; this.angle = Math.PI - this.angle; }
-                if (this.x > canvas.width - 30) { this.x = canvas.width - 30; this.angle = Math.PI - this.angle; }
-                if (this.y < 30) { this.y = 30; this.angle = -this.angle; }
-                if (this.y > canvas.height - 30) { this.y = canvas.height - 30; this.angle = -this.angle; }
-            }
-
-            draw() {
-                ctx.save();
-                ctx.translate(this.x, this.y);
-
-                ctx.fillStyle = 'rgba(0,0,0,0.4)';
-                ctx.beginPath();
-                ctx.ellipse(0, 4, 14, 8, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.rotate(this.angle);
-
-                ctx.fillStyle = '#2b3a26';
-                ctx.beginPath();
-                ctx.ellipse(0, 0, 14, 10, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#3a5a40';
-                ctx.beginPath();
-                ctx.ellipse(-2, 0, 11, 7.5, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                if (this.hasBall) {
-                    ctx.fillStyle = '#4a3319';
-                    ctx.beginPath();
-                    ctx.arc(-18, 0, this.ballSize, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.fillStyle = '#2d1f0f';
-                    ctx.beginPath();
-                    ctx.arc(-16, -3, 3, 0, Math.PI * 2);
-                    ctx.arc(-20, 4, 2.5, 0, Math.PI * 2);
-                    ctx.fill();
                 }
 
                 ctx.restore();
@@ -730,9 +587,6 @@
 
                     if (minDist < this.radius + (target.radius || 4) + 4) {
                         target.hp -= this.damage;
-                        target.x += Math.cos(targetAngle) * 4;
-                        target.y += Math.sin(targetAngle) * 4;
-
                         if (target.hp <= 0) this.hp = Math.min(this.maxHp, this.hp + 25);
                     }
                 } else {
@@ -855,7 +709,6 @@
             trees = [];
             flowers = [];
             foods = [];
-            beetles = [];
 
             for (let i = 0; i < 40; i++) {
                 dirtPatches.push({
@@ -915,6 +768,7 @@
                 });
             }
 
+            // --- GENERACIÓN DE ROCAS ORGÁNICAS (POLIGONALES / IRREGULARES) ---
             for (let i = 0; i < 28; i++) {
                 let rx = 120 + Math.random() * (canvas.width - 240);
                 let ry = 120 + Math.random() * (canvas.height - 240);
@@ -940,6 +794,7 @@
                 });
             }
 
+            // --- GENERACIÓN DE ARBUSTOS ORGÁNICOS (MULTILOBULADOS) ---
             for (let i = 0; i < 26; i++) {
                 const bx = 90 + Math.random() * (canvas.width - 180);
                 const by = 90 + Math.random() * (canvas.height - 180);
@@ -955,6 +810,7 @@
                 spawnFoodCluster(bx + (Math.random() - 0.5) * 65, by + (Math.random() - 0.5) * 65, 12);
             }
 
+            // --- GENERACIÓN DE ÁRBOLES ORGÁNICOS (MULTILOBULADOS) ---
             for (let i = 0; i < 20; i++) {
                 const tx = 140 + Math.random() * (canvas.width - 280);
                 const ty = 140 + Math.random() * (canvas.height - 280);
@@ -968,10 +824,6 @@
                 }
                 trees.push({ x: tx, y: ty, radius: radius, lobes: lobes });
             }
-
-            for (let i = 0; i < 3; i++) {
-                beetles.push(new Beetle(200 + Math.random() * (canvas.width - 400), 200 + Math.random() * (canvas.height - 400)));
-            }
         }
 
         function init() {
@@ -979,7 +831,6 @@
             termiteNests = [];
             ants = [];
             termites = [];
-            beetles = [];
             enemies = [];
             webs = [];
             pheromones = [];
@@ -1018,7 +869,6 @@
             foodEl.textContent = storedFood;
             antEl.textContent = ants.length;
             termiteEl.textContent = termites.length;
-            beetleEl.textContent = beetles.length;
             nestEl.textContent = antNests.length + termiteNests.length;
             progressEl.textContent = `${foodSpawnCounter}/10 🍓`;
         }
@@ -1047,8 +897,6 @@
                 placeNest(clickX, clickY, 'ant');
             } else if (currentTool === 'termite_nest') {
                 placeNest(clickX, clickY, 'termite');
-            } else if (currentTool === 'beetle') {
-                beetles.push(new Beetle(clickX, clickY));
             } else if (currentTool === 'food') {
                 spawnFoodCluster(clickX, clickY);
             } else if (currentTool === 'spider') {
@@ -1067,14 +915,15 @@
         document.getElementById('btn-clear').addEventListener('click', init);
 
         function drawEnvironmentBase() {
-            ctx.fillStyle = '#264218';
+            ctx.fillStyle = '#2b481c';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+            // Parches de tierra orgánicos (elipses rotadas)
             for (let d of dirtPatches) {
                 ctx.save();
                 ctx.translate(d.x, d.y);
                 ctx.rotate(d.angle);
-                ctx.fillStyle = 'rgba(42, 27, 14, 0.5)';
+                ctx.fillStyle = 'rgba(51, 33, 18, 0.45)';
                 ctx.beginPath();
                 ctx.ellipse(0, 0, d.rx, d.ry, 0, 0, Math.PI * 2);
                 ctx.fill();
@@ -1110,7 +959,7 @@
                 ctx.save();
                 ctx.translate(fn.x, fn.y);
                 ctx.rotate(fn.angle);
-                ctx.strokeStyle = '#14300a';
+                ctx.strokeStyle = '#1a3810';
                 ctx.lineWidth = 2;
                 for (let i = 0; i < 6; i++) {
                     ctx.rotate(Math.PI / 3);
@@ -1127,19 +976,31 @@
                 ctx.translate(l.x, l.y);
                 ctx.rotate(l.angle);
 
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
                 ctx.beginPath();
                 ctx.roundRect(-l.w/2 + 6, -l.h/2 + 7, l.w, l.h, 6);
                 ctx.fill();
 
-                ctx.fillStyle = '#2c190a';
+                ctx.fillStyle = '#38210e';
                 ctx.beginPath();
                 ctx.roundRect(-l.w/2, -l.h/2, l.w, l.h, 6);
                 ctx.fill();
 
-                ctx.fillStyle = '#946b43';
+                ctx.strokeStyle = '#1b0f06';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(-l.w/2 + 12, -l.h/4); ctx.lineTo(l.w/2 - 12, -l.h/4);
+                ctx.moveTo(-l.w/2 + 18, l.h/4); ctx.lineTo(l.w/2 - 18, l.h/4);
+                ctx.stroke();
+
+                ctx.fillStyle = '#a97d52';
                 ctx.beginPath();
                 ctx.ellipse(l.w/2 - 2, 0, 4.8, l.h/2 - 1, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#2d5a1b';
+                ctx.beginPath();
+                ctx.ellipse(-8, -l.h/3, l.w * 0.3, 5, 0, 0, Math.PI * 2);
                 ctx.fill();
 
                 ctx.restore();
@@ -1152,32 +1013,52 @@
                     ctx.arc(fl.x + Math.cos(a) * 2.5, fl.y + Math.sin(a) * 2.5, 1.8, 0, Math.PI * 2);
                     ctx.fill();
                 }
-                ctx.fillStyle = '#110a00';
+                ctx.fillStyle = '#1c1100';
                 ctx.beginPath();
                 ctx.arc(fl.x, fl.y, 1.5, 0, Math.PI * 2);
                 ctx.fill();
             }
 
+            // --- RENDERIZADO DE ROCAS ORGÁNICAS (POLIGONALES) ---
             for (let r of rocks) {
                 ctx.save();
                 ctx.translate(r.x, r.y);
 
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                // Sombra irregular
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
                 ctx.beginPath();
                 ctx.moveTo(r.points[0].x + 6, r.points[0].y + 8);
-                for (let pt of r.points) ctx.lineTo(pt.x + 6, pt.y + 8);
+                for (let pt of r.points) {
+                    ctx.lineTo(pt.x + 6, pt.y + 8);
+                }
                 ctx.closePath();
                 ctx.fill();
 
-                ctx.fillStyle = '#424a47';
+                // Cuerpo roca base
+                ctx.fillStyle = '#4f5653';
                 ctx.beginPath();
                 ctx.moveTo(r.points[0].x, r.points[0].y);
-                for (let pt of r.points) ctx.lineTo(pt.x, pt.y);
+                for (let pt of r.points) {
+                    ctx.lineTo(pt.x, pt.y);
+                }
+                ctx.closePath();
+                ctx.fill();
+
+                // Relieve superior
+                ctx.fillStyle = '#6b7370';
+                ctx.beginPath();
+                let first = true;
+                for (let pt of r.points) {
+                    let px = pt.x * 0.7;
+                    let py = pt.y * 0.7;
+                    if (first) { ctx.moveTo(px, py); first = false; }
+                    else { ctx.lineTo(px, py); }
+                }
                 ctx.closePath();
                 ctx.fill();
 
                 if (r.hasMoss) {
-                    ctx.fillStyle = '#224413';
+                    ctx.fillStyle = '#2b541a';
                     ctx.beginPath();
                     ctx.arc(r.radius * 0.2, -r.radius * 0.3, r.radius * 0.38, 0, Math.PI * 2);
                     ctx.fill();
@@ -1188,47 +1069,69 @@
         }
 
         function drawCanopyLayer() {
+            // --- RENDERIZADO DE ARBUSTOS ORGÁNICOS (MULTILOBULADOS) ---
             for (let b of bushes) {
                 ctx.save();
                 ctx.translate(b.x, b.y);
 
-                ctx.fillStyle = 'rgba(0,0,0,0.4)';
+                // Sombra arbusto
+                ctx.fillStyle = 'rgba(0,0,0,0.35)';
                 for (let lob of b.lobes) {
                     ctx.beginPath();
                     ctx.arc(lob.x + 7, lob.y + 7, lob.r, 0, Math.PI * 2);
                     ctx.fill();
                 }
 
-                ctx.fillStyle = '#0b2008';
+                // Base arbusto
+                ctx.fillStyle = '#10290d';
                 for (let lob of b.lobes) {
                     ctx.beginPath();
                     ctx.arc(lob.x, lob.y, lob.r, 0, Math.PI * 2);
                     ctx.fill();
                 }
 
+                // Capa superior arbusto
+                ctx.fillStyle = '#1b3f17';
+                for (let lob of b.lobes) {
+                    ctx.beginPath();
+                    ctx.arc(lob.x - 4, lob.y - 4, lob.r * 0.75, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
                 ctx.restore();
             }
 
+            // --- RENDERIZADO DE ÁRBOLES ORGÁNICOS (MULTILOBULADOS) ---
             for (let t of trees) {
                 ctx.save();
                 ctx.translate(t.x, t.y);
 
-                ctx.fillStyle = 'rgba(2, 6, 1, 0.45)';
+                // Sombra árbol
+                ctx.fillStyle = 'rgba(4, 10, 2, 0.4)';
                 for (let lob of t.lobes) {
                     ctx.beginPath();
                     ctx.arc(lob.x + 25, lob.y + 28, lob.r, 0, Math.PI * 2);
                     ctx.fill();
                 }
 
-                ctx.fillStyle = '#140c05';
+                // Tronco
+                ctx.fillStyle = '#1f1308';
                 ctx.beginPath();
                 ctx.arc(0, 0, 12, 0, Math.PI * 2);
                 ctx.fill();
 
-                ctx.fillStyle = 'rgba(7, 24, 5, 0.9)';
+                // Capas de follaje orgánico irregular
+                ctx.fillStyle = 'rgba(10, 31, 8, 0.88)';
                 for (let lob of t.lobes) {
                     ctx.beginPath();
                     ctx.arc(lob.x, lob.y, lob.r, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                ctx.fillStyle = 'rgba(18, 52, 14, 0.78)';
+                for (let lob of t.lobes) {
+                    ctx.beginPath();
+                    ctx.arc(lob.x - 10, lob.y - 10, lob.r * 0.72, 0, Math.PI * 2);
                     ctx.fill();
                 }
 
@@ -1276,7 +1179,6 @@
 
                 for (let ant of ants) ant.update();
                 for (let t of termites) t.update();
-                for (let b of beetles) b.update();
                 for (let en of enemies) en.update();
 
                 for (let i = ants.length - 1; i >= 0; i--) {
@@ -1295,14 +1197,6 @@
                     }
                 }
 
-                for (let i = beetles.length - 1; i >= 0; i--) {
-                    if (beetles[i].hp <= 0) {
-                        spawnFoodCluster(beetles[i].x, beetles[i].y, 5);
-                        beetles.splice(i, 1);
-                        needsUIUpdate = true;
-                    }
-                }
-
                 for (let i = enemies.length - 1; i >= 0; i--) {
                     if (enemies[i].hp <= 0) {
                         let drop = enemies[i].type === 'mantis' ? 30 : 15;
@@ -1315,7 +1209,6 @@
 
             if (needsUIUpdate) updateUI();
 
-            // DIBUJAR FONDO Y ENTORNO ORGÁNICO
             drawEnvironmentBase();
 
             for (let p of pheromones) {
@@ -1345,28 +1238,28 @@
             }
 
             for (let n of antNests) {
-                ctx.fillStyle = '#3a1f12';
+                ctx.fillStyle = '#4a2818';
                 ctx.beginPath();
                 ctx.arc(n.x, n.y, n.radius + 8, 0, Math.PI * 2);
                 ctx.fill();
-                ctx.fillStyle = '#050201';
+                ctx.fillStyle = '#0b0503';
                 ctx.beginPath();
                 ctx.arc(n.x, n.y, n.radius - 5, 0, Math.PI * 2);
                 ctx.fill();
             }
 
             for (let n of termiteNests) {
-                ctx.fillStyle = '#522c0f';
+                ctx.fillStyle = '#653814';
                 ctx.beginPath();
                 ctx.arc(n.x, n.y, n.radius + 9, 0, Math.PI * 2);
                 ctx.fill();
 
-                ctx.fillStyle = '#73462b';
+                ctx.fillStyle = '#8c5838';
                 ctx.beginPath();
                 ctx.arc(n.x - 4, n.y - 4, n.radius * 0.68, 0, Math.PI * 2);
                 ctx.fill();
 
-                ctx.fillStyle = '#1f0f05';
+                ctx.fillStyle = '#2e190a';
                 ctx.beginPath();
                 ctx.arc(n.x + 3, n.y + 3, 5.5, 0, Math.PI * 2);
                 ctx.arc(n.x - 6, n.y + 4, 4.5, 0, Math.PI * 2);
@@ -1375,20 +1268,12 @@
 
             for (let ant of ants) ant.draw();
             for (let t of termites) t.draw();
-            for (let b of beetles) b.draw();
             for (let en of enemies) en.draw();
 
-            // DIBUJAR CAPA SUPERIOR DE ÁRBOLES Y ARBUSTOS
             drawCanopyLayer();
 
-            let gradient = ctx.createRadialGradient(canvas.width/2, canvas.height/2, canvas.width*0.3, canvas.width/2, canvas.height/2, canvas.width*0.75);
-            gradient.addColorStop(0, 'rgba(0,0,0,0)');
-            gradient.addColorStop(1, 'rgba(2, 8, 2, 0.45)');
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
             const validPlacement = canPlaceAt(mousePos.x, mousePos.y, currentTool);
-            const previewRadius = (currentTool === 'nest' || currentTool === 'termite_nest') ? 28 : (currentTool === 'mantis') ? 22 : (currentTool === 'spider' || currentTool === 'beetle') ? 16 : 14;
+            const previewRadius = (currentTool === 'nest' || currentTool === 'termite_nest') ? 28 : (currentTool === 'mantis') ? 22 : (currentTool === 'spider') ? 16 : 14;
 
             ctx.strokeStyle = validPlacement ? 'rgba(167, 201, 87, 0.95)' : 'rgba(230, 57, 70, 0.98)';
             ctx.fillStyle = validPlacement ? 'rgba(167, 201, 87, 0.18)' : 'rgba(230, 57, 70, 0.3)';
