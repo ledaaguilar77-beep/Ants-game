@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+<!-- ===== PARTE 1 de 10: HTML + CSS + estructura ===== -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -468,7 +469,9 @@
         <canvas id="gameCanvas"></canvas>
         <div id="hint">🖱️ Clic: acción/morder · Botón derecho: cámara · Rueda: zoom · WASD: reina/cámara · Q/E/F: habilidades · Esc: pausa</div>
     </div>
-    <script>
+
+<script>
+// ================= PARTE 2 de 10: constantes, especies, cámara, colisiones, cuerpo de obrera =================
 'use strict';
 
 /* ============================================================
@@ -1171,7 +1174,9 @@ function drawWorkerBody(c, key, walk, dark = 0) {
     }
     drawAntennae(c, pal);
 }
-       function drawQueenBody(c, key, charge = 0) {
+
+// ================= PARTE 3 de 10: dibujo de reina, retratos de especie, clase QueenAnt =================
+function drawQueenBody(c, key, charge = 0) {
     const pal = antPalette(key, 0);
     const k = key === 'generic' ? 'generic' : key;
 
@@ -1747,582 +1752,9 @@ class QueenAnt extends Entity {
         ctx.restore();
     }
 }
-       function drawQueenBody(c, key, charge = 0) {
-    const pal = antPalette(key, 0);
-    const k = key === 'generic' ? 'generic' : key;
 
-    c.strokeStyle = pal.leg;
-    c.lineWidth = 2.1;
-    c.beginPath();
-    c.moveTo(-6, -6); c.lineTo(-14, -20);
-    c.moveTo(0, -6); c.lineTo(2, -22);
-    c.moveTo(7, -6); c.lineTo(15, -19);
-    c.moveTo(-6, 6); c.lineTo(-14, 20);
-    c.moveTo(0, 6); c.lineTo(2, 22);
-    c.moveTo(7, 6); c.lineTo(15, 19);
-    c.stroke();
-
-    c.fillStyle = pal.gaster;
-    c.beginPath();
-    c.ellipse(-10, 0, 10, 6.6, 0, 0, Math.PI * 2);
-    c.fill();
-
-    c.fillStyle = pal.sheen;
-    c.globalAlpha = 0.5;
-    c.beginPath();
-    c.ellipse(-10, -2.4, 7, 1.9, -0.08, 0, Math.PI * 2);
-    c.fill();
-    c.globalAlpha = 1;
-
-    if (k === 'camponotus') {
-        c.strokeStyle = pal.accent;
-        c.lineWidth = 1.2;
-        c.beginPath();
-        c.moveTo(-15, -4.4); c.lineTo(-15, 4.4);
-        c.moveTo(-12, -5.7); c.lineTo(-12, 5.7);
-        c.moveTo(-9, -6.4); c.lineTo(-9, 6.4);
-        c.stroke();
-    } else if (k === 'leptogenys') {
-        c.fillStyle = pal.accent;
-        c.beginPath();
-        c.moveTo(-19.6, 0); c.lineTo(-24.4, -2.2); c.lineTo(-24.4, 2.2);
-        c.closePath();
-        c.fill();
-    } else if (k === 'odontomachus') {
-        c.fillStyle = 'rgba(255, 209, 102, 0.35)';
-        c.beginPath();
-        c.ellipse(-10, 0, 11.5, 7.8, 0, 0, Math.PI * 2);
-        c.fill();
-    }
-
-    c.fillStyle = pal.thorax;
-    c.beginPath();
-    c.ellipse(0, 0, 6.2, 4.6, 0, 0, Math.PI * 2);
-    c.fill();
-
-    c.fillStyle = pal.sheen;
-    c.globalAlpha = 0.4;
-    c.beginPath();
-    c.ellipse(-0.5, -1.4, 4.2, 1.4, 0, 0, Math.PI * 2);
-    c.fill();
-    c.globalAlpha = 1;
-
-    c.strokeStyle = 'rgba(235, 225, 200, 0.45)';
-    c.lineWidth = 0.9;
-    c.beginPath();
-    c.moveTo(-2.5, -3.6); c.lineTo(2.5, -1.4);
-    c.moveTo(-2.5, 3.6); c.lineTo(2.5, 1.4);
-    c.stroke();
-
-    if (k === 'odontomachus') {
-        c.fillStyle = pal.head;
-        c.beginPath();
-        c.moveTo(5.6, -4.2);
-        c.lineTo(12.4, -5);
-        c.lineTo(14, 0);
-        c.lineTo(12.4, 5);
-        c.lineTo(5.6, 4.2);
-        c.closePath();
-        c.fill();
-        c.strokeStyle = pal.mandible;
-        c.lineWidth = 2.4;
-        c.beginPath();
-        c.moveTo(13.4, -3.4); c.lineTo(23, -6.2);
-        c.moveTo(13.4, 3.4); c.lineTo(23, 6.2);
-        c.stroke();
-        if (charge > 0) {
-            c.strokeStyle = `rgba(255, 209, 102, ${0.35 + charge * 0.5})`;
-            c.lineWidth = 2.6;
-            c.beginPath();
-            c.moveTo(13.4, -3.4); c.lineTo(23, -6.2);
-            c.moveTo(13.4, 3.4); c.lineTo(23, 6.2);
-            c.stroke();
-        }
-        c.fillStyle = '#1b1b1b';
-        c.beginPath();
-        c.arc(11.6, -2.2, 0.9, 0, Math.PI * 2);
-        c.arc(11.6, 2.2, 0.9, 0, Math.PI * 2);
-        c.fill();
-    } else if (k === 'camponotus') {
-        c.fillStyle = pal.head;
-        c.beginPath();
-        c.ellipse(9.5, 0, 5, 4.4, 0, 0, Math.PI * 2);
-        c.fill();
-        c.strokeStyle = pal.mandible;
-        c.lineWidth = 2;
-        c.beginPath();
-        c.moveTo(13.6, -2.6); c.lineTo(16, -1);
-        c.moveTo(13.6, 2.6); c.lineTo(16, 1);
-        c.stroke();
-    } else if (k === 'leptogenys') {
-        c.fillStyle = pal.head;
-        c.beginPath();
-        c.ellipse(9.2, 0, 4.2, 3.4, 0, 0, Math.PI * 2);
-        c.fill();
-        c.strokeStyle = pal.mandible;
-        c.lineWidth = 1.3;
-        c.beginPath();
-        c.moveTo(12.6, -1.8); c.lineTo(14.8, -0.8);
-        c.moveTo(12.6, 1.8); c.lineTo(14.8, 0.8);
-        c.stroke();
-    } else if (k === 'cephalotes') {
-        c.strokeStyle = pal.accent;
-        c.lineWidth = 1;
-        c.globalAlpha = 0.85;
-        for (let i = 0; i < 9; i++) {
-            const a = -1.0 + i * 0.25;
-            c.beginPath();
-            c.moveTo(-10 + Math.cos(a) * 7.5, Math.sin(a) * 5.2);
-            c.lineTo(-10 + Math.cos(a) * 10.5, Math.sin(a) * 7.2);
-            c.stroke();
-        }
-        c.globalAlpha = 1;
-
-        c.fillStyle = pal.head;
-        c.beginPath();
-        c.moveTo(4.4, -5.6);
-        c.lineTo(11.4, -6.4);
-        c.lineTo(13.6, 0);
-        c.lineTo(11.4, 6.4);
-        c.lineTo(4.4, 5.6);
-        c.closePath();
-        c.fill();
-        c.strokeStyle = pal.accent;
-        c.lineWidth = 0.9;
-        c.beginPath();
-        c.moveTo(5, -4.6); c.lineTo(10.6, -5.2);
-        c.moveTo(5, 4.6); c.lineTo(10.6, 5.2);
-        c.stroke();
-        c.fillStyle = '#0e0e0c';
-        c.beginPath();
-        c.arc(11.8, -2.6, 1.3, 0, Math.PI * 2);
-        c.arc(11.8, 2.6, 1.3, 0, Math.PI * 2);
-        c.fill();
-        c.strokeStyle = pal.mandible;
-        c.lineWidth = 1.8;
-        c.beginPath();
-        c.moveTo(12.6, -2.4); c.lineTo(15.4, -1.2);
-        c.moveTo(12.6, 2.4); c.lineTo(15.4, 1.2);
-        c.stroke();
-    } else if (k === 'atta') {
-        c.strokeStyle = pal.accent;
-        c.lineWidth = 1.2;
-        for (let i = 0; i < 3; i++) {
-            c.beginPath();
-            c.moveTo(-2 + i * 2.2, -5.4);
-            c.lineTo(-4 + i * 2.2, -8.4);
-            c.moveTo(-2 + i * 2.2, 5.4);
-            c.lineTo(-4 + i * 2.2, 8.4);
-            c.stroke();
-        }
-        c.fillStyle = pal.head;
-        c.beginPath();
-        c.ellipse(11, 0, 6, 5.2, 0, 0, Math.PI * 2);
-        c.fill();
-        c.fillStyle = 'rgba(0,0,0,0.35)';
-        c.beginPath();
-        c.ellipse(13, -0.8, 3.2, 3.6, 0, 0, Math.PI * 2);
-        c.fill();
-        c.fillStyle = '#1b0b04';
-        c.beginPath();
-        c.arc(14, -2.4, 1.3, 0, Math.PI * 2);
-        c.arc(14, 2.4, 1.3, 0, Math.PI * 2);
-        c.fill();
-        c.strokeStyle = pal.mandible;
-        c.lineWidth = 2.2;
-        c.beginPath();
-        c.moveTo(15, -2.8); c.lineTo(18.6, -1.4);
-        c.moveTo(15, 2.8); c.lineTo(18.6, 1.4);
-        c.stroke();
-    } else {
-        c.fillStyle = '#4a1c0e';
-        c.beginPath();
-        c.ellipse(8, 0, 4.4, 3.8, 0, 0, Math.PI * 2);
-        c.fill();
-    }
-
-    c.fillStyle = '#ffd166';
-    c.beginPath();
-    c.moveTo(7.6, -4.4); c.lineTo(8.4, -7.6); c.lineTo(9.8, -4.6);
-    c.moveTo(9.8, -4.6); c.lineTo(11.4, -7.2); c.lineTo(12, -4.2);
-    c.fill();
-
-    c.strokeStyle = pal.mandible;
-    c.lineWidth = 1.15;
-    c.beginPath();
-    c.moveTo(11, -2.6); c.quadraticCurveTo(16, -8, 20, -7);
-    c.moveTo(11, 2.6); c.quadraticCurveTo(16, 8, 20, 7);
-    c.stroke();
-}
-
-function drawSpeciesPortrait(cnv, key) {
-    const c = cnv.getContext('2d');
-    const w = cnv.width;
-    const h = cnv.height;
-    const bg = c.createRadialGradient(w * 0.5, h * 0.35, 10, w * 0.5, h * 0.55, w * 0.75);
-    bg.addColorStop(0, key === 'camponotus' ? '#3a2a13'
-        : key === 'leptogenys' ? '#33260f'
-        : key === 'cephalotes' ? '#2b2b24'
-        : key === 'atta' ? '#3a2413'
-        : '#2e2414');
-    bg.addColorStop(1, '#0d170a');
-    c.fillStyle = bg;
-    c.fillRect(0, 0, w, h);
-
-    for (let i = 0; i < 18; i++) {
-        const bx = (i * 97.31 + 40) % w;
-        const by = (i * 53.17 + 20) % h;
-        const br = 4 + ((i * 37) % 16);
-        c.fillStyle = i % 3 === 0 ? 'rgba(120, 180, 90, 0.11)' : 'rgba(45, 90, 40, 0.2)';
-        c.beginPath();
-        c.ellipse(bx, by, br, br * TILT, 0, 0, Math.PI * 2);
-        c.fill();
-    }
-
-    c.fillStyle = 'rgba(0,0,0,0.42)';
-    c.beginPath();
-    c.ellipse(w * 0.5, h * 0.79, w * 0.4, h * 0.15, 0, 0, Math.PI * 2);
-    c.fill();
-
-    if (key === 'camponotus') {
-        const tx = w * 0.87;
-        c.fillStyle = '#3b2a17';
-        c.fillRect(tx - 18, 0, 36, h);
-        c.fillStyle = '#4d3720';
-        c.fillRect(tx - 18, 0, 6, h);
-        c.strokeStyle = 'rgba(20, 12, 6, 0.55)';
-        c.lineWidth = 2;
-        for (let gy = 8; gy < h; gy += 17) {
-            c.beginPath();
-            c.moveTo(tx - 15, gy); c.quadraticCurveTo(tx, gy + 6, tx + 15, gy + 1);
-            c.stroke();
-        }
-        c.fillStyle = '#120a04';
-        c.beginPath();
-        c.ellipse(tx, h * 0.66, 10, 15, 0, 0, Math.PI * 2);
-        c.fill();
-        c.fillStyle = 'rgba(255, 209, 102, 0.28)';
-        c.beginPath();
-        c.ellipse(tx, h * 0.66, 5, 8, 0, 0, Math.PI * 2);
-        c.fill();
-    } else if (key === 'odontomachus') {
-        c.fillStyle = '#4a3320';
-        c.beginPath();
-        c.moveTo(w * 0.22, h * 0.92);
-        c.quadraticCurveTo(w * 0.5, h * 0.42, w * 0.78, h * 0.92);
-        c.closePath();
-        c.fill();
-        c.fillStyle = '#5c4128';
-        c.beginPath();
-        c.moveTo(w * 0.3, h * 0.92);
-        c.quadraticCurveTo(w * 0.5, h * 0.52, w * 0.7, h * 0.92);
-        c.closePath();
-        c.fill();
-        c.fillStyle = '#1c130a';
-        c.beginPath();
-        c.ellipse(w * 0.5, h * 0.55, w * 0.06, h * 0.045, 0, 0, Math.PI * 2);
-        c.fill();
-        const glow = c.createRadialGradient(w * 0.5, h * 0.55, 2, w * 0.5, h * 0.55, 34);
-        glow.addColorStop(0, 'rgba(255, 150, 60, 0.4)');
-        glow.addColorStop(1, 'rgba(255, 120, 40, 0)');
-        c.fillStyle = glow;
-        c.fillRect(w * 0.28, h * 0.32, w * 0.44, h * 0.34);
-    } else if (key === 'leptogenys') {
-        for (let i = 0; i < 9; i++) {
-            const lx = (i * 71 + 30) % w;
-            const ly = h * 0.8 + ((i * 29) % 24);
-            c.fillStyle = i % 2 ? 'rgba(122, 82, 40, 0.75)' : 'rgba(94, 120, 52, 0.6)';
-            c.beginPath();
-            c.ellipse(lx, ly, 11, 4.4, (i * 0.9) % 3, 0, Math.PI * 2);
-            c.fill();
-        }
-    } else if (key === 'cephalotes') {
-        const tx = w * 0.86;
-        c.fillStyle = '#3b2a17';
-        c.fillRect(tx - 20, 0, 40, h);
-        c.strokeStyle = 'rgba(20, 12, 6, 0.55)';
-        c.lineWidth = 2;
-        for (let gy = 7; gy < h; gy += 15) {
-            c.beginPath();
-            c.moveTo(tx - 17, gy); c.quadraticCurveTo(tx, gy + 5, tx + 17, gy + 1);
-            c.stroke();
-        }
-        c.fillStyle = '#120a04';
-        c.beginPath();
-        c.ellipse(tx, h * 0.62, 8, 12, 0, 0, Math.PI * 2);
-        c.fill();
-        c.fillStyle = 'rgba(217, 197, 140, 0.25)';
-        c.beginPath();
-        c.ellipse(tx, h * 0.62, 4, 7, 0, 0, Math.PI * 2);
-        c.fill();
-        for (let i = 0; i < 8; i++) {
-            c.fillStyle = 'rgba(120, 150, 90, 0.13)';
-            c.beginPath();
-            c.ellipse((i * 83 + 25) % w, h * 0.25 + ((i * 47) % (h * 0.5)), 14, 6, 0.3, 0, Math.PI * 2);
-            c.fill();
-        }
-    } else if (key === 'atta') {
-        c.fillStyle = '#4a2c14';
-        c.beginPath();
-        c.ellipse(w * 0.5, h * 0.94, w * 0.42, h * 0.2, 0, Math.PI, Math.PI * 2);
-        c.fill();
-        for (let i = 0; i < 14; i++) {
-            const fx = w * (0.14 + (i % 7) * 0.12);
-            const fy = h * (0.72 + Math.floor(i / 7) * 0.09);
-            const fr = 7 + (i * 13) % 7;
-            c.fillStyle = 'rgba(232, 226, 205, 0.75)';
-            c.beginPath();
-            c.ellipse(fx, fy, fr, fr * 0.55, 0, 0, Math.PI * 2);
-            c.fill();
-            c.fillStyle = 'rgba(200, 190, 160, 0.5)';
-            c.beginPath();
-            c.ellipse(fx - 1, fy - 1, fr * 0.5, fr * 0.28, 0, 0, Math.PI * 2);
-            c.fill();
-        }
-        c.strokeStyle = '#5b8c3a';
-        c.lineWidth = 3;
-        c.beginPath();
-        c.moveTo(w * 0.07, h * 0.86);
-        c.quadraticCurveTo(w * 0.16, h * 0.62, w * 0.27, h * 0.8);
-        c.stroke();
-        c.fillStyle = '#6a994e';
-        c.beginPath();
-        c.ellipse(w * 0.16, h * 0.74, 15, 7, -0.5, 0, Math.PI * 2);
-        c.fill();
-    }
-
-    c.save();
-    c.translate(w * 0.36, h * 0.6);
-    c.scale(1.72, 1.72 * 0.94);
-    c.rotate(-0.16);
-    drawQueenBody(c, key, 0);
-    c.restore();
-
-    c.save();
-    c.translate(w * 0.7, h * 0.72);
-    c.scale(1.3, 1.3 * 0.94);
-    c.rotate(-0.24);
-    drawWorkerBody(c, key, 0);
-    c.restore();
-}
-
-class QueenAnt extends Entity {
-    constructor(x, y, species) {
-        super(x, y);
-        this.species = species || speciesKey;
-        const sp = SP(this.species);
-        this.angle = 0;
-        this.radius = 16;
-        this.speed = sp.queenSpeed;
-        this.hp = sp.queenHp;
-        this.maxHp = sp.queenHp;
-        this.damage = sp.queenDamage;
-        this.load = 0;
-        this.capacity = QUEEN_CAPACITY;
-        this.walkCycle = 0;
-        this.isMoving = false;
-        this.leapCD = 0;
-        this.chargeCD = 0;
-        this.raidCD = 0;
-        this.isCharging = false;
-        this.chargeT = 0;
-        this.attackTarget = null;
-        this.atkCD = 0;
-        this.attackFlash = 0;
-        this.poison = 0;
-        this.poisonDmg = 0.05;
-        this.isAnt = true;
-    }
-
-    update() {
-        if (this.leapCD > 0) this.leapCD = Math.max(0, this.leapCD - STEP);
-        if (this.chargeCD > 0) this.chargeCD = Math.max(0, this.chargeCD - STEP);
-        if (this.raidCD > 0) this.raidCD = Math.max(0, this.raidCD - STEP);
-        if (this.atkCD > 0) this.atkCD = Math.max(0, this.atkCD - STEP);
-        if (this.attackFlash > 0) this.attackFlash = Math.max(0, this.attackFlash - STEP);
-
-        if (this.attackTarget) {
-            const t = this.attackTarget;
-            const stillThere = t && t.hp > 0 && (enemies.includes(t) || termites.includes(t) || beetles.includes(t) || termiteNests.includes(t));
-            if (!stillThere) {
-                this.attackTarget = null;
-            } else if (!this.isCharging) {
-                queenTarget = { x: t.x, y: t.y };
-            }
-        }
-
-        if (this.isCharging) {
-            if (mouse.x > 0 && mouse.y > 0) {
-                const aim = Math.atan2((mouse.y - this.y) / TILT, mouse.x - this.x);
-                this.angle = this.lerpAngle(this.angle, aim, 0.3);
-            }
-            this.chargeT = Math.min(1, this.chargeT + STEP / 1.1);
-            this.walkCycle += 0.06;
-        }
-
-        this.isMoving = false;
-        let moveX = 0;
-        let moveY = 0;
-
-        if (keysPressed['w'] || keysPressed['arrowup']) moveY -= 1;
-        if (keysPressed['s'] || keysPressed['arrowdown']) moveY += 1;
-        if (keysPressed['a'] || keysPressed['arrowleft']) moveX -= 1;
-        if (keysPressed['d'] || keysPressed['arrowright']) moveX += 1;
-
-        let moveAngle = this.angle;
-        if (moveX !== 0 || moveY !== 0) {
-            if (!this.attackTarget) queenTarget = null;
-            moveAngle = Math.atan2(moveY, moveX);
-            if (!this.isCharging) this.angle = this.lerpAngle(this.angle, moveAngle, 0.25);
-            this.isMoving = true;
-        } else if (queenTarget) {
-            const dx = queenTarget.x - this.x;
-            const dy = (queenTarget.y - this.y) / TILT;
-            const dist = Math.hypot(dx, dy);
-            const stopAt = this.attackTarget ? 18 : 6;
-            if (dist > stopAt) {
-                moveAngle = Math.atan2(dy, dx);
-                if (!this.isCharging) this.angle = this.lerpAngle(this.angle, moveAngle, 0.22);
-                this.isMoving = true;
-            } else {
-                queenTarget = null;
-            }
-        }
-
-        if (this.isMoving) {
-            this.walkCycle += this.speed * 0.28;
-            const nextX = this.x + Math.cos(moveAngle) * this.speed;
-            const nextY = this.y + Math.sin(moveAngle) * this.speed * TILT;
-
-            if (!checkObstacleCollision(nextX, nextY, 8)) {
-                this.x = nextX;
-                this.y = nextY;
-            } else if (!checkObstacleCollision(nextX, this.y, 8)) {
-                this.x = nextX;
-            } else if (!checkObstacleCollision(this.x, nextY, 8)) {
-                this.y = nextY;
-            }
-
-            const margin = 25;
-            this.x = clamp(this.x, margin, WORLD_W - margin);
-            this.y = clamp(this.y, margin, WORLD_H - margin);
-        }
-
-        // Mordida de la reina (clic sobre una criatura)
-        const at = this.attackTarget;
-        if (at && at.hp > 0) {
-            const d = Math.hypot(at.x - this.x, (at.y - this.y) / TILT);
-            if (!this.isCharging && d < (at.radius || 12) + 90) {
-                this.angle = this.lerpAngle(this.angle, Math.atan2((at.y - this.y) / TILT, at.x - this.x), 0.3);
-            }
-            if (d < (at.radius || 12) + 18 && this.atkCD <= 0) {
-                this.atkCD = 0.55;
-                this.attackFlash = 0.25;
-                if (termiteNests.includes(at)) damageTermiteNest(at, this.damage * 3.4);
-                else at.hp -= this.damage * 3.4;
-                if (!at.isStatic) {
-                    at.x += Math.cos(this.angle) * 3;
-                    at.y += Math.sin(this.angle) * 3 * TILT;
-                }
-                spawnHitParticles(at.x, at.y, '#ffd166', 5);
-            }
-        }
-
-        // Regeneración lenta cuando no hay amenazas cerca
-        let threatened = false;
-        for (const en of enemies) {
-            if (Math.hypot(en.x - this.x, (en.y - this.y) / TILT) < 260) { threatened = true; break; }
-        }
-        if (!threatened) {
-            for (const t of termites) {
-                if (Math.hypot(t.x - this.x, (t.y - this.y) / TILT) < 200) { threatened = true; break; }
-            }
-        }
-        if (!threatened) this.hp = Math.min(this.maxHp, this.hp + 0.02);
-
-        // Depositar en el nido
-        if (this.load > 0 && antNests.length > 0) {
-            const nest = antNests[0];
-            const dist = Math.hypot(nest.x - this.x, (nest.y - this.y) / TILT);
-            if (dist < nest.radius + 10) {
-                const delivered = this.load;
-                this.load = 0;
-                storedFood += delivered;
-                growNest(nest, delivered);
-                spawnHitParticles(nest.x, nest.y, '#ffd166', 8);
-
-                if (layEgg(nest)) {
-                    setStatus(`🥚 +${delivered} entregadas · ¡Huevo puesto! (${EGG_TIME}s para eclosionar)`);
-                } else if (storedFood >= EGG_COST) {
-                    setStatus(`🍓 +${delivered} entregadas · Nido lleno de huevos (${eggs.length}/5)`);
-                } else {
-                    setStatus(`🍓 +${delivered} entregadas (${storedFood}/${EGG_COST} 🍓 para el siguiente huevo)`);
-                }
-                updateUI();
-                return;
-            }
-        }
-
-        // Recoger comida
-        if (this.load < this.capacity) {
-            for (let i = foods.length - 1; i >= 0; i--) {
-                const f = foods[i];
-                const dist = Math.hypot(f.x - this.x, (f.y - this.y) / TILT);
-                if (dist < 18) {
-                    const take = Math.min(f.amount, this.capacity - this.load);
-                    f.amount -= take;
-                    this.load += take;
-                    if (f.amount <= 0) foods.splice(i, 1);
-                    spawnHitParticles(this.x, this.y, '#ffccd5', 6);
-                    setStatus(`🍓 Recogida +${take} (${this.load}/${this.capacity}). Llévala al nido`);
-                    break;
-                }
-            }
-        }
-    }
-
-    draw() {
-        ctx.save();
-        ctx.translate(this.x, this.y);
-
-        ctx.strokeStyle = 'rgba(255, 209, 102, 0.7)';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.ellipse(0, 2, 20, 20 * TILT, 0, 0, Math.PI * 2);
-        ctx.stroke();
-
-        ctx.fillStyle = 'rgba(0,0,0,0.42)';
-        ctx.beginPath();
-        ctx.ellipse(3, 6, 13, 6.5, 0, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.scale(1, TILT);
-        ctx.rotate(this.angle);
-
-        drawQueenBody(ctx, this.species, this.chargeT);
-
-        if (this.attackFlash > 0) {
-            ctx.strokeStyle = `rgba(255, 209, 102, ${Math.min(1, this.attackFlash * 4)})`;
-            ctx.lineWidth = 2.6;
-            ctx.beginPath();
-            ctx.arc(14, 0, 13, -0.7, 0.7);
-            ctx.stroke();
-        }
-
-        for (let i = 0; i < Math.min(3, this.load); i++) {
-            ctx.fillStyle = '#ff2a55';
-            ctx.beginPath();
-            ctx.arc(-18 + i * 2.6, -4 + i * 3.6, 3.4, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.fillStyle = '#ffccd5';
-            ctx.beginPath();
-            ctx.arc(-18.8 + i * 2.6, -5 + i * 3.6, 1.1, 0, Math.PI * 2);
-            ctx.fill();
-        }
-
-        ctx.restore();
-    }
-}class Ant extends Entity {
+// ================= PARTE 4 de 10: clase Ant y clase Termite =================
+class Ant extends Entity {
     constructor(x, y, nestRef) {
         super(x, y);
         this.species = (nestRef && nestRef.species) || speciesKey;
@@ -2854,7 +2286,578 @@ class Termite extends Entity {
         ctx.restore();
     }
 }
-       /* ============================================================
+
+// ================= PARTE 5 de 10: clase Beetle, ENEMY_STATS, clase Enemy =================
+class Beetle extends Entity {
+    constructor(x, y) {
+        super(x, y);
+        this.radius = 15;
+        this.speed = 1.4;
+        this.hp = 240;
+        this.maxHp = 240;
+        this.hasBall = false;
+        this.ballSize = 14;
+        this.ballSpin = 0;
+        this.walkCycle = Math.random() * Math.PI * 2;
+        this.escaped = false;
+        this.announced = false;
+    }
+
+    update() {
+        this.walkCycle += this.speed * 0.22;
+        if (this.hasBall) this.ballSpin += 0.1;
+
+        let threat = null;
+        let minThreatDist = 140;
+        for (const en of enemies) {
+            const d = Math.hypot(en.x - this.x, (en.y - this.y) / TILT);
+            if (d < minThreatDist) { minThreatDist = d; threat = en; }
+        }
+        if (!threat) {
+            for (const a of ants) {
+                const d = Math.hypot(a.x - this.x, (a.y - this.y) / TILT);
+                if (d < 65) { minThreatDist = d; threat = a; break; }
+            }
+        }
+
+        if (threat) {
+            const fleeAngle = Math.atan2((this.y - threat.y) / TILT, this.x - threat.x);
+            this.angle = this.lerpAngle(this.angle, fleeAngle, 0.18);
+            if (this.hasBall && minThreatDist < 55) {
+                this.hasBall = false;
+                spawnFoodCluster(this.x, this.y, 3);
+            }
+        } else if (this.hasBall) {
+            // Roba la bola y escapa hacia el borde más cercano del mapa
+            const dLeft = this.x;
+            const dRight = WORLD_W - this.x;
+            const dTop = this.y;
+            const dBottom = WORLD_H - this.y;
+            const m = Math.min(dLeft, dRight, dTop, dBottom);
+            if (m < 55) {
+                this.escaped = true;
+                this.hasBall = false;
+                return;
+            }
+            let escapeAngle = this.angle;
+            if (m === dLeft) escapeAngle = Math.PI;
+            else if (m === dRight) escapeAngle = 0;
+            else if (m === dTop) escapeAngle = -Math.PI / 2;
+            else escapeAngle = Math.PI / 2;
+            this.angle = this.lerpAngle(this.angle, escapeAngle, 0.12);
+        } else {
+            let closestFood = null;
+            let minD = 280;
+            for (const f of foods) {
+                const d = Math.hypot(f.x - this.x, (f.y - this.y) / TILT);
+                if (d < minD) { minD = d; closestFood = f; }
+            }
+
+            if (closestFood) {
+                const a = Math.atan2((closestFood.y - this.y) / TILT, closestFood.x - this.x);
+                this.angle = this.lerpAngle(this.angle, a, 0.15);
+                if (minD < 14) {
+                    const idx = foods.indexOf(closestFood);
+                    if (idx > -1) foods.splice(idx, 1);
+                    this.hasBall = true;
+                    if (gameMode === 'normal' && !this.announced) {
+                        this.announced = true;
+                        setStatus('🪲 ¡Un escarabajo pelotero está robando comida! Mátalo antes de que escape', true);
+                    }
+                }
+            } else {
+                this.angle += (Math.random() - 0.5) * 0.2;
+            }
+        }
+
+        moveEntitySmooth(this, this.speed, 14);
+    }
+
+    draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+
+        if (this.poison > 0) {
+            ctx.strokeStyle = 'rgba(128, 237, 153, 0.5)';
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.ellipse(0, 0, 17, 17 * TILT, 0, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+
+        if (this.hp < this.maxHp) {
+            ctx.fillStyle = 'rgba(0,0,0,0.65)';
+            ctx.fillRect(-16, -24, 32, 4);
+            ctx.fillStyle = '#80ed99';
+            ctx.fillRect(-16, -24, 32 * Math.max(0, this.hp / this.maxHp), 4);
+        }
+
+        ctx.fillStyle = 'rgba(0,0,0,0.42)';
+        ctx.beginPath();
+        ctx.ellipse(3, 6, 16, 9, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.scale(1, TILT);
+        ctx.rotate(this.angle);
+
+        ctx.strokeStyle = '#1b2618';
+        ctx.lineWidth = 2;
+        const swing = Math.sin(this.walkCycle) * 3;
+        ctx.beginPath();
+        ctx.moveTo(-4, -8); ctx.lineTo(-8 + swing, -16);
+        ctx.moveTo(2, -8); ctx.lineTo(4 - swing, -17);
+        ctx.moveTo(7, -6); ctx.lineTo(11 + swing, -14);
+        ctx.moveTo(-4, 8); ctx.lineTo(-8 - swing, 16);
+        ctx.moveTo(2, 8); ctx.lineTo(4 + swing, 17);
+        ctx.moveTo(7, 6); ctx.lineTo(11 - swing, 14);
+        ctx.stroke();
+
+        ctx.fillStyle = '#283618';
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 15, 11, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#4f772d';
+        ctx.beginPath();
+        ctx.ellipse(-2, -1, 12, 8, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = 'rgba(181, 228, 140, 0.35)';
+        ctx.beginPath();
+        ctx.ellipse(-2, -3.5, 8, 3, -0.2, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#132a13';
+        ctx.beginPath();
+        ctx.moveTo(13, -3); ctx.lineTo(19, 0); ctx.lineTo(13, 3);
+        ctx.fill();
+
+        if (this.hasBall) {
+            ctx.save();
+            ctx.translate(-21, 0);
+            ctx.rotate(this.ballSpin);
+            ctx.fillStyle = '#583101';
+            ctx.beginPath();
+            ctx.arc(0, 0, this.ballSize, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#3d1e00';
+            ctx.beginPath();
+            ctx.arc(-4, -3, 3.5, 0, Math.PI * 2);
+            ctx.arc(5, 4, 3, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#e63946';
+            ctx.beginPath();
+            ctx.arc(2, -5, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
+
+        ctx.restore();
+    }
+}
+
+const ENEMY_STATS = {
+    spider:    { speed: 1.75, radius: 16, hp: 100, damage: 6,  melee: 30, sight: 260, drop: 15 },
+    mantis:    { speed: 2.3,  radius: 22, hp: 190, damage: 10, melee: 28, sight: 300, drop: 30 },
+    antlion:   { speed: 1.05, radius: 24, hp: 340, damage: 14, melee: 40, sight: 240, drop: 45 },
+    scorpion:  { speed: 1.5,  radius: 20, hp: 270, damage: 11, melee: 34, sight: 280, drop: 40 },
+    centipede: { speed: 2.6,  radius: 14, hp: 120, damage: 5,  melee: 16, sight: 320, drop: 22 },
+    wasp:      { speed: 3.9,  radius: 13, hp: 58,  damage: 12, melee: 24, sight: 360, drop: 28 }
+};
+
+class Enemy extends Entity {
+    constructor(x, y, type) {
+        super(x, y);
+        const st = ENEMY_STATS[type] || ENEMY_STATS.spider;
+        this.type = ENEMY_STATS[type] ? type : 'spider';
+        this.attackCooldown = 0;
+        this.meleeCD = 0;
+        this.walkCycle = Math.random() * Math.PI * 2;
+        this.beacon = null;
+        this.wave = null;
+
+        this.speed = st.speed;
+        this.radius = st.radius;
+        this.hp = st.hp;
+        this.maxHp = st.hp;
+        this.damage = st.damage;
+        this.meleeInterval = st.melee;
+        this.sight = st.sight;
+        this.drop = st.drop;
+        this.poison = 0;
+        this.poisonDmg = 0.05;
+        this.trapCD = this.type === 'antlion' ? 4 + Math.random() * 4 : 0;
+        this.trapTarget = null;
+        this.isAnt = false;
+    }
+
+    update() {
+        if (this.attackCooldown > 0) this.attackCooldown--;
+        if (this.meleeCD > 0) this.meleeCD--;
+        this.walkCycle += this.speed * 0.25;
+
+        if (this.trapTarget && (this.trapTarget.hp <= 0 || !ants.includes(this.trapTarget))) {
+            this.trapTarget = null;
+        }
+
+        if (this.type === 'antlion') {
+            this.trapCD -= STEP;
+            if (this.trapCD <= 0 && traps.filter(tr => tr.owner === this).length < 2) {
+                this.trapCD = 13;
+                traps.push({ x: this.x, y: this.y, owner: this, r: 30, life: 1600, triggered: false, target: null });
+                spawnHitParticles(this.x, this.y, '#c9ae7f', 7);
+            }
+        }
+
+        let target = null;
+        let minDist = this.sight;
+
+        for (const other of enemies) {
+            if (other !== this && other.type !== this.type) {
+                const d = Math.hypot(other.x - this.x, (other.y - this.y) / TILT);
+                if (d < minDist) { minDist = d; target = other; }
+            }
+        }
+        for (const ant of ants) {
+            const d = Math.hypot(ant.x - this.x, (ant.y - this.y) / TILT);
+            if (d < minDist) { minDist = d; target = ant; }
+        }
+        for (const t of termites) {
+            const d = Math.hypot(t.x - this.x, (t.y - this.y) / TILT);
+            if (d < minDist) { minDist = d; target = t; }
+        }
+        for (const b of beetles) {
+            const d = Math.hypot(b.x - this.x, (b.y - this.y) / TILT);
+            if (d < minDist) { minDist = d; target = b; }
+        }
+        if (gameMode === 'normal') {
+            if (queen && queen.hp > 0) {
+                const d = Math.hypot(queen.x - this.x, (queen.y - this.y) / TILT);
+                if (d < minDist) { minDist = d; target = queen; }
+            }
+            for (const n of antNests) {
+                if (n.hp <= 0) continue;
+                const d = Math.hypot(n.x - this.x, (n.y - this.y) / TILT);
+                if (d < minDist) { minDist = d; target = n; }
+            }
+        }
+
+        if (this.trapTarget) {
+            target = this.trapTarget;
+            minDist = Math.hypot(this.trapTarget.x - this.x, (this.trapTarget.y - this.y) / TILT);
+        } else if (defenseActive) {
+            let guard = null;
+            let gd = 260;
+            for (const a of ants) {
+                if (!a.defending) continue;
+                const d = Math.hypot(a.x - this.x, (a.y - this.y) / TILT);
+                if (d < gd) { gd = d; guard = a; }
+            }
+            if (guard) { target = guard; minDist = gd; }
+        }
+
+        if (target) {
+            const targetAngle = Math.atan2((target.y - this.y) / TILT, target.x - this.x);
+            this.angle = this.lerpAngle(this.angle, targetAngle, 0.16);
+
+            if (this.type === 'spider' && minDist < 230 && minDist > 50 && this.attackCooldown === 0) {
+                webs.push({ x: this.x, y: this.y, angle: targetAngle, speed: 5.2, life: 75 });
+                this.attackCooldown = 75;
+            }
+
+            if (minDist < this.radius + (target.radius || 5) + 4 && this.meleeCD <= 0) {
+                this.meleeCD = this.meleeInterval;
+                const dmg = this.damage * (this.trapTarget === target ? 1.7 : 1);
+                target.hp -= dmg;
+                if (this.type === 'scorpion') {
+                    if (target.slowTimer !== undefined) target.slowTimer = Math.max(target.slowTimer, 170);
+                    target.poison = Math.max(target.poison || 0, 190);
+                    target.poisonDmg = 0.06;
+                    spawnHitParticles(target.x, target.y, '#80ed99', 3);
+                }
+                if (target.isAnt && SP(target.species).thorns) {
+                    this.hp -= 2.4 + target.maxHp * 0.05;
+                    spawnHitParticles(this.x, this.y, '#d9c58c', 2);
+                }
+                if (!target.isStatic) {
+                    target.x += Math.cos(targetAngle) * 4.5;
+                    target.y += Math.sin(targetAngle) * 4.5 * TILT;
+                }
+                if (Math.random() < 0.35) spawnHitParticles(target.x, target.y, '#ffbe0b', 3);
+
+                if (target.hp <= 0 && !target.killCredited) {
+                    target.killCredited = true;
+                    this.hp = Math.min(this.maxHp, this.hp + 25);
+                }
+            }
+        } else if (this.beacon && this.beacon.hp > 0) {
+            const ba = Math.atan2((this.beacon.y - this.y) / TILT, this.beacon.x - this.x);
+            this.angle = this.lerpAngle(this.angle, ba, 0.09);
+        } else {
+            this.angle += (Math.random() - 0.5) * 0.25;
+        }
+
+        moveEntitySmooth(this, this.trapTarget ? this.speed * 1.9 : this.speed, this.radius * 0.7);
+    }
+
+    draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+
+        if (this.poison > 0) {
+            ctx.strokeStyle = 'rgba(128, 237, 153, 0.5)';
+            ctx.lineWidth = 1.4;
+            ctx.beginPath();
+            ctx.ellipse(0, 0, this.radius * 1.15, this.radius * 1.15 * TILT, 0, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+
+        const barWidth = this.radius * 2.2;
+        ctx.fillStyle = 'rgba(0,0,0,0.65)';
+        ctx.fillRect(-barWidth / 2, -this.radius - 16, barWidth, 4.5);
+        const barColors = { mantis: '#ffbe0b', antlion: '#f4a261', scorpion: '#e5383b', centipede: '#e76f51', wasp: '#ffd166' };
+        ctx.fillStyle = barColors[this.type] || '#ff4d6d';
+        ctx.fillRect(-barWidth / 2, -this.radius - 16, barWidth * Math.max(0, this.hp / this.maxHp), 4.5);
+
+        ctx.fillStyle = 'rgba(0,0,0,0.45)';
+        ctx.beginPath();
+        ctx.ellipse(4, 8, this.radius * 1.1, this.radius * 0.6, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.scale(1, TILT);
+        ctx.rotate(this.angle);
+
+        if (this.type === 'mantis') {
+            ctx.strokeStyle = '#1b4332';
+            ctx.lineWidth = 2.6;
+            const swing = Math.sin(this.walkCycle) * 4;
+            ctx.beginPath();
+            ctx.moveTo(-6, -5); ctx.lineTo(-16 + swing, -20);
+            ctx.moveTo(-6, 5); ctx.lineTo(-16 - swing, 20);
+            ctx.moveTo(0, -5); ctx.lineTo(-3 - swing, -18);
+            ctx.moveTo(0, 5); ctx.lineTo(-3 + swing, 18);
+            ctx.stroke();
+
+            ctx.strokeStyle = '#40916c';
+            ctx.lineWidth = 4.2;
+            ctx.beginPath();
+            ctx.moveTo(10, -4); ctx.lineTo(28, -17); ctx.lineTo(21, -3);
+            ctx.moveTo(10, 4); ctx.lineTo(28, 17); ctx.lineTo(21, 3);
+            ctx.stroke();
+
+            ctx.fillStyle = '#1b4332';
+            ctx.beginPath();
+            ctx.ellipse(-8, 0, 17, 8, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#2d6a4f';
+            ctx.beginPath();
+            ctx.ellipse(9, 0, 12, 6, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#74c69d';
+            ctx.beginPath();
+            ctx.arc(21, 0, 6.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#ffb703';
+            ctx.beginPath();
+            ctx.arc(23, -4.5, 2.6, 0, Math.PI * 2);
+            ctx.arc(23, 4.5, 2.6, 0, Math.PI * 2);
+            ctx.fill();
+        } else if (this.type === 'antlion') {
+            ctx.strokeStyle = '#6b4b2a';
+            ctx.lineWidth = 2;
+            const sw = Math.sin(this.walkCycle) * 3;
+            ctx.beginPath();
+            for (let i = -1; i <= 1; i++) {
+                ctx.moveTo(i * 6, 8); ctx.lineTo(i * 7 + sw, 17);
+                ctx.moveTo(i * 6, -8); ctx.lineTo(i * 7 - sw, -17);
+            }
+            ctx.stroke();
+
+            ctx.fillStyle = '#c9ae7f';
+            ctx.beginPath();
+            ctx.ellipse(-8, 0, 16, 11, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = 'rgba(90, 66, 38, 0.55)';
+            ctx.lineWidth = 1.2;
+            for (let i = 0; i < 4; i++) {
+                ctx.beginPath();
+                ctx.arc(-8, 0, 4 + i * 3.2, -1.1, 1.1);
+                ctx.stroke();
+            }
+
+            ctx.fillStyle = '#a98b5c';
+            ctx.beginPath();
+            ctx.ellipse(8, 0, 9, 7.5, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#2b1a0c';
+            ctx.beginPath();
+            ctx.arc(12, -3, 1.8, 0, Math.PI * 2);
+            ctx.arc(12, 3, 1.8, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = '#3d2b18';
+            ctx.lineWidth = 3.2;
+            ctx.beginPath();
+            ctx.moveTo(15, -3); ctx.quadraticCurveTo(24, -9, 31, -3);
+            ctx.moveTo(15, 3); ctx.quadraticCurveTo(24, 9, 31, 3);
+            ctx.stroke();
+        } else if (this.type === 'scorpion') {
+            ctx.strokeStyle = '#4a1414';
+            ctx.lineWidth = 2.2;
+            const sw = Math.sin(this.walkCycle) * 3;
+            for (let i = -1; i <= 1; i += 2) {
+                ctx.beginPath();
+                ctx.moveTo(-8, i * 4); ctx.lineTo(-16 + sw, i * 14);
+                ctx.moveTo(-4, i * 5); ctx.lineTo(-6 - sw, i * 17);
+                ctx.moveTo(2, i * 5); ctx.lineTo(4 + sw, i * 16);
+                ctx.moveTo(7, i * 4); ctx.lineTo(12 - sw, i * 14);
+                ctx.stroke();
+            }
+
+            ctx.strokeStyle = '#7f1d1d';
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            ctx.moveTo(-14, 0);
+            ctx.quadraticCurveTo(-22, -6, -14, -14);
+            ctx.stroke();
+            ctx.fillStyle = '#ffd166';
+            ctx.beginPath();
+            ctx.arc(-13, -16, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#6a1f1f';
+            ctx.beginPath();
+            ctx.ellipse(-10, 0, 8, 6.5, 0, 0, Math.PI * 2);
+            ctx.ellipse(-2, 0, 6, 5.5, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#8c2f2f';
+            ctx.beginPath();
+            ctx.ellipse(7, 0, 7, 6, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = '#6a1f1f';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(12, -3); ctx.lineTo(20, -8);
+            ctx.moveTo(12, 3); ctx.lineTo(20, 8);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(20, -10, 3.4, Math.PI * 0.4, Math.PI * 1.9);
+            ctx.arc(20, 10, 3.4, Math.PI * 1.1, Math.PI * 0.6, true);
+            ctx.stroke();
+
+            ctx.fillStyle = '#e9c46a';
+            ctx.beginPath();
+            ctx.arc(15, -3, 1.3, 0, Math.PI * 2);
+            ctx.arc(15, 3, 1.3, 0, Math.PI * 2);
+            ctx.fill();
+        } else if (this.type === 'centipede') {
+            ctx.strokeStyle = '#7a2a12';
+            ctx.lineWidth = 1.6;
+            const sw = Math.sin(this.walkCycle) * 3;
+            for (let i = -3; i <= 3; i++) {
+                ctx.beginPath();
+                ctx.moveTo(i * 4.5, 3); ctx.lineTo(i * 4.5 - 3 + sw, 10);
+                ctx.moveTo(i * 4.5, -3); ctx.lineTo(i * 4.5 - 3 - sw, -10);
+                ctx.stroke();
+            }
+            for (let i = 0; i < 6; i++) {
+                const x = 12 - i * 6;
+                ctx.fillStyle = i % 2 ? '#b23a1a' : '#8c2f14';
+                ctx.beginPath();
+                ctx.ellipse(x, 0, 4.6, 3.4, 0, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.fillStyle = '#e76f51';
+            ctx.beginPath();
+            ctx.arc(15, 0, 4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#4a1c0e';
+            ctx.lineWidth = 1.4;
+            ctx.beginPath();
+            ctx.moveTo(18, -2); ctx.lineTo(24, -5);
+            ctx.moveTo(18, 2); ctx.lineTo(24, 5);
+            ctx.stroke();
+        } else if (this.type === 'wasp') {
+            const flap = 0.5 + 0.5 * Math.abs(Math.sin(this.walkCycle * 2.2));
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.32)';
+            ctx.beginPath();
+            ctx.ellipse(-4, -9, 11, 4 * flap + 1, -0.5, 0, Math.PI * 2);
+            ctx.ellipse(-4, 9, 11, 4 * flap + 1, 0.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#1b1b1b';
+            ctx.beginPath();
+            ctx.ellipse(-10, 0, 9, 5, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#ffd166';
+            ctx.beginPath();
+            ctx.ellipse(-13, 0, 2.2, 4.2, 0, 0, Math.PI * 2);
+            ctx.ellipse(-7, 0, 2.2, 4.6, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#3d2b0f';
+            ctx.beginPath();
+            ctx.ellipse(0, 0, 4, 3.4, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#ffd166';
+            ctx.beginPath();
+            ctx.arc(6, 0, 3.6, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#1b1b1b';
+            ctx.beginPath();
+            ctx.arc(7.4, -1.2, 1, 0, Math.PI * 2);
+            ctx.arc(7.4, 1.2, 1, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = '#1b1b1b';
+            ctx.lineWidth = 1.6;
+            ctx.beginPath();
+            ctx.moveTo(-18, 0); ctx.lineTo(-23, 0);
+            ctx.stroke();
+        } else {
+            ctx.strokeStyle = '#0f0f0f';
+            ctx.lineWidth = 2.4;
+            const swing = Math.sin(this.walkCycle) * 3.5;
+            for (let i = -1; i <= 1; i += 2) {
+                ctx.beginPath();
+                ctx.moveTo(-3, 0); ctx.lineTo(-16 + swing * i, i * 21);
+                ctx.moveTo(-1, 0); ctx.lineTo(-7 - swing * i, i * 23);
+                ctx.moveTo(2, 0); ctx.lineTo(9 + swing * i, i * 22);
+                ctx.moveTo(4, 0); ctx.lineTo(17 - swing * i, i * 18);
+                ctx.stroke();
+            }
+
+            ctx.fillStyle = '#161616';
+            ctx.beginPath();
+            ctx.arc(-7, 0, 11.5, 0, Math.PI * 2);
+            ctx.arc(7, 0, 7.8, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#d90429';
+            ctx.beginPath();
+            ctx.moveTo(-8, -4); ctx.lineTo(-3, 0); ctx.lineTo(-8, 4); ctx.lineTo(-13, 0);
+            ctx.fill();
+
+            ctx.fillStyle = '#ff0054';
+            ctx.fillRect(13, -3.5, 2.2, 2.2);
+            ctx.fillRect(13, 1.3, 2.2, 2.2);
+        }
+
+        ctx.restore();
+    }
+}
+
+/* ============================================================
    Nidos, comida y generación del mundo
    ============================================================ */
 function growNest(nest, amount) {
@@ -2882,6 +2885,7 @@ function layEgg(nest) {
     return true;
 }
 
+// ================= PARTE 6 de 10: comida/nidos, generateEnvironment, pintado del mundo, dosel =================
 function spawnFoodCluster(x, y, count = 12) {
     for (let i = 0; i < count; i++) {
         const offsetX = (Math.random() - 0.5) * 60;
@@ -3547,9 +3551,12 @@ function drawCanopyLayer() {
 
         ctx.restore();
     }
-}/* ============================================================
+}
+
+/* ============================================================
    Flujo del juego
    ============================================================ */
+// ================= PARTE 7 de 10: flujo de partida, habilidades, nidos, oleadas =================
 function resetWorld() {
     antNests = [];
     termiteNests = [];
@@ -4213,7 +4220,9 @@ function finishWave() {
     }
     updateUI();
 }
-       function updateNormalStep() {
+
+// ================= PARTE 8 de 10: updateNormalStep, guardado/carga, UI, herramientas =================
+function updateNormalStep() {
     if (gameMode !== 'normal' || !normal || endState || !normal.founded) return;
 
     normal.layTimer = (normal.layTimer ?? 0) - STEP;
@@ -4603,9 +4612,11 @@ function setTool(tool) {
     if (btn) btn.classList.add('active');
     if (toolDescriptions[tool]) setStatus(toolDescriptions[tool]);
 }
-       /* ============================================================
+
+/* ============================================================
    Render
    ============================================================ */
+// ================= PARTE 9 de 10: minimapa, dibujos, render, ataque de reina, handleLeftClick =================
 function getMinimapRect() {
     const w = Math.min(200, Math.max(110, viewW * 0.16));
     const h = w * WORLD_H / WORLD_W;
@@ -5392,7 +5403,9 @@ function handleLeftClick(wx, wy) {
 
     updateUI();
 }
-       let dragging = null;
+
+// ================= PARTE 10 de 10: eventos, step(), cámara, loop, tarjetas de especie, arranque =================
+let dragging = null;
 
 canvas.addEventListener('contextmenu', e => e.preventDefault());
 
