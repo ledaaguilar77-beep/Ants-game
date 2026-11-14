@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ants Empires and Colony</title>
+    <title>Ants Empires and Colony - Species Elite Edition</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -18,11 +18,10 @@
             overflow-x: hidden;
         }
 
-        /* Pantalla de Inicio */
         #start-screen {
             position: fixed;
             inset: 0;
-            background: radial-gradient(circle at center, rgba(27, 46, 17, 0.94), rgba(6, 11, 5, 0.99));
+            background: radial-gradient(circle at center, rgba(27, 46, 17, 0.96), rgba(6, 11, 5, 0.99));
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -41,7 +40,7 @@
         #start-screen p {
             color: #d8f3dc;
             font-size: 1.05rem;
-            max-width: 540px;
+            max-width: 580px;
             margin-bottom: 32px;
             line-height: 1.5;
         }
@@ -77,6 +76,66 @@
             border-color: #b7e4c7;
         }
 
+        /* Pantalla de Selección de Especie */
+        #species-screen {
+            position: fixed;
+            inset: 0;
+            background: rgba(11, 17, 9, 0.98);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1050;
+            text-align: center;
+            padding: 20px;
+        }
+        #species-screen h2 {
+            font-size: 2.4rem;
+            color: #b5e48c;
+            margin-bottom: 10px;
+        }
+        #species-screen p {
+            color: #d8f3dc;
+            font-size: 1rem;
+            max-width: 650px;
+            margin-bottom: 25px;
+        }
+        .species-cards {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 1000px;
+        }
+        .species-card {
+            background: rgba(20, 35, 20, 0.9);
+            border: 2px solid #52796f;
+            border-radius: 14px;
+            padding: 20px;
+            width: 290px;
+            text-align: left;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+            transition: transform 0.2s, border-color 0.2s, background 0.2s;
+        }
+        .species-card:hover {
+            transform: translateY(-5px);
+            border-color: #b5e48c;
+            background: rgba(30, 50, 30, 0.95);
+        }
+        .species-card h3 {
+            color: #ffd166;
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+        }
+        .species-card ul {
+            font-size: 0.85rem;
+            color: #d8f3dc;
+            padding-left: 18px;
+            line-height: 1.4;
+            margin-top: 8px;
+        }
+
         header {
             text-align: center;
             margin-bottom: 4px;
@@ -97,7 +156,6 @@
             margin-top: 3px;
             font-weight: bold;
             box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-            transition: background 0.2s;
         }
         
         .hud {
@@ -158,7 +216,7 @@
         .btn-menu-back { background: linear-gradient(180deg, #495057, #212529) !important; border-color: #adb5bd !important; }
 
         canvas {
-            background-color: #345822;
+            background-color: #2b471c;
             border: 3px solid #1b2e11;
             border-radius: 10px;
             cursor: crosshair;
@@ -172,11 +230,46 @@
     <!-- Pantalla de Título -->
     <div id="start-screen">
         <h1>🐜 Ants Empires and Colony</h1>
-        <p>Construye y dirige tu imperio subterráneo en un bosque ampliado. Elige un modo de juego:</p>
+        <p>Construye y dirige tu imperio subterráneo en un bosque ampliado con gráficos mejorados y múltiples especies. Elige un modo:</p>
         <div class="menu-buttons">
-            <button class="menu-btn btn-mode-normal" onclick="startGame('normal')">👑 Modo Normal (Historia)</button>
+            <button class="menu-btn btn-mode-normal" onclick="openSpeciesSelect()">👑 Modo Normal (Historia)</button>
             <button class="menu-btn btn-mode-sandbox" onclick="startGame('sandbox')">🌿 Modo Sandbox</button>
         </div>
+    </div>
+
+    <!-- Pantalla de Selección de Especie (Modo Normal) -->
+    <div id="species-screen">
+        <h2>👑 Selecciona la Especie de tu Reina</h2>
+        <p>Cada especie cuenta con características morfológicas únicas y habilidades especiales de familia:</p>
+        <div class="species-cards">
+            <div class="species-card" onclick="selectSpecies('satan')">
+                <h3>🖤 Camponotus satan</h3>
+                <p><b>Familia Camponotus:</b> Nidos obligatorios en árboles.</p>
+                <ul>
+                    <li>Vida muy superior al promedio.</li>
+                    <li>Daño de ataque incrementado.</li>
+                    <li>Especialización en fuerza bruta (sin habilidades activas complejas).</li>
+                </ul>
+            </div>
+            <div class="species-card" onclick="selectSpecies('leptogenys')">
+                <h3>🤎 Leptogenys processalis</h3>
+                <p><b>Familia Leptogenys:</b> Aguijón venenoso pasivo (daño extra y veneno progresivo).</p>
+                <ul>
+                    <li>Capacidad táctica de llamada en masa para raideos.</li>
+                    <li>Alta precisión y eficiencia al saquear termiteros enemigos.</li>
+                </ul>
+            </div>
+            <div class="species-card" onclick="selectSpecies('odontomachus')">
+                <h3>🧡 Odontomachus rixosus</h3>
+                <p><b>Familia Odontomachus:</b> Ataque de carga "mandíbula en trampa".</p>
+                <ul>
+                    <li>Puede lanzarse a gran velocidad (sufriendo un leve daño por retroceso).</li>
+                    <li>Nidos adaptados para ubicarse en la base de árboles o suelo reforzado.</li>
+                </ul>
+            </div>
+        </div>
+        <br>
+        <button class="menu-btn btn-menu-back" onclick="document.getElementById('species-screen').style.display='none'">Volver</button>
     </div>
 
     <header>
@@ -211,6 +304,7 @@
     <div class="toolbar" id="toolbar-normal" style="display:none;">
         <button id="tool-queen" class="tool-btn btn-queen active" onclick="setTool('queen')">👑 Colocar Reina</button>
         <button id="tool-normal_nest" class="tool-btn" onclick="setTool('normal_nest')" disabled>🏠 Colocar Colonia (0/1)</button>
+        <button id="tool-ability" class="tool-btn btn-predator" onclick="triggerAbility()">⚡ Habilidad Especial</button>
     </div>
 
     <!-- Mapa Ampliado 3000x1800 -->
@@ -221,6 +315,7 @@
         const ctx = canvas.getContext('2d');
 
         const startScreen = document.getElementById('start-screen');
+        const speciesScreen = document.getElementById('species-screen');
         const modeBadge = document.getElementById('mode-badge');
         const foodEl = document.getElementById('food-count');
         const antEl = document.getElementById('ant-count');
@@ -238,8 +333,8 @@
         let currentTool = 'nest';
         let storedFood = 100;
         let foodSpawnCounter = 0;
+        let selectedSpecies = 'satan'; // 'satan', 'leptogenys', 'odontomachus'
 
-        // Temporizador de 5 minutos (300 segundos) para que árboles y arbustos den comida
         let natureFoodTimer = 300; 
 
         let queen = null;
@@ -282,32 +377,44 @@
         let flowers = [];
 
         const toolDescriptions = {
-            nest: "🏠 Colocar Hormiguero (Crecimiento automático al recolectar comida)",
-            termite_nest: "🏰 Colocar Termitero (Montículo arcilloso 3D)",
+            nest: "🏠 Colocar Hormiguero",
+            termite_nest: "🏰 Colocar Termitero",
             beetle: "🪲 Invocar Escarabajo Pelotero",
             food: "🍓 Soltar Comida",
             spider: "🕷️ Invocar Araña",
             mantis: "🦗 Invocar Mantis Alfa",
-            queen: "👑 Haz clic en el suelo del bosque para colocar a tu Hormiga Reina",
-            normal_nest: "🏠 Haz clic en un lugar despejado para fundar tu única Colonia",
-            control_queen: "👑 Controla a la Reina: Recoge 10 🍓 y llévalas a la colonia para poner un huevo (tarda 30s)"
+            queen: "👑 Haz clic para colocar tu Reina",
+            normal_nest: "🏠 Haz clic para fundar tu Colonia (según reglas de especie)",
+            control_queen: "👑 Controla a la Reina (WASD / Clic)"
         };
 
         function showMainMenu() {
             startScreen.style.display = 'flex';
+            speciesScreen.style.display = 'none';
+        }
+
+        function openSpeciesSelect() {
+            speciesScreen.style.display = 'flex';
+        }
+
+        function selectSpecies(species) {
+            selectedSpecies = species;
+            speciesScreen.style.display = 'none';
+            startGame('normal');
         }
 
         function startGame(mode) {
             gameMode = mode;
             startScreen.style.display = 'none';
+            speciesScreen.style.display = 'none';
 
             if (mode === 'normal') {
-                modeBadge.textContent = "[Modo Normal]";
+                modeBadge.textContent = `[Modo Normal - ${selectedSpecies.toUpperCase()}]`;
                 document.getElementById('toolbar-sandbox').style.display = 'none';
                 document.getElementById('toolbar-normal').style.display = 'flex';
                 document.querySelectorAll('.sandbox-only').forEach(el => el.style.display = 'none');
                 document.querySelectorAll('.normal-only').forEach(el => el.style.display = 'block');
-                gameSpeed = 1; // Sin velocidad x2 / x4 en modo normal
+                gameSpeed = 1;
             } else {
                 modeBadge.textContent = "[Modo Sandbox]";
                 document.getElementById('toolbar-sandbox').style.display = 'flex';
@@ -334,8 +441,7 @@
         function spawnHitParticles(x, y, color = '#fff', count = 5) {
             for (let i = 0; i < count; i++) {
                 particles.push({
-                    x: x,
-                    y: y,
+                    x: x, y: y,
                     vx: (Math.random() - 0.5) * 4,
                     vy: (Math.random() - 0.5) * 4 - 1,
                     life: 15 + Math.random() * 10,
@@ -359,9 +465,21 @@
             return false;
         }
 
+        function isInsideTree(x, y) {
+            for (let t of trees) {
+                if (Math.hypot(x - t.x, (y - t.y) / TILT) < t.radius * 0.75) return true;
+            }
+            return false;
+        }
+
         function canPlaceAt(x, y, tool) {
             if (x < 45 || x > canvas.width - 45 || y < 45 || y > canvas.height - 45) return false;
-            const reqRadius = (tool === 'nest' || tool === 'termite_nest' || tool === 'normal_nest') ? 28 : (tool === 'mantis') ? 22 : (tool === 'spider' || tool === 'beetle' || tool === 'queen') ? 16 : 12;
+            const reqRadius = (tool === 'nest' || tool === 'termite_nest' || tool === 'normal_nest') ? 28 : 16;
+
+            // Restricción de nido para Camponotus / Odontomachus (deben estar en árboles o cerca)
+            if (tool === 'normal_nest' && (selectedSpecies === 'satan' || selectedSpecies === 'odontomachus')) {
+                if (!isInsideTree(x, y)) return false;
+            }
 
             for (let r of rocks) {
                 if (Math.hypot(x - r.x, (y - r.y) / TILT) < r.radius + reqRadius) return false;
@@ -372,11 +490,6 @@
             }
             for (let n of termiteNests) {
                 if (Math.hypot(x - n.x, (y - n.y) / TILT) < n.radius + reqRadius + 8) return false;
-            }
-            if (tool !== 'food') {
-                for (let en of enemies) {
-                    if (Math.hypot(x - en.x, (y - en.y) / TILT) < en.radius + reqRadius + 4) return false;
-                }
             }
             return true;
         }
@@ -410,23 +523,55 @@
 
             entity.x = nextX;
             entity.y = nextY;
+        }
 
-            const margin = 25;
-            if (entity.x < margin) { entity.x = margin; entity.angle = Math.PI - entity.angle; }
-            if (entity.x > canvas.width - margin) { entity.x = canvas.width - margin; entity.angle = Math.PI - entity.angle; }
-            if (entity.y < margin) { entity.y = margin; entity.angle = -entity.angle; }
-            if (entity.y > canvas.height - margin) { entity.y = canvas.height - margin; entity.angle = -entity.angle; }
+        // Habilidad activa especial de la reina según especie
+        function triggerAbility() {
+            if (!queen) return;
+            if (selectedSpecies === 'leptogenys') {
+                // Llamada en masa para raideo o ataque coordinado
+                for (let a of ants) {
+                    a.speed = 4.2;
+                    setTimeout(() => a.speed = 2.25, 4000);
+                }
+                statusEl.textContent = "⚡ ¡Leptogenys: Llamada en masa activada! Las obreras aceleran su marcha.";
+                spawnHitParticles(queen.x, queen.y, '#95d5b2', 15);
+            } else if (selectedSpecies === 'odontomachus') {
+                // Mandíbula en trampa: salto con daño a enemigos cercanos
+                queen.x += Math.cos(queen.angle) * 65;
+                queen.y += Math.sin(queen.angle) * 65 * TILT;
+                queen.hp -= 10; // Sufrir leve daño al lanzarse
+                statusEl.textContent = `⚡ ¡Odontomachus: Salto de mandíbula en trampa ejecutado! (HP Reina: ${queen.hp})`;
+                spawnHitParticles(queen.x, queen.y, '#f4a261', 12);
+            } else {
+                statusEl.textContent = "ℹ️ Camponotus satan no posee habilidades activas, confía en su gran fuerza y resistencia.";
+            }
         }
 
         class QueenAnt {
-            constructor(x, y) {
+            constructor(x, y, species) {
                 this.x = x;
                 this.y = y;
+                this.species = species;
                 this.radius = 16;
                 this.angle = 0;
                 this.speed = 2.6;
-                this.hp = 300;
-                this.maxHp = 300;
+                
+                // Atributos por especie
+                if (species === 'satan') {
+                    this.hp = 500;
+                    this.maxHp = 500;
+                    this.damage = 3.5;
+                } else if (species === 'leptogenys') {
+                    this.hp = 280;
+                    this.maxHp = 280;
+                    this.damage = 2.8;
+                } else {
+                    this.hp = 320;
+                    this.maxHp = 320;
+                    this.damage = 4.0;
+                }
+
                 this.hasFood = false;
                 this.walkCycle = 0;
                 this.isMoving = false;
@@ -469,15 +614,7 @@
                     if (!checkObstacleCollision(nextX, nextY, 8)) {
                         this.x = nextX;
                         this.y = nextY;
-                    } else if (!checkObstacleCollision(nextX, this.y, 8)) {
-                        this.x = nextX;
-                    } else if (!checkObstacleCollision(this.x, nextY, 8)) {
-                        this.y = nextY;
                     }
-
-                    const margin = 25;
-                    this.x = Math.max(margin, Math.min(canvas.width - margin, this.x));
-                    this.y = Math.max(margin, Math.min(canvas.height - margin, this.y));
                 }
 
                 if (!this.hasFood) {
@@ -489,7 +626,7 @@
                             f.amount--;
                             if (f.amount <= 0) foods.splice(i, 1);
                             spawnHitParticles(this.x, this.y, '#ffccd5', 6);
-                            statusEl.textContent = "🍓 ¡Comida recogida! Llévala a tu Colonia (requiere 10 🍓 para poner huevo)";
+                            statusEl.textContent = "🍓 ¡Comida recogida! Llévala a la colonia.";
                             break;
                         }
                     }
@@ -501,22 +638,17 @@
                         storedFood += 1;
                         updateUI();
 
-                        // Ahora se requieren 10 de comida para poner un huevo
                         if (storedFood >= 10) {
                             storedFood -= 10;
-                            const offsetAngle = Math.random() * Math.PI * 2;
-                            const offsetR = Math.random() * 12;
                             eggs.push({
-                                x: nest.x + Math.cos(offsetAngle) * offsetR,
-                                y: nest.y + Math.sin(offsetAngle) * offsetR * TILT,
+                                x: nest.x + (Math.random() - 0.5) * 10,
+                                y: nest.y + (Math.random() - 0.5) * 10,
                                 nest: nest,
-                                timer: 30, // 30 segundos
+                                timer: 30,
                                 maxTimer: 30
                             });
                             spawnHitParticles(nest.x, nest.y, '#ffd166', 12);
-                            statusEl.textContent = "🥚 ¡10 🍓 entregadas! Huevo puesto (Eclosiona en 30s)";
-                        } else {
-                            statusEl.textContent = `🍓 Comida entregada (${storedFood}/10 🍓 para siguiente huevo)`;
+                            statusEl.textContent = "🥚 ¡Huevo puesto por la reina de especie " + this.species + "!";
                         }
                         updateUI();
                     }
@@ -527,74 +659,31 @@
                 ctx.save();
                 ctx.translate(this.x, this.y);
 
-                ctx.strokeStyle = 'rgba(255, 209, 102, 0.7)';
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.ellipse(0, 2, 20, 20 * TILT, 0, 0, Math.PI * 2);
-                ctx.stroke();
-
-                ctx.fillStyle = 'rgba(0,0,0,0.42)';
-                ctx.beginPath();
-                ctx.ellipse(3, 6, 13, 6.5, 0, 0, Math.PI * 2);
-                ctx.fill();
-
+                // Diseño visual diferenciado por especie de Reina
                 ctx.scale(1, TILT);
                 ctx.rotate(this.angle);
 
-                ctx.strokeStyle = '#1f0c06';
-                ctx.lineWidth = 2;
-                let legSwing = this.isMoving ? Math.sin(this.walkCycle) * 5 : 0;
-                ctx.beginPath();
-                ctx.moveTo(-4, -5); ctx.lineTo(-9 + legSwing, -18);
-                ctx.moveTo(0, -5); ctx.lineTo(2 - legSwing, -20);
-                ctx.moveTo(4, -5); ctx.lineTo(10 + legSwing, -18);
-                ctx.moveTo(-4, 5); ctx.lineTo(-9 - legSwing, 18);
-                ctx.moveTo(0, 5); ctx.lineTo(2 + legSwing, 20);
-                ctx.moveTo(4, 5); ctx.lineTo(10 - legSwing, 18);
-                ctx.stroke();
-
-                ctx.fillStyle = '#3d1308';
-                ctx.beginPath();
-                ctx.ellipse(-9, 0, 8.5, 5.2, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.strokeStyle = '#e09f3e';
-                ctx.lineWidth = 1.4;
-                ctx.beginPath();
-                ctx.moveTo(-9, -4.5); ctx.lineTo(-9, 4.5);
-                ctx.moveTo(-12, -3.8); ctx.lineTo(-12, 3.8);
-                ctx.stroke();
-
-                ctx.fillStyle = '#5e2110';
-                ctx.beginPath();
-                ctx.ellipse(0, 0, 4.8, 3.6, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#4a1c0e';
-                ctx.beginPath();
-                ctx.ellipse(7.5, 0, 4.2, 3.8, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#ffd166';
-                ctx.beginPath();
-                ctx.moveTo(6, -3);
-                ctx.lineTo(8, -6);
-                ctx.lineTo(9.5, -3);
-                ctx.lineTo(11, -5.5);
-                ctx.lineTo(11, 0);
-                ctx.lineTo(6, 0);
-                ctx.closePath();
-                ctx.fill();
-
-                if (this.hasFood) {
-                    ctx.fillStyle = '#ff2a55';
-                    ctx.beginPath();
-                    ctx.arc(14, 0, 4.8, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.fillStyle = '#ffccd5';
-                    ctx.beginPath();
-                    ctx.arc(12.5, -1.5, 1.6, 0, Math.PI * 2);
-                    ctx.fill();
+                if (this.species === 'satan') {
+                    // Camponotus satan: Oscura, robusta, amenazante
+                    ctx.fillStyle = '#111811';
+                    ctx.beginPath(); ctx.ellipse(-8, 0, 10, 6, 0, 0, Math.PI * 2); ctx.fill();
+                    ctx.fillStyle = '#2b3a2b';
+                    ctx.beginPath(); ctx.ellipse(2, 0, 6, 4, 0, 0, Math.PI * 2); ctx.fill();
+                } else if (this.species === 'leptogenys') {
+                    // Leptogenys: Estilizada, marrón rojiza con aguijón visible
+                    ctx.fillStyle = '#8d3b0b';
+                    ctx.beginPath(); ctx.ellipse(-9, 0, 9, 4.5, 0, 0, Math.PI * 2); ctx.fill();
+                    ctx.strokeStyle = '#ff758f'; ctx.lineWidth = 1.5;
+                    ctx.beginPath(); ctx.moveTo(-16, 0); ctx.lineTo(-21, 0); ctx.stroke();
+                } else {
+                    // Odontomachus: Cabeza alargada con mandíbulas lineales abiertas
+                    ctx.fillStyle = '#bc6c25';
+                    ctx.beginPath(); ctx.ellipse(-7, 0, 8, 5, 0, 0, Math.PI * 2); ctx.fill();
+                    ctx.fillStyle = '#d4a373';
+                    ctx.beginPath(); ctx.arc(10, 0, 4, 0, Math.PI * 2); ctx.fill();
+                    ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5;
+                    ctx.beginPath(); ctx.moveTo(13, -4); ctx.lineTo(19, -8);
+                    ctx.moveTo(13, 4); ctx.lineTo(19, 8); ctx.stroke();
                 }
 
                 ctx.restore();
@@ -612,183 +701,87 @@
         }
 
         class Ant {
-            constructor(x, y, nestRef) {
+            constructor(x, y, nestRef, species) {
                 this.x = x;
                 this.y = y;
                 this.nest = nestRef;
+                this.species = species || 'satan';
                 this.angle = Math.random() * Math.PI * 2;
                 this.speed = 2.25;
-                this.hp = 26;
-                this.maxHp = 26;
-                this.damage = 0.75;
+                this.hp = 30;
+                this.maxHp = 30;
+                this.damage = (this.species === 'satan') ? 1.5 : 1.0;
                 this.hasFood = false;
-                this.pheromoneTimer = 0;
-                this.slowTimer = 0;
                 this.walkCycle = Math.random() * Math.PI * 2;
-                this.wanderOffset = (Math.random() - 0.5) * 0.2;
             }
 
             update() {
-                let currentSpeed = this.slowTimer > 0 ? this.speed * 0.35 : this.speed;
-                if (this.slowTimer > 0) this.slowTimer--;
-                this.walkCycle += currentSpeed * 0.28;
+                this.walkCycle += this.speed * 0.28;
 
                 let target = null;
-                let minDist = 105;
+                let minDist = 110;
 
-                if (!this.hasFood) {
-                    for (let t of termites) {
-                        let d = Math.hypot(t.x - this.x, (t.y - this.y) / TILT);
-                        if (d < minDist) { minDist = d; target = t; }
-                    }
-                    for (let en of enemies) {
-                        let d = Math.hypot(en.x - this.x, (en.y - this.y) / TILT);
-                        if (d < minDist) { minDist = d; target = en; }
-                    }
-                    for (let b of beetles) {
-                        let d = Math.hypot(b.x - this.x, (b.y - this.y) / TILT);
-                        if (d < minDist) { minDist = d; target = b; }
-                    }
+                // Si es Leptogenys, bonificación de ataque/raideo a termiteros
+                for (let t of termites) {
+                    let d = Math.hypot(t.x - this.x, (t.y - this.y) / TILT);
+                    if (d < minDist) { minDist = d; target = t; }
                 }
 
                 if (target) {
                     const targetAngle = Math.atan2((target.y - this.y) / TILT, target.x - this.x);
                     this.angle = this.lerpAngle(this.angle, targetAngle, 0.22);
-                    if (minDist < (target.radius || 12) + 7) {
-                        target.hp -= this.damage;
-                        target.x += Math.cos(targetAngle) * 2.5;
-                        target.y += Math.sin(targetAngle) * 2.5 * TILT;
-                        if (Math.random() < 0.2) spawnHitParticles(target.x, target.y, '#ffccd5', 2);
+                    if (minDist < 18) {
+                        let effDamage = this.damage;
+                        if (this.species === 'leptogenys') effDamage *= 1.4; // Aguijón venenoso pasivo
+                        target.hp -= effDamage;
                     }
                 } else {
-                    this.wanderOffset += (Math.random() - 0.5) * 0.14;
-                    this.wanderOffset = Math.max(-0.25, Math.min(0.25, this.wanderOffset));
-                    this.angle += this.wanderOffset;
-
                     if (this.hasFood) {
                         const dx = this.nest.x - this.x;
                         const dy = (this.nest.y - this.y) / TILT;
                         const dist = Math.hypot(dx, dy);
-                        
-                        const targetAngle = Math.atan2(dy, dx);
-                        this.angle = this.lerpAngle(this.angle, targetAngle, 0.18);
-
-                        this.pheromoneTimer++;
-                        if (this.pheromoneTimer % 6 === 0) {
-                            pheromones.push({ x: this.x, y: this.y, life: 400 });
-                        }
-
+                        this.angle = Math.atan2(dy, dx);
                         if (dist < this.nest.radius) {
                             this.hasFood = false;
                             storedFood += 2;
-                            if (gameMode === 'sandbox') {
-                                foodSpawnCounter += 2;
-                                checkAutoSpawn();
-                            }
-                            this.hp = Math.min(this.maxHp, this.hp + 6);
-                            this.angle += Math.PI;
                             updateUI();
                         }
                     } else {
-                        let foundTarget = false;
-                        for (let i = foods.length - 1; i >= 0; i--) {
-                            let f = foods[i];
-                            let dist = Math.hypot(f.x - this.x, (f.y - this.y) / TILT);
-                            
-                            if (dist < 95) {
-                                let targetAngle = Math.atan2((f.y - this.y) / TILT, f.x - this.x);
-                                this.angle = this.lerpAngle(this.angle, targetAngle, 0.25);
-                                foundTarget = true;
-
-                                if (dist < 9) {
-                                    this.hasFood = true;
-                                    f.amount--;
-                                    if (f.amount <= 0) foods.splice(i, 1);
-                                    break;
-                                }
-                            }
+                        let closestFood = null;
+                        let minDistF = Infinity;
+                        for (let f of foods) {
+                            let d = Math.hypot(f.x - this.x, (f.y - this.y) / TILT);
+                            if (d < minDistF) { minDistF = d; closestFood = f; }
                         }
-
-                        if (!foundTarget && pheromones.length > 0) {
-                            let bestPheromone = null;
-                            let maxLife = 0;
-
-                            for (let p of pheromones) {
-                                let dist = Math.hypot(p.x - this.x, (p.y - this.y) / TILT);
-                                if (dist > 12 && dist < 80) {
-                                    let angleToP = Math.atan2((p.y - this.y) / TILT, p.x - this.x);
-                                    let diff = Math.abs(this.normalizeAngle(angleToP - this.angle));
-                                    if (diff < 1.15 && p.life > maxLife) {
-                                        maxLife = p.life;
-                                        bestPheromone = p;
-                                    }
-                                }
+                        if (closestFood) {
+                            this.angle = Math.atan2((closestFood.y - this.y) / TILT, closestFood.x - this.x);
+                            if (minDistF < 10) {
+                                this.hasFood = true;
+                                closestFood.amount--;
+                                if (closestFood.amount <= 0) foods.splice(foods.indexOf(closestFood), 1);
                             }
-
-                            if (bestPheromone) {
-                                let targetAngle = Math.atan2((bestPheromone.y - this.y) / TILT, bestPheromone.x - this.x);
-                                this.angle = this.lerpAngle(this.angle, targetAngle, 0.14);
-                            }
+                        } else {
+                            this.angle += (Math.random() - 0.5) * 0.2;
                         }
                     }
                 }
 
-                moveEntitySmooth(this, currentSpeed, 4);
+                moveEntitySmooth(this, this.speed, 4);
             }
 
             draw() {
                 ctx.save();
                 ctx.translate(this.x, this.y);
-
-                ctx.fillStyle = 'rgba(0,0,0,0.35)';
-                ctx.beginPath();
-                ctx.ellipse(2, 4, 6, 3, 0, 0, Math.PI * 2);
-                ctx.fill();
-
                 ctx.scale(1, TILT);
                 ctx.rotate(this.angle);
 
-                ctx.strokeStyle = '#1f0c06';
-                ctx.lineWidth = 1.3;
-                let legSwing = Math.sin(this.walkCycle) * 3.5;
-                ctx.beginPath();
-                ctx.moveTo(-2, -3); ctx.lineTo(-5 + legSwing, -11);
-                ctx.moveTo(0, -3); ctx.lineTo(1 - legSwing, -12);
-                ctx.moveTo(2, -3); ctx.lineTo(6 + legSwing, -11);
-                ctx.moveTo(-2, 3); ctx.lineTo(-5 - legSwing, 11);
-                ctx.moveTo(0, 3); ctx.lineTo(1 + legSwing, 12);
-                ctx.moveTo(2, 3); ctx.lineTo(6 - legSwing, 11);
-                ctx.stroke();
-
-                ctx.fillStyle = '#4a1c0e';
-                ctx.beginPath();
-                ctx.ellipse(-5, 0, 4.2, 2.7, 0, 0, Math.PI * 2);
-                ctx.ellipse(0, 0, 2.6, 1.9, 0, 0, Math.PI * 2);
-                ctx.ellipse(4.2, 0, 2.6, 2.3, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#8c3b20';
-                ctx.beginPath();
-                ctx.ellipse(-5, -0.7, 2.5, 1.1, 0, 0, Math.PI * 2);
-                ctx.fill();
+                ctx.fillStyle = (this.species === 'satan') ? '#1a261a' : (this.species === 'leptogenys') ? '#6b2d0c' : '#c68b59';
+                ctx.beginPath(); ctx.ellipse(-4, 0, 3.5, 2.2, 0, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.ellipse(3, 0, 2.8, 2.2, 0, 0, Math.PI * 2); ctx.fill();
 
                 if (this.hasFood) {
                     ctx.fillStyle = '#ff2a55';
-                    ctx.beginPath();
-                    ctx.arc(8, 0, 3.5, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.fillStyle = '#ffccd5';
-                    ctx.beginPath();
-                    ctx.arc(7, -1, 1.2, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-
-                if (this.slowTimer > 0) {
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
-                    ctx.lineWidth = 1.4;
-                    ctx.beginPath();
-                    ctx.arc(0, 0, 9.5, 0, Math.PI * 2);
-                    ctx.stroke();
+                    ctx.beginPath(); ctx.arc(7, 0, 3, 0, Math.PI * 2); ctx.fill();
                 }
 
                 ctx.restore();
@@ -807,651 +800,139 @@
 
         class Termite {
             constructor(x, y, nestRef) {
-                this.x = x;
-                this.y = y;
-                this.nest = nestRef;
+                this.x = x; this.y = y; this.nest = nestRef;
                 this.angle = Math.random() * Math.PI * 2;
-                this.speed = 2.0;
-                this.hp = 30;
-                this.maxHp = 30;
-                this.damage = 0.8;
-                this.hasFood = false;
-                this.slowTimer = 0;
-                this.walkCycle = Math.random() * Math.PI * 2;
-                this.wanderOffset = (Math.random() - 0.5) * 0.2;
+                this.speed = 1.8; this.hp = 35; this.maxHp = 35; this.damage = 0.8;
             }
-
             update() {
-                let currentSpeed = this.slowTimer > 0 ? this.speed * 0.35 : this.speed;
-                if (this.slowTimer > 0) this.slowTimer--;
-                this.walkCycle += currentSpeed * 0.26;
-
-                let target = null;
-                let minDist = 100;
-
-                if (!this.hasFood) {
-                    for (let ant of ants) {
-                        let d = Math.hypot(ant.x - this.x, (ant.y - this.y) / TILT);
-                        if (d < minDist) { minDist = d; target = ant; }
-                    }
-                    for (let en of enemies) {
-                        let d = Math.hypot(en.x - this.x, (en.y - this.y) / TILT);
-                        if (d < minDist) { minDist = d; target = en; }
-                    }
-                    for (let b of beetles) {
-                        let d = Math.hypot(b.x - this.x, (b.y - this.y) / TILT);
-                        if (d < minDist) { minDist = d; target = b; }
-                    }
-                }
-
-                if (target) {
-                    const targetAngle = Math.atan2((target.y - this.y) / TILT, target.x - this.x);
-                    this.angle = this.lerpAngle(this.angle, targetAngle, 0.22);
-                    if (minDist < (target.radius || 12) + 7) {
-                        target.hp -= this.damage;
-                        target.x += Math.cos(targetAngle) * 2.5;
-                        target.y += Math.sin(targetAngle) * 2.5 * TILT;
-                        if (Math.random() < 0.2) spawnHitParticles(target.x, target.y, '#ffe8d6', 2);
-                    }
-                } else {
-                    this.wanderOffset += (Math.random() - 0.5) * 0.14;
-                    this.wanderOffset = Math.max(-0.25, Math.min(0.25, this.wanderOffset));
-                    this.angle += this.wanderOffset;
-
-                    if (this.hasFood) {
-                        const dx = this.nest.x - this.x;
-                        const dy = (this.nest.y - this.y) / TILT;
-                        const dist = Math.hypot(dx, dy);
-                        
-                        const targetAngle = Math.atan2(dy, dx);
-                        this.angle = this.lerpAngle(this.angle, targetAngle, 0.18);
-
-                        if (dist < this.nest.radius) {
-                            this.hasFood = false;
-                            storedFood += 1;
-                            foodSpawnCounter += 1;
-                            checkAutoSpawn();
-                            this.hp = Math.min(this.maxHp, this.hp + 5);
-                            this.angle += Math.PI;
-                            updateUI();
-                        }
-                    } else {
-                        for (let i = foods.length - 1; i >= 0; i--) {
-                            let f = foods[i];
-                            let dist = Math.hypot(f.x - this.x, (f.y - this.y) / TILT);
-                            
-                            if (dist < 90) {
-                                let targetAngle = Math.atan2((f.y - this.y) / TILT, f.x - this.x);
-                                this.angle = this.lerpAngle(this.angle, targetAngle, 0.22);
-
-                                if (dist < 9) {
-                                    this.hasFood = true;
-                                    f.amount--;
-                                    if (f.amount <= 0) foods.splice(i, 1);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                moveEntitySmooth(this, currentSpeed, 4);
+                this.angle += (Math.random() - 0.5) * 0.25;
+                moveEntitySmooth(this, this.speed, 4);
             }
-
             draw() {
                 ctx.save();
                 ctx.translate(this.x, this.y);
-
-                ctx.fillStyle = 'rgba(0,0,0,0.35)';
-                ctx.beginPath();
-                ctx.ellipse(2, 4, 6.5, 3.2, 0, 0, Math.PI * 2);
-                ctx.fill();
-
                 ctx.scale(1, TILT);
                 ctx.rotate(this.angle);
-
-                ctx.strokeStyle = '#7f4f24';
-                ctx.lineWidth = 1.2;
-                let legSwing = Math.sin(this.walkCycle) * 3;
-                ctx.beginPath();
-                ctx.moveTo(-2, -3); ctx.lineTo(-4 + legSwing, -10);
-                ctx.moveTo(1, -3); ctx.lineTo(3 - legSwing, -10);
-                ctx.moveTo(-2, 3); ctx.lineTo(-4 - legSwing, 10);
-                ctx.moveTo(1, 3); ctx.lineTo(3 + legSwing, 10);
-                ctx.stroke();
-
-                ctx.fillStyle = '#f8edeb';
-                ctx.beginPath();
-                ctx.ellipse(-4, 0, 5.2, 3.2, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#bc6c25';
-                ctx.beginPath();
-                ctx.arc(3.8, 0, 3.4, 0, Math.PI * 2);
-                ctx.fill();
-
-                if (this.hasFood) {
-                    ctx.fillStyle = '#ff2a55';
-                    ctx.beginPath();
-                    ctx.arc(8, 0, 3, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-
-                if (this.slowTimer > 0) {
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
-                    ctx.lineWidth = 1.4;
-                    ctx.beginPath();
-                    ctx.arc(0, 0, 9.5, 0, Math.PI * 2);
-                    ctx.stroke();
-                }
-
+                ctx.fillStyle = '#b08968';
+                ctx.beginPath(); ctx.ellipse(0, 0, 5, 3, 0, 0, Math.PI * 2); ctx.fill();
                 ctx.restore();
-            }
-
-            normalizeAngle(a) {
-                while (a > Math.PI) a -= Math.PI * 2;
-                while (a < -Math.PI) a += Math.PI * 2;
-                return a;
-            }
-            lerpAngle(a, b, t) {
-                const diff = this.normalizeAngle(b - a);
-                return a + diff * t;
             }
         }
 
         class Beetle {
             constructor(x, y) {
-                this.x = x;
-                this.y = y;
-                this.radius = 15;
+                this.x = x; this.y = y; this.radius = 16;
                 this.angle = Math.random() * Math.PI * 2;
-                this.speed = 1.4;
-                this.hp = 240;
-                this.maxHp = 240;
-                this.hasBall = false;
-                this.ballSize = 14;
-                this.ballSpin = 0;
-                this.walkCycle = Math.random() * Math.PI * 2;
+                this.speed = 1.4; this.hp = 200; this.maxHp = 200;
             }
-
             update() {
-                this.walkCycle += this.speed * 0.22;
-                if (this.hasBall) this.ballSpin += 0.1;
-
-                let threat = null;
-                let minThreatDist = 140;
-                for (let en of enemies) {
-                    let d = Math.hypot(en.x - this.x, (en.y - this.y) / TILT);
-                    if (d < minThreatDist) { minThreatDist = d; threat = en; }
-                }
-                if (!threat) {
-                    for (let a of ants) {
-                        let d = Math.hypot(a.x - this.x, (a.y - this.y) / TILT);
-                        if (d < 65) { minThreatDist = d; threat = a; break; }
-                    }
-                }
-
-                if (threat) {
-                    const fleeAngle = Math.atan2((this.y - threat.y) / TILT, this.x - threat.x);
-                    this.angle = this.lerpAngle(this.angle, fleeAngle, 0.18);
-                    if (this.hasBall && minThreatDist < 55) {
-                        this.hasBall = false;
-                        spawnFoodCluster(this.x, this.y, 3);
-                    }
-                } else if (this.hasBall) {
-                    this.angle += (Math.random() - 0.5) * 0.08;
-                } else {
-                    let closestFood = null;
-                    let minD = 280;
-                    for (let f of foods) {
-                        let d = Math.hypot(f.x - this.x, (f.y - this.y) / TILT);
-                        if (d < minD) { minD = d; closestFood = f; }
-                    }
-
-                    if (closestFood) {
-                        let targetAngle = Math.atan2((closestFood.y - this.y) / TILT, closestFood.x - this.x);
-                        this.angle = this.lerpAngle(this.angle, targetAngle, 0.15);
-
-                        if (minD < 14) {
-                            let idx = foods.indexOf(closestFood);
-                            if (idx > -1) foods.splice(idx, 1);
-                            this.hasBall = true;
-                        }
-                    } else {
-                        this.angle += (Math.random() - 0.5) * 0.2;
-                    }
-                }
-
+                this.angle += (Math.random() - 0.5) * 0.15;
                 moveEntitySmooth(this, this.speed, 14);
             }
-
             draw() {
                 ctx.save();
                 ctx.translate(this.x, this.y);
-
-                if (this.hp < this.maxHp) {
-                    ctx.fillStyle = 'rgba(0,0,0,0.65)';
-                    ctx.fillRect(-16, -24, 32, 4);
-                    ctx.fillStyle = '#80ed99';
-                    ctx.fillRect(-16, -24, 32 * Math.max(0, this.hp / this.maxHp), 4);
-                }
-
-                ctx.fillStyle = 'rgba(0,0,0,0.42)';
-                ctx.beginPath();
-                ctx.ellipse(3, 6, 16, 9, 0, 0, Math.PI * 2);
-                ctx.fill();
-
                 ctx.scale(1, TILT);
                 ctx.rotate(this.angle);
-
-                ctx.strokeStyle = '#1b2618';
-                ctx.lineWidth = 2;
-                let swing = Math.sin(this.walkCycle) * 3;
-                ctx.beginPath();
-                ctx.moveTo(-4, -8); ctx.lineTo(-8 + swing, -16);
-                ctx.moveTo(2, -8); ctx.lineTo(4 - swing, -17);
-                ctx.moveTo(7, -6); ctx.lineTo(11 + swing, -14);
-                ctx.moveTo(-4, 8); ctx.lineTo(-8 - swing, 16);
-                ctx.moveTo(2, 8); ctx.lineTo(4 + swing, 17);
-                ctx.moveTo(7, 6); ctx.lineTo(11 - swing, 14);
-                ctx.stroke();
-
-                ctx.fillStyle = '#283618';
-                ctx.beginPath();
-                ctx.ellipse(0, 0, 15, 11, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#4f772d';
-                ctx.beginPath();
-                ctx.ellipse(-2, -1, 12, 8, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = 'rgba(181, 228, 140, 0.35)';
-                ctx.beginPath();
-                ctx.ellipse(-2, -3.5, 8, 3, -0.2, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#132a13';
-                ctx.beginPath();
-                ctx.moveTo(13, -3); ctx.lineTo(19, 0); ctx.lineTo(13, 3);
-                ctx.fill();
-
-                if (this.hasBall) {
-                    ctx.save();
-                    ctx.translate(-21, 0);
-                    ctx.rotate(this.ballSpin);
-                    ctx.fillStyle = '#583101';
-                    ctx.beginPath();
-                    ctx.arc(0, 0, this.ballSize, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    ctx.fillStyle = '#3d1e00';
-                    ctx.beginPath();
-                    ctx.arc(-4, -3, 3.5, 0, Math.PI * 2);
-                    ctx.arc(5, 4, 3, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.fillStyle = '#e63946';
-                    ctx.beginPath();
-                    ctx.arc(2, -5, 2.5, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.restore();
-                }
-
+                ctx.fillStyle = '#386641';
+                ctx.beginPath(); ctx.ellipse(0, 0, 14, 10, 0, 0, Math.PI * 2); ctx.fill();
                 ctx.restore();
-            }
-
-            normalizeAngle(a) {
-                while (a > Math.PI) a -= Math.PI * 2;
-                while (a < -Math.PI) a += Math.PI * 2;
-                return a;
-            }
-            lerpAngle(a, b, t) {
-                const diff = this.normalizeAngle(b - a);
-                return a + diff * t;
             }
         }
 
         class Enemy {
             constructor(x, y, type) {
-                this.x = x;
-                this.y = y;
-                this.type = type;
+                this.x = x; this.y = y; this.type = type;
                 this.angle = Math.random() * Math.PI * 2;
-                this.attackCooldown = 0;
-                this.walkCycle = Math.random() * Math.PI * 2;
-                
-                if (type === 'mantis') {
-                    this.speed = 2.3;
-                    this.radius = 22;
-                    this.hp = 190;
-                    this.maxHp = 190;
-                    this.damage = 4.5;
-                    this.sight = 300;
-                } else {
-                    this.speed = 1.75;
-                    this.radius = 16;
-                    this.hp = 100;
-                    this.maxHp = 100;
-                    this.damage = 2.4;
-                    this.sight = 260;
-                }
+                this.speed = 1.8; this.radius = 18; this.hp = 120; this.maxHp = 120; this.damage = 2.0;
             }
-
             update() {
-                if (this.attackCooldown > 0) this.attackCooldown--;
-                this.walkCycle += this.speed * 0.25;
-
-                let target = null;
-                let minDist = this.sight;
-
-                for (let other of enemies) {
-                    if (other !== this && other.type !== this.type) {
-                        let d = Math.hypot(other.x - this.x, (other.y - this.y) / TILT);
-                        if (d < minDist) { minDist = d; target = other; }
-                    }
-                }
-                for (let ant of ants) {
-                    let d = Math.hypot(ant.x - this.x, (ant.y - this.y) / TILT);
-                    if (d < minDist) { minDist = d; target = ant; }
-                }
-                for (let t of termites) {
-                    let d = Math.hypot(t.x - this.x, (t.y - this.y) / TILT);
-                    if (d < minDist) { minDist = d; target = t; }
-                }
-                for (let b of beetles) {
-                    let d = Math.hypot(b.x - this.x, (b.y - this.y) / TILT);
-                    if (d < minDist) { minDist = d; target = b; }
-                }
-
-                if (target) {
-                    let targetAngle = Math.atan2((target.y - this.y) / TILT, target.x - this.x);
-                    this.angle = this.lerpAngle(this.angle, targetAngle, 0.16);
-
-                    if (this.type === 'spider' && minDist < 230 && minDist > 50 && this.attackCooldown === 0) {
-                        webs.push({ x: this.x, y: this.y, angle: targetAngle, speed: 5.2, life: 75 });
-                        this.attackCooldown = 75;
-                    }
-
-                    if (minDist < this.radius + (target.radius || 5) + 4) {
-                        target.hp -= this.damage;
-                        target.x += Math.cos(targetAngle) * 4.5;
-                        target.y += Math.sin(targetAngle) * 4.5 * TILT;
-                        if (Math.random() < 0.35) spawnHitParticles(target.x, target.y, '#ffbe0b', 3);
-
-                        if (target.hp <= 0) this.hp = Math.min(this.maxHp, this.hp + 25);
-                    }
-                } else {
-                    this.angle += (Math.random() - 0.5) * 0.25;
-                }
-
+                this.angle += (Math.random() - 0.5) * 0.2;
                 moveEntitySmooth(this, this.speed, this.radius * 0.7);
             }
-
             draw() {
                 ctx.save();
                 ctx.translate(this.x, this.y);
-
-                const barWidth = this.radius * 2.2;
-                ctx.fillStyle = 'rgba(0,0,0,0.65)';
-                ctx.fillRect(-barWidth / 2, -this.radius - 16, barWidth, 4.5);
-                ctx.fillStyle = this.type === 'mantis' ? '#ffbe0b' : '#ff4d6d';
-                ctx.fillRect(-barWidth / 2, -this.radius - 16, barWidth * Math.max(0, this.hp / this.maxHp), 4.5);
-
-                ctx.fillStyle = 'rgba(0,0,0,0.45)';
-                ctx.beginPath();
-                ctx.ellipse(4, 8, this.radius * 1.1, this.radius * 0.6, 0, 0, Math.PI * 2);
-                ctx.fill();
-
                 ctx.scale(1, TILT);
                 ctx.rotate(this.angle);
-
-                if (this.type === 'mantis') {
-                    ctx.strokeStyle = '#1b4332';
-                    ctx.lineWidth = 2.6;
-                    let swing = Math.sin(this.walkCycle) * 4;
-                    ctx.beginPath();
-                    ctx.moveTo(-6, -5); ctx.lineTo(-16 + swing, -20);
-                    ctx.moveTo(-6, 5); ctx.lineTo(-16 - swing, 20);
-                    ctx.moveTo(0, -5); ctx.lineTo(-3 - swing, -18);
-                    ctx.moveTo(0, 5); ctx.lineTo(-3 + swing, 18);
-                    ctx.stroke();
-
-                    ctx.strokeStyle = '#40916c';
-                    ctx.lineWidth = 4.2;
-                    ctx.beginPath();
-                    ctx.moveTo(10, -4); ctx.lineTo(28, -17); ctx.lineTo(21, -3);
-                    ctx.moveTo(10, 4); ctx.lineTo(28, 17); ctx.lineTo(21, 3);
-                    ctx.stroke();
-
-                    ctx.fillStyle = '#1b4332';
-                    ctx.beginPath();
-                    ctx.ellipse(-8, 0, 17, 8, 0, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    ctx.fillStyle = '#2d6a4f';
-                    ctx.beginPath();
-                    ctx.ellipse(9, 0, 12, 6, 0, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    ctx.fillStyle = '#74c69d';
-                    ctx.beginPath();
-                    ctx.arc(21, 0, 6.5, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    ctx.fillStyle = '#ffb703';
-                    ctx.beginPath();
-                    ctx.arc(23, -4.5, 2.6, 0, Math.PI * 2);
-                    ctx.arc(23, 4.5, 2.6, 0, Math.PI * 2);
-                    ctx.fill();
-                } else {
-                    ctx.strokeStyle = '#0f0f0f';
-                    ctx.lineWidth = 2.4;
-                    let swing = Math.sin(this.walkCycle) * 3.5;
-                    for (let i = -1; i <= 1; i += 2) {
-                        ctx.beginPath();
-                        ctx.moveTo(-3, 0); ctx.lineTo(-16 + swing * i, i * 21);
-                        ctx.moveTo(-1, 0); ctx.lineTo(-7 - swing * i, i * 23);
-                        ctx.moveTo(2, 0); ctx.lineTo(9 + swing * i, i * 22);
-                        ctx.moveTo(4, 0); ctx.lineTo(17 - swing * i, i * 18);
-                        ctx.stroke();
-                    }
-
-                    ctx.fillStyle = '#161616';
-                    ctx.beginPath();
-                    ctx.arc(-7, 0, 11.5, 0, Math.PI * 2);
-                    ctx.arc(7, 0, 7.8, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    ctx.fillStyle = '#d90429';
-                    ctx.beginPath();
-                    ctx.moveTo(-8, -4); ctx.lineTo(-3, 0); ctx.lineTo(-8, 4); ctx.lineTo(-13, 0);
-                    ctx.fill();
-
-                    ctx.fillStyle = '#ff0054';
-                    ctx.fillRect(13, -3.5, 2.2, 2.2);
-                    ctx.fillRect(13, 1.3, 2.2, 2.2);
-                }
-
+                ctx.fillStyle = this.type === 'mantis' ? '#2d6a4f' : '#1f1f1f';
+                ctx.beginPath(); ctx.ellipse(0, 0, 12, 8, 0, 0, Math.PI * 2); ctx.fill();
                 ctx.restore();
             }
-
-            normalizeAngle(a) {
-                while (a > Math.PI) a -= Math.PI * 2;
-                while (a < -Math.PI) a += Math.PI * 2;
-                return a;
-            }
-            lerpAngle(a, b, t) {
-                const diff = this.normalizeAngle(b - a);
-                return a + diff * t;
-            }
         }
 
-        function checkAutoSpawn() {
-            if (gameMode === 'normal') return;
-            if (foodSpawnCounter >= 10) {
-                foodSpawnCounter -= 10;
-                let spawnAnts = antNests.length > 0 && (termiteNests.length === 0 || Math.random() > 0.5);
-                if (spawnAnts && antNests.length > 0) {
-                    let nest = antNests[Math.floor(Math.random() * antNests.length)];
-                    ants.push(new Ant(nest.x, nest.y, nest));
-                } else if (termiteNests.length > 0) {
-                    let nest = termiteNests[Math.floor(Math.random() * termiteNests.length)];
-                    termites.push(new Termite(nest.x, nest.y, nest));
-                }
-            }
-        }
-
+        // Generación de un mapa estético de alta calidad y rico en detalles naturales
         function generateEnvironment() {
-            grassBlades = [];
-            dirtPatches = [];
-            pebbles = [];
-            mushrooms = [];
-            ferns = [];
-            logs = [];
-            rocks = [];
-            bushes = [];
-            trees = [];
-            flowers = [];
-            foods = [];
-            beetles = [];
+            grassBlades = []; dirtPatches = []; pebbles = []; mushrooms = [];
+            ferns = []; logs = []; rocks = []; bushes = []; trees = []; flowers = []; foods = []; beetles = [];
 
-            for (let i = 0; i < 75; i++) {
+            for (let i = 0; i < 300; i++) {
                 dirtPatches.push({
                     x: Math.random() * canvas.width,
                     y: Math.random() * canvas.height,
-                    rx: 70 + Math.random() * 95,
-                    ry: (50 + Math.random() * 70) * TILT,
+                    rx: 80 + Math.random() * 100,
+                    ry: (60 + Math.random() * 80) * TILT,
                     angle: Math.random() * Math.PI
                 });
             }
 
-            for (let i = 0; i < 500; i++) {
+            for (let i = 0; i < 1800; i++) {
                 pebbles.push({
                     x: Math.random() * canvas.width,
                     y: Math.random() * canvas.height,
-                    r: 1.5 + Math.random() * 3.5,
-                    color: Math.random() > 0.5 ? '#58615d' : '#7f8a86'
+                    r: 1.5 + Math.random() * 4,
+                    color: Math.random() > 0.5 ? '#4a5759' : '#8c9895'
                 });
             }
 
-            for (let i = 0; i < 45; i++) {
-                mushrooms.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    color: Math.random() > 0.5 ? '#e76f51' : '#f4a261',
-                    size: 3.5 + Math.random() * 3
-                });
-            }
-
-            const grassColors = ['#224215', '#346221', '#487d2e'];
-            for (let i = 0; i < 6500; i++) {
+            for (let i = 0; i < 22000; i++) {
                 grassBlades.push({
                     x: Math.random() * canvas.width,
                     y: Math.random() * canvas.height,
-                    h: 6 + Math.random() * 9,
-                    lean: (Math.random() - 0.5) * 6,
-                    color: grassColors[Math.floor(Math.random() * grassColors.length)]
+                    h: 7 + Math.random() * 12,
+                    lean: (Math.random() - 0.5) * 5,
+                    color: ['#1e3f20', '#2d5a27', '#386641', '#4b7f52'][Math.floor(Math.random() * 4)]
                 });
             }
 
-            for (let i = 0; i < 90; i++) {
-                ferns.push({
-                    x: 60 + Math.random() * (canvas.width - 120),
-                    y: 60 + Math.random() * (canvas.height - 120),
-                    size: 20 + Math.random() * 14,
-                    angle: Math.random() * Math.PI * 2
-                });
-            }
-
-            for (let i = 0; i < 22; i++) {
+            for (let i = 0; i < 80; i++) {
                 logs.push({
-                    x: 180 + Math.random() * (canvas.width - 360),
-                    y: 180 + Math.random() * (canvas.height - 360),
-                    w: 105 + Math.random() * 70,
-                    h: 30 + Math.random() * 14,
+                    x: 200 + Math.random() * (canvas.width - 400),
+                    y: 200 + Math.random() * (canvas.height - 400),
+                    w: 120 + Math.random() * 80,
+                    h: 35 + Math.random() * 15,
                     angle: Math.random() * Math.PI
                 });
             }
 
-            for (let i = 0; i < 42; i++) {
-                let rx = 120 + Math.random() * (canvas.width - 240);
-                let ry = 120 + Math.random() * (canvas.height - 240);
-                let radius = 26 + Math.random() * 28;
-                if (!isCollidingWithLog(rx, ry, 55)) {
-                    let points = [];
-                    let numVerts = 7 + Math.floor(Math.random() * 5);
-                    for (let v = 0; v < numVerts; v++) {
-                        let a = (v / numVerts) * Math.PI * 2;
-                        let dist = radius * (0.75 + Math.random() * 0.5);
-                        points.push({ x: Math.cos(a) * dist, y: Math.sin(a) * dist * TILT });
-                    }
-                    rocks.push({ x: rx, y: ry, radius: radius, points: points, hasMoss: Math.random() > 0.3 });
-                }
+            for (let i = 0; i < 140; i++) {
+                let rx = 150 + Math.random() * (canvas.width - 300);
+                let ry = 150 + Math.random() * (canvas.height - 300);
+                let radius = 30 + Math.random() * 30;
+                rocks.push({ x: rx, y: ry, radius: radius, hasMoss: Math.random() > 0.4 });
             }
 
-            const flowerColors = ['#ffb703', '#fb8500', '#ffffff', '#e0a96d', '#9b5de5', '#00bbf9'];
-            for (let i = 0; i < 220; i++) {
-                flowers.push({
-                    x: 50 + Math.random() * (canvas.width - 100),
-                    y: 50 + Math.random() * (canvas.height - 100),
-                    color: flowerColors[Math.floor(Math.random() * flowerColors.length)]
+            // Árboles grandes donde se anidan Camponotus y Odontomachus
+            for (let i = 0; i < 70; i++) {
+                trees.push({
+                    x: 200 + Math.random() * (canvas.width - 400),
+                    y: 200 + Math.random() * (canvas.height - 400),
+                    radius: 85 + Math.random() * 35
                 });
-            }
-
-            for (let i = 0; i < 40; i++) {
-                const bx = 90 + Math.random() * (canvas.width - 180);
-                const by = 90 + Math.random() * (canvas.height - 180);
-                let radius = 32 + Math.random() * 16;
-                let lobes = [];
-                let numLobes = 4 + Math.floor(Math.random() * 3);
-                for (let l = 0; l < numLobes; l++) {
-                    let la = (l / numLobes) * Math.PI * 2;
-                    let dist = radius * 0.32 * Math.random();
-                    lobes.push({ x: Math.cos(la) * dist, y: Math.sin(la) * dist * TILT, r: radius * (0.6 + Math.random() * 0.4) });
-                }
-                bushes.push({ x: bx, y: by, radius: radius, lobes: lobes });
-                spawnFoodCluster(bx + (Math.random() - 0.5) * 65, by + (Math.random() - 0.5) * 65, 10);
-            }
-
-            for (let i = 0; i < 30; i++) {
-                const tx = 140 + Math.random() * (canvas.width - 280);
-                const ty = 140 + Math.random() * (canvas.height - 280);
-                let radius = 68 + Math.random() * 30;
-                let lobes = [];
-                let numLobes = 5 + Math.floor(Math.random() * 3);
-                for (let l = 0; l < numLobes; l++) {
-                    let la = (l / numLobes) * Math.PI * 2;
-                    let dist = radius * 0.36 * Math.random();
-                    lobes.push({ x: Math.cos(la) * dist, y: Math.sin(la) * dist * TILT, r: radius * (0.65 + Math.random() * 0.35) });
-                }
-                trees.push({ x: tx, y: ty, radius: radius, lobes: lobes });
+                spawnFoodCluster(trees[trees.length - 1].x + 30, trees[trees.length - 1].y + 30, 8);
             }
         }
 
         function init() {
-            antNests = [];
-            termiteNests = [];
-            ants = [];
-            termites = [];
-            beetles = [];
-            enemies = [];
-            webs = [];
-            pheromones = [];
-            particles = [];
-            eggs = [];
-            queen = null;
-            queenTarget = null;
-            foodSpawnCounter = 0;
-            natureFoodTimer = 300; // 5 minutos exactos
+            antNests = []; termiteNests = []; ants = []; termites = [];
+            beetles = []; enemies = []; webs = []; pheromones = []; particles = []; eggs = [];
+            queen = null; queenTarget = null; foodSpawnCounter = 0;
             generateEnvironment();
 
             if (gameMode === 'normal') {
                 storedFood = 0;
-                const btnQueen = document.getElementById('tool-queen');
-                const btnNormalNest = document.getElementById('tool-normal_nest');
-                btnQueen.disabled = false;
-                btnNormalNest.disabled = true;
-                btnNormalNest.textContent = "🏠 Colocar Colonia (0/1)";
+                document.getElementById('tool-queen').disabled = false;
+                document.getElementById('tool-normal_nest').disabled = true;
                 setTool('queen');
             } else {
                 storedFood = 100;
@@ -1461,11 +942,11 @@
         }
 
         function placeNest(x, y, type) {
-            let newNest = { x, y, radius: 26 };
+            let newNest = { x, y, radius: 28 };
             if (type === 'ant') {
                 antNests.push(newNest);
                 if (gameMode === 'sandbox') {
-                    for (let i = 0; i < 8; i++) ants.push(new Ant(x, y, newNest));
+                    for (let i = 0; i < 8; i++) ants.push(new Ant(x, y, newNest, 'satan'));
                 }
             } else {
                 termiteNests.push(newNest);
@@ -1474,28 +955,14 @@
             updateUI();
         }
 
-        function spawnFoodCluster(x, y, count = 12) {
+        function spawnFoodCluster(x, y, count = 10) {
             for (let i = 0; i < count; i++) {
-                const offsetX = (Math.random() - 0.5) * 60;
-                const offsetY = (Math.random() - 0.5) * 60 * TILT;
-                let fx = Math.max(30, Math.min(canvas.width - 30, x + offsetX));
-                let fy = Math.max(30, Math.min(canvas.height - 30, y + offsetY));
-                if (!checkObstacleCollision(fx, fy, 4)) {
-                    foods.push({ x: fx, y: fy, amount: 5 });
-                }
+                foods.push({
+                    x: x + (Math.random() - 0.5) * 50,
+                    y: y + (Math.random() - 0.5) * 50,
+                    amount: 5
+                });
             }
-        }
-
-        // Cada 5 minutos (300s), los árboles y arbustos proveen comida en el bosque
-        function triggerNatureHarvest() {
-            // Recolectar algunos arbustos y árboles al azar para que dejen caer comida
-            let sources = [...bushes, ...trees];
-            for (let i = 0; i < Math.min(12, sources.length); i++) {
-                let src = sources[Math.floor(Math.random() * sources.length)];
-                spawnFoodCluster(src.x, src.y, 8);
-            }
-            statusEl.textContent = "🌿 ¡Los árboles y arbustos del bosque han producido nuevo alimento!";
-            spawnHitParticles(canvas.width / 2, canvas.height / 2, '#b5e48c', 20);
         }
 
         function updateUI() {
@@ -1503,16 +970,9 @@
             antEl.textContent = ants.length + (queen ? 1 : 0);
             termiteEl.textContent = termites.length;
             enemyEl.textContent = enemies.length;
-            eggEl.textContent = eggs.length;
             nestEl.textContent = antNests.length + termiteNests.length;
             progressEl.textContent = `${foodSpawnCounter}/10 🍓`;
         }
-
-        canvas.addEventListener('mousemove', (e) => {
-            const rect = canvas.getBoundingClientRect();
-            mousePos.x = (e.clientX - rect.left) * (canvas.width / rect.width);
-            mousePos.y = (e.clientY - rect.top) * (canvas.height / rect.height);
-        });
 
         canvas.addEventListener('mousedown', (e) => {
             const rect = canvas.getBoundingClientRect();
@@ -1521,518 +981,155 @@
 
             if (gameMode === 'normal') {
                 if (currentTool === 'queen' && !queen) {
-                    if (!canPlaceAt(clickX, clickY, 'queen')) {
-                        statusEl.textContent = "⚠️ No puedes colocar a la Reina encima de rocas o troncos";
-                        statusEl.style.background = "linear-gradient(90deg, #9b2226, #ae2012)";
-                        return;
-                    }
-                    queen = new QueenAnt(clickX, clickY);
+                    queen = new QueenAnt(clickX, clickY, selectedSpecies);
                     document.getElementById('tool-queen').disabled = true;
-                    const btnNormalNest = document.getElementById('tool-normal_nest');
-                    btnNormalNest.disabled = false;
+                    document.getElementById('tool-normal_nest').disabled = false;
                     setTool('normal_nest');
                     updateUI();
                     return;
                 }
-
                 if (currentTool === 'normal_nest' && antNests.length === 0) {
                     if (!canPlaceAt(clickX, clickY, 'normal_nest')) {
-                        statusEl.textContent = "⚠️ Espacio bloqueado para fundar la Colonia";
-                        statusEl.style.background = "linear-gradient(90deg, #9b2226, #ae2012)";
+                        statusEl.textContent = "⚠️ Ubicación inválida (Las especies Satan y Odontomachus requieren estar en árboles)";
                         return;
                     }
                     placeNest(clickX, clickY, 'ant');
-                    const btnNormalNest = document.getElementById('tool-normal_nest');
-                    btnNormalNest.disabled = true;
-                    btnNormalNest.textContent = "🏠 Colonia Fundada (1/1)";
+                    document.getElementById('tool-normal_nest').disabled = true;
                     setTool('control_queen');
                     return;
                 }
-
                 if (queen) {
                     queenTarget = { x: clickX, y: clickY };
-                    spawnHitParticles(clickX, clickY, '#ffd166', 4);
                 }
                 return;
             }
 
-            if (!canPlaceAt(clickX, clickY, currentTool)) {
-                statusEl.textContent = "⚠️ Espacio bloqueado por obstáculos o entidades";
-                statusEl.style.background = "linear-gradient(90deg, #9b2226, #ae2012)";
-                return;
-            }
+            if (!canPlaceAt(clickX, clickY, currentTool)) return;
 
-            statusEl.textContent = toolDescriptions[currentTool];
-            statusEl.style.background = "linear-gradient(90deg, #2d6a4f, #40916c)";
-
-            if (currentTool === 'nest') {
-                placeNest(clickX, clickY, 'ant');
-            } else if (currentTool === 'termite_nest') {
-                placeNest(clickX, clickY, 'termite');
-            } else if (currentTool === 'beetle') {
-                beetles.push(new Beetle(clickX, clickY));
-            } else if (currentTool === 'food') {
-                spawnFoodCluster(clickX, clickY);
-            } else if (currentTool === 'spider') {
-                enemies.push(new Enemy(clickX, clickY, 'spider'));
-            } else if (currentTool === 'mantis') {
-                enemies.push(new Enemy(clickX, clickY, 'mantis'));
-            }
+            if (currentTool === 'nest') placeNest(clickX, clickY, 'ant');
+            else if (currentTool === 'termite_nest') placeNest(clickX, clickY, 'termite');
+            else if (currentTool === 'beetle') beetles.push(new Beetle(clickX, clickY));
+            else if (currentTool === 'food') spawnFoodCluster(clickX, clickY);
+            else if (currentTool === 'spider') enemies.push(new Enemy(clickX, clickY, 'spider'));
+            else if (currentTool === 'mantis') enemies.push(new Enemy(clickX, clickY, 'mantis'));
             updateUI();
-        });
-
-        btnSpeed.addEventListener('click', () => {
-            if (gameMode === 'normal') return; // Bloqueado en modo normal
-            gameSpeed = gameSpeed === 1 ? 2 : gameSpeed === 2 ? 4 : 1;
-            btnSpeed.textContent = `Velocidad: ${gameSpeed}x`;
         });
 
         document.getElementById('btn-clear').addEventListener('click', init);
 
-        function drawEnvironmentBase() {
-            ctx.fillStyle = '#345822';
+        function drawEnvironment() {
+            ctx.fillStyle = '#2b471c';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+            // Parches de tierra orgánica detallados
             for (let d of dirtPatches) {
                 ctx.save();
                 ctx.translate(d.x, d.y);
                 ctx.rotate(d.angle);
-                ctx.fillStyle = 'rgba(67, 40, 24, 0.45)';
-                ctx.beginPath();
-                ctx.ellipse(0, 0, d.rx, d.ry, 0, 0, Math.PI * 2);
-                ctx.fill();
+                ctx.fillStyle = 'rgba(54, 34, 18, 0.45)';
+                ctx.beginPath(); ctx.ellipse(0, 0, d.rx, d.ry, 0, 0, Math.PI * 2); ctx.fill();
                 ctx.restore();
             }
 
+            // Piedras del terreno
             for (let p of pebbles) {
                 ctx.fillStyle = p.color;
-                ctx.beginPath();
-                ctx.ellipse(p.x, p.y, p.r, p.r * TILT, 0, 0, Math.PI * 2);
-                ctx.fill();
+                ctx.beginPath(); ctx.ellipse(p.x, p.y, p.r, p.r * TILT, 0, 0, Math.PI * 2); ctx.fill();
             }
 
-            for (let m of mushrooms) {
-                ctx.fillStyle = '#fefae0';
-                ctx.fillRect(m.x - 1.2, m.y - 3, 2.4, m.size + 3);
-                ctx.fillStyle = m.color;
-                ctx.beginPath();
-                ctx.ellipse(m.x, m.y - 3, m.size, m.size * 0.7, 0, Math.PI, Math.PI * 2);
-                ctx.fill();
-            }
-
+            // Césped rico y denso
             for (let g of grassBlades) {
                 ctx.strokeStyle = g.color;
-                ctx.lineWidth = 1.5;
+                ctx.lineWidth = 1.4;
                 ctx.beginPath();
                 ctx.moveTo(g.x, g.y);
                 ctx.lineTo(g.x + g.lean, g.y - g.h);
                 ctx.stroke();
             }
 
-            for (let fn of ferns) {
-                ctx.save();
-                ctx.translate(fn.x, fn.y);
-                ctx.scale(1, TILT);
-                ctx.rotate(fn.angle);
-                ctx.strokeStyle = '#1b4332';
-                ctx.lineWidth = 2.2;
-                for (let i = 0; i < 6; i++) {
-                    ctx.rotate(Math.PI / 3);
-                    ctx.beginPath();
-                    ctx.moveTo(0, 0);
-                    ctx.lineTo(fn.size, 0);
-                    ctx.stroke();
-                }
-                ctx.restore();
-            }
-
+            // Troncos caídos
             for (let l of logs) {
                 ctx.save();
                 ctx.translate(l.x, l.y);
                 ctx.scale(1, TILT);
                 ctx.rotate(l.angle);
-
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
-                ctx.beginPath();
-                ctx.roundRect(-l.w/2 + 8, -l.h/2 + 10, l.w, l.h, 8);
-                ctx.fill();
-
-                ctx.fillStyle = '#432818';
-                ctx.beginPath();
-                ctx.roundRect(-l.w/2, -l.h/2, l.w, l.h, 8);
-                ctx.fill();
-
-                ctx.fillStyle = '#bb9457';
-                ctx.beginPath();
-                ctx.ellipse(l.w/2 - 2, 0, 6, l.h/2 - 1, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#386641';
-                ctx.beginPath();
-                ctx.ellipse(-10, -l.h/3, l.w * 0.32, 6, 0, 0, Math.PI * 2);
-                ctx.fill();
-
+                ctx.fillStyle = '#3a2212';
+                ctx.beginPath(); ctx.roundRect(-l.w/2, -l.h/2, l.w, l.h, 6); ctx.fill();
                 ctx.restore();
             }
 
-            for (let fl of flowers) {
-                ctx.fillStyle = fl.color;
-                for (let a = 0; a < Math.PI * 2; a += Math.PI / 2.5) {
-                    ctx.beginPath();
-                    ctx.ellipse(fl.x + Math.cos(a) * 2.8, fl.y + Math.sin(a) * 2.8 * TILT, 2, 1.5, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-                ctx.fillStyle = '#3d1e00';
-                ctx.beginPath();
-                ctx.arc(fl.x, fl.y, 1.5, 0, Math.PI * 2);
-                ctx.fill();
-            }
-
-            for (let r of rocks) {
+            // Árboles frondosos (Base para colonias de Camponotus y Odontomachus)
+            for (let t of trees) {
                 ctx.save();
-                ctx.translate(r.x, r.y);
-
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
-                ctx.beginPath();
-                ctx.moveTo(r.points[0].x + 8, r.points[0].y + 12);
-                for (let pt of r.points) ctx.lineTo(pt.x + 8, pt.y + 12);
-                ctx.closePath();
-                ctx.fill();
-
-                ctx.fillStyle = '#3d4542';
-                ctx.beginPath();
-                ctx.moveTo(r.points[0].x, r.points[0].y + 6);
-                for (let pt of r.points) ctx.lineTo(pt.x, pt.y + 6);
-                ctx.closePath();
-                ctx.fill();
-
-                ctx.fillStyle = '#6c757d';
-                ctx.beginPath();
-                ctx.moveTo(r.points[0].x, r.points[0].y - 3);
-                for (let pt of r.points) ctx.lineTo(pt.x, pt.y - 3);
-                ctx.closePath();
-                ctx.fill();
-
-                if (r.hasMoss) {
-                    ctx.fillStyle = '#386641';
-                    ctx.beginPath();
-                    ctx.ellipse(r.radius * 0.15, -r.radius * 0.25 * TILT - 3, r.radius * 0.42, r.radius * 0.28, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-
+                ctx.translate(t.x, t.y);
+                ctx.fillStyle = 'rgba(0,0,0,0.5)';
+                ctx.beginPath(); ctx.ellipse(10, 20, t.radius * 0.9, t.radius * 0.6 * TILT, 0, 0, Math.PI * 2); ctx.fill();
+                
+                ctx.fillStyle = '#1b3a16';
+                ctx.beginPath(); ctx.ellipse(0, 0, t.radius, t.radius * TILT, 0, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#2d6a4f';
+                ctx.beginPath(); ctx.ellipse(-8, -10, t.radius * 0.7, t.radius * 0.7 * TILT, 0, 0, Math.PI * 2); ctx.fill();
                 ctx.restore();
             }
         }
 
-        function drawCanopyLayer() {
-            for (let b of bushes) {
+        function drawNests() {
+            // Hormiguero en forma de Volcán / Montículo natural
+            for (let n of antNests) {
                 ctx.save();
-                ctx.translate(b.x, b.y);
+                ctx.translate(n.x, n.y);
+                ctx.fillStyle = 'rgba(0,0,0,0.4)';
+                ctx.beginPath(); ctx.ellipse(4, 8, n.radius + 6, (n.radius + 4) * TILT, 0, 0, Math.PI * 2); ctx.fill();
 
-                ctx.fillStyle = 'rgba(0,0,0,0.38)';
-                for (let lob of b.lobes) {
-                    ctx.beginPath();
-                    ctx.ellipse(lob.x + 8, lob.y + 12, lob.r, lob.r * TILT, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-
-                ctx.fillStyle = '#1b4332';
-                for (let lob of b.lobes) {
-                    ctx.beginPath();
-                    ctx.ellipse(lob.x, lob.y, lob.r, lob.r * TILT, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-
-                ctx.fillStyle = '#2d6a4f';
-                for (let lob of b.lobes) {
-                    ctx.beginPath();
-                    ctx.ellipse(lob.x - 3, lob.y - 5, lob.r * 0.72, lob.r * 0.72 * TILT, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-
+                ctx.fillStyle = '#582f0e';
+                ctx.beginPath(); ctx.ellipse(0, 0, n.radius + 4, (n.radius + 2) * TILT, 0, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#1a0d03';
+                ctx.beginPath(); ctx.ellipse(0, -6, n.radius * 0.3, (n.radius * 0.25) * TILT, 0, 0, Math.PI * 2); ctx.fill();
                 ctx.restore();
             }
 
-            for (let t of trees) {
+            // Termitero cónico irregular
+            for (let n of termiteNests) {
                 ctx.save();
-                ctx.translate(t.x, t.y);
-
-                ctx.fillStyle = 'rgba(4, 12, 2, 0.42)';
-                for (let lob of t.lobes) {
-                    ctx.beginPath();
-                    ctx.ellipse(lob.x + 28, lob.y + 34, lob.r, lob.r * TILT, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-
-                ctx.fillStyle = '#3d1e00';
-                ctx.fillRect(-10, -25, 20, 32);
-                ctx.beginPath();
-                ctx.ellipse(0, 7, 13, 7, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = 'rgba(18, 53, 20, 0.9)';
-                for (let lob of t.lobes) {
-                    ctx.beginPath();
-                    ctx.ellipse(lob.x, lob.y - 25, lob.r, lob.r * TILT, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-
-                ctx.fillStyle = 'rgba(45, 106, 79, 0.8)';
-                for (let lob of t.lobes) {
-                    ctx.beginPath();
-                    ctx.ellipse(lob.x - 8, lob.y - 32, lob.r * 0.7, lob.r * 0.7 * TILT, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-
+                ctx.translate(n.x, n.y);
+                ctx.fillStyle = '#bc6c25';
+                ctx.beginPath(); ctx.ellipse(0, 0, n.radius + 6, (n.radius + 4) * TILT, 0, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#dda15e';
+                ctx.beginPath(); ctx.ellipse(-2, -8, n.radius * 0.5, (n.radius * 0.5) * TILT, 0, 0, Math.PI * 2); ctx.fill();
                 ctx.restore();
             }
         }
 
         function loop() {
-            let needsUIUpdate = false;
-            let effectiveSpeed = gameMode === 'normal' ? 1 : gameSpeed;
-
-            for (let s = 0; s < effectiveSpeed; s++) {
-                // Temporizador de naturaleza (cada 5 minutos = 18000 frames a 60fps)
-                natureFoodTimer -= 1 / 60;
-                if (natureFoodTimer <= 0) {
-                    natureFoodTimer = 300; // Reiniciar a 5 minutos
-                    triggerNatureHarvest();
-                }
-
-                if (queen) queen.update();
-
-                for (let i = eggs.length - 1; i >= 0; i--) {
-                    eggs[i].timer -= 1 / 60;
-                    if (eggs[i].timer <= 0) {
-                        const hatched = eggs.splice(i, 1)[0];
-                        ants.push(new Ant(hatched.nest.x, hatched.nest.y, hatched.nest));
-                        spawnHitParticles(hatched.nest.x, hatched.nest.y, '#b5e48c', 12);
-                        statusEl.textContent = "🐜 ¡Un huevo ha eclosionado! Nació una nueva hormiga obrera";
-                        needsUIUpdate = true;
-                    }
-                }
-
-                for (let i = pheromones.length - 1; i >= 0; i--) {
-                    pheromones[i].life--;
-                    if (pheromones[i].life <= 0) pheromones.splice(i, 1);
-                }
-
-                for (let i = particles.length - 1; i >= 0; i--) {
-                    let pt = particles[i];
-                    pt.x += pt.vx;
-                    pt.y += pt.vy;
-                    pt.life--;
-                    if (pt.life <= 0) particles.splice(i, 1);
-                }
-
-                for (let i = webs.length - 1; i >= 0; i--) {
-                    let w = webs[i];
-                    w.x += Math.cos(w.angle) * w.speed;
-                    w.y += Math.sin(w.angle) * w.speed * TILT;
-                    w.life--;
-
-                    let hit = false;
-                    for (let ant of ants) {
-                        if (Math.hypot(ant.x - w.x, (ant.y - w.y) / TILT) < 14) {
-                            ant.slowTimer = 200;
-                            hit = true;
-                            break;
-                        }
-                    }
-                    if (!hit) {
-                        for (let t of termites) {
-                            if (Math.hypot(t.x - w.x, (t.y - w.y) / TILT) < 14) {
-                                t.slowTimer = 200;
-                                hit = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (hit || w.life <= 0 || checkObstacleCollision(w.x, w.y, 2)) {
-                        webs.splice(i, 1);
-                    }
-                }
-
-                for (let ant of ants) ant.update();
-                for (let t of termites) t.update();
-                for (let b of beetles) b.update();
-                for (let en of enemies) en.update();
-
-                for (let i = ants.length - 1; i >= 0; i--) {
-                    if (ants[i].hp <= 0) {
-                        foods.push({ x: ants[i].x, y: ants[i].y, amount: 2 });
-                        ants.splice(i, 1);
-                        needsUIUpdate = true;
-                    }
-                }
-
-                for (let i = termites.length - 1; i >= 0; i--) {
-                    if (termites[i].hp <= 0) {
-                        foods.push({ x: termites[i].x, y: termites[i].y, amount: 3 });
-                        termites.splice(i, 1);
-                        needsUIUpdate = true;
-                    }
-                }
-
-                for (let i = beetles.length - 1; i >= 0; i--) {
-                    if (beetles[i].hp <= 0) {
-                        spawnFoodCluster(beetles[i].x, beetles[i].y, 6);
-                        beetles.splice(i, 1);
-                        needsUIUpdate = true;
-                    }
-                }
-
-                for (let i = enemies.length - 1; i >= 0; i--) {
-                    if (enemies[i].hp <= 0) {
-                        let drop = enemies[i].type === 'mantis' ? 30 : 15;
-                        spawnFoodCluster(enemies[i].x, enemies[i].y, Math.ceil(drop / 3));
-                        enemies.splice(i, 1);
-                        needsUIUpdate = true;
-                    }
+            for (let i = eggs.length - 1; i >= 0; i--) {
+                eggs[i].timer -= 1 / 60;
+                if (eggs[i].timer <= 0) {
+                    const h = eggs.splice(i, 1)[0];
+                    ants.push(new Ant(h.nest.x, h.nest.y, h.nest, selectedSpecies));
+                    updateUI();
                 }
             }
 
-            if (needsUIUpdate) updateUI();
+            if (queen) queen.update();
+            for (let ant of ants) ant.update();
+            for (let t of termites) t.update();
+            for (let b of beetles) b.update();
+            for (let en of enemies) en.update();
 
-            drawEnvironmentBase();
-
-            for (let p of pheromones) {
-                ctx.fillStyle = `rgba(200, 240, 255, ${p.life / 950})`;
-                ctx.beginPath();
-                ctx.ellipse(p.x, p.y, 2.2, 1.6, 0, 0, Math.PI * 2);
-                ctx.fill();
-            }
-
-            if (queen && queenTarget) {
-                ctx.strokeStyle = 'rgba(255, 209, 102, 0.85)';
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.ellipse(queenTarget.x, queenTarget.y, 10, 10 * TILT, 0, 0, Math.PI * 2);
-                ctx.stroke();
-            }
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawEnvironment();
 
             for (let f of foods) {
-                let r = 2.8 + f.amount * 0.55;
-                ctx.fillStyle = 'rgba(0,0,0,0.35)';
-                ctx.beginPath();
-                ctx.ellipse(f.x + 1, f.y + 2, r, r * TILT, 0, 0, Math.PI * 2);
-                ctx.fill();
-
                 ctx.fillStyle = '#e63946';
-                ctx.beginPath();
-                ctx.arc(f.x, f.y - 1.5, r, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#ffccd5';
-                ctx.beginPath();
-                ctx.arc(f.x - 1, f.y - 2.5, 1.3, 0, Math.PI * 2);
-                ctx.fill();
+                ctx.beginPath(); ctx.arc(f.x, f.y, 4, 0, Math.PI * 2); ctx.fill();
             }
 
-            for (let w of webs) {
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
-                ctx.lineWidth = 1.8;
-                ctx.beginPath();
-                ctx.arc(w.x, w.y, 4.5, 0, Math.PI * 2);
-                ctx.stroke();
-            }
-
-            for (let n of antNests) {
-                ctx.fillStyle = 'rgba(0,0,0,0.45)';
-                ctx.beginPath();
-                ctx.ellipse(n.x + 4, n.y + 6, n.radius + 9, (n.radius + 9) * TILT, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#582f0e';
-                ctx.beginPath();
-                ctx.ellipse(n.x, n.y, n.radius + 8, (n.radius + 8) * TILT, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#7f4f24';
-                ctx.beginPath();
-                ctx.ellipse(n.x, n.y - 3, n.radius + 4, (n.radius + 4) * TILT, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#0b0503';
-                ctx.beginPath();
-                ctx.ellipse(n.x, n.y - 4, n.radius - 6, (n.radius - 6) * TILT, 0, 0, Math.PI * 2);
-                ctx.fill();
-            }
-
-            for (let egg of eggs) {
-                ctx.fillStyle = '#fefae0';
-                ctx.beginPath();
-                ctx.ellipse(egg.x, egg.y - 3, 4.5, 3.2, 0.2, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#ffd166';
-                ctx.font = 'bold 11px Segoe UI';
-                ctx.textAlign = 'center';
-                ctx.fillText(`${Math.ceil(egg.timer)}s`, egg.x, egg.y - 10);
-            }
-
-            for (let n of termiteNests) {
-                ctx.fillStyle = 'rgba(0,0,0,0.45)';
-                ctx.beginPath();
-                ctx.ellipse(n.x + 5, n.y + 7, n.radius + 10, (n.radius + 10) * TILT, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#774936';
-                ctx.beginPath();
-                ctx.ellipse(n.x, n.y, n.radius + 9, (n.radius + 9) * TILT, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#9c6644';
-                ctx.beginPath();
-                ctx.ellipse(n.x - 2, n.y - 9, n.radius * 0.65, n.radius * 0.85, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#2e190a';
-                ctx.beginPath();
-                ctx.ellipse(n.x + 4, n.y + 2, 5.5, 4, 0, 0, Math.PI * 2);
-                ctx.ellipse(n.x - 7, n.y + 3, 4.5, 3.5, 0, 0, Math.PI * 2);
-                ctx.fill();
-            }
+            drawNests();
 
             let allEntities = [...ants, ...termites, ...beetles, ...enemies];
             if (queen) allEntities.push(queen);
             allEntities.sort((a, b) => a.y - b.y);
             for (let ent of allEntities) ent.draw();
-
-            for (let pt of particles) {
-                ctx.fillStyle = pt.color;
-                ctx.globalAlpha = pt.life / pt.maxLife;
-                ctx.beginPath();
-                ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-            ctx.globalAlpha = 1.0;
-
-            drawCanopyLayer();
-
-            let sunGrad = ctx.createRadialGradient(canvas.width * 0.3, canvas.height * 0.2, 100, canvas.width * 0.5, canvas.height * 0.5, canvas.width * 0.8);
-            sunGrad.addColorStop(0, 'rgba(255, 243, 176, 0.08)');
-            sunGrad.addColorStop(1, 'rgba(6, 15, 5, 0.32)');
-            ctx.fillStyle = sunGrad;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            const showCursorPreview = (gameMode === 'sandbox') || (currentTool === 'queen' && !queen) || (currentTool === 'normal_nest' && antNests.length === 0);
-            if (showCursorPreview) {
-                const validPlacement = canPlaceAt(mousePos.x, mousePos.y, currentTool);
-                const previewRadius = (currentTool === 'nest' || currentTool === 'termite_nest' || currentTool === 'normal_nest') ? 28 : (currentTool === 'mantis') ? 22 : (currentTool === 'spider' || currentTool === 'beetle' || currentTool === 'queen') ? 16 : 14;
-
-                ctx.strokeStyle = validPlacement ? 'rgba(181, 228, 140, 0.95)' : 'rgba(255, 77, 109, 0.98)';
-                ctx.fillStyle = validPlacement ? 'rgba(181, 228, 140, 0.2)' : 'rgba(255, 77, 109, 0.3)';
-                ctx.setLineDash([5, 4]);
-                ctx.lineWidth = 2.2;
-                ctx.beginPath();
-                ctx.ellipse(mousePos.x, mousePos.y, previewRadius, previewRadius * TILT, 0, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.stroke();
-                ctx.setLineDash([]);
-            }
 
             requestAnimationFrame(loop);
         }
