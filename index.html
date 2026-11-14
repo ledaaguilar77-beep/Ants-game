@@ -421,6 +421,10 @@
         <button id="tool-food" class="tool-btn" onclick="setTool('food')">🍓 Soltar Comida</button>
         <button id="tool-spider" class="tool-btn btn-predator" onclick="setTool('spider')">🕷️ Araña Teje-redes</button>
         <button id="tool-mantis" class="tool-btn btn-predator" onclick="setTool('mantis')">🦗 Mantis Alfa</button>
+        <button id="tool-antlion" class="tool-btn btn-predator" onclick="setTool('antlion')">🐜 Hormiga León</button>
+        <button id="tool-scorpion" class="tool-btn btn-predator" onclick="setTool('scorpion')">🦂 Escorpión</button>
+        <button id="tool-centipede" class="tool-btn btn-predator" onclick="setTool('centipede')">🐛 Ciempiés</button>
+        <button id="tool-wasp" class="tool-btn btn-predator" onclick="setTool('wasp')">🐝 Avispa Cazadora</button>
     </div>
 
     <!-- Barra de herramientas Modo Normal (Historia) -->
@@ -725,6 +729,8 @@ function canPlaceAt(x, y, tool) {
     if (x < 45 || x > WORLD_W - 45 || y < 45 || y > WORLD_H - 45) return false;
     const reqRadius = (tool === 'nest' || tool === 'termite_nest' || tool === 'normal_nest') ? 28
         : (tool === 'mantis') ? 22
+        : (tool === 'antlion') ? 24
+        : (tool === 'scorpion') ? 20
         : (tool === 'spider' || tool === 'beetle' || tool === 'queen') ? 16 : 12;
 
     for (const r of rocks) {
@@ -1390,7 +1396,7 @@ class Ant extends Entity {
         if (this.nestAtkCD > 0) this.nestAtkCD--;
         this.walkCycle += currentSpeed * 0.28;
 
-        const raid = (speciesKey === 'leptogenys' && !this.hasFood) ? getRaidTarget() : null;
+        const raid = !this.hasFood ? getRaidTarget() : null;
         if (raid) {
             const ra = Math.atan2((raid.y - this.y) / TILT, raid.x - this.x);
             this.angle = this.lerpAngle(this.angle, ra, 0.17);
@@ -1634,7 +1640,7 @@ class Termite extends Entity {
         if (target) {
             const targetAngle = Math.atan2((target.y - this.y) / TILT, target.x - this.x);
             this.angle = this.lerpAngle(this.angle, targetAngle, 0.22);
-            if (minDist < (target.radius || 12) + 7 && this.meleeCD <= 0) {
+                       if (minDist < (target.radius || 12) + 7 && this.meleeCD <= 0) {
                 this.meleeCD = this.meleeInterval;
                 target.hp -= this.soldier ? this.damage + 2 : this.damage;
                 if (!target.isStatic) {
@@ -1651,7 +1657,7 @@ class Termite extends Entity {
             if (this.beacon && this.beacon.hp > 0) {
                 const ba = Math.atan2((this.beacon.y - this.y) / TILT, this.beacon.x - this.x);
                 this.angle = this.lerpAngle(this.angle, ba, 0.09);
-            } else if (!this.soldier && this.nest) {
+            } else if (!this.soldier && this.nest && !this.nest.isWaveNest && !this.nest.isRaidNest) {
                 if (this.hasFood) {
                     const dx = this.nest.x - this.x;
                     const dy = (this.nest.y - this.y) / TILT;
@@ -1910,33 +1916,34 @@ class Beetle extends Entity {
     }
 }
 
+const ENEMY_STATS = {
+    spider:    { speed: 1.75, radius: 16, hp: 100, damage: 6,  melee: 30, sight: 260, drop: 15 },
+    mantis:    { speed: 2.3,  radius: 22, hp: 190, damage: 10, melee: 28, sight: 300, drop: 30 },
+    antlion:   { speed: 1.05, radius: 24, hp: 340, damage: 14, melee: 40, sight: 240, drop: 45 },
+    scorpion:  { speed: 1.5,  radius: 20, hp: 270, damage: 11, melee: 34, sight: 280, drop: 40 },
+    centipede: { speed: 2.6,  radius: 14, hp: 120, damage: 5,  melee: 16, sight: 320, drop: 22 },
+    wasp:      { speed: 3.1,  radius: 13, hp: 90,  damage: 12, melee: 26, sight: 340, drop: 28 }
+};
+
 class Enemy extends Entity {
     constructor(x, y, type) {
         super(x, y);
-        this.type = type;
+        const st = ENEMY_STATS[type] || ENEMY_STATS.spider;
+        this.type = ENEMY_STATS[type] ? type : 'spider';
         this.attackCooldown = 0;
         this.meleeCD = 0;
         this.walkCycle = Math.random() * Math.PI * 2;
         this.beacon = null;
         this.wave = null;
 
-        if (type === 'mantis') {
-            this.speed = 2.3;
-            this.radius = 22;
-            this.hp = 190;
-            this.maxHp = 190;
-            this.damage = 10;
-            this.meleeInterval = 28;
-            this.sight = 300;
-        } else {
-            this.speed = 1.75;
-            this.radius = 16;
-            this.hp = 100;
-            this.maxHp = 100;
-            this.damage = 6;
-            this.meleeInterval = 30;
-            this.sight = 260;
-        }
+        this.speed = st.speed;
+        this.radius = st.radius;
+        this.hp = st.hp;
+        this.maxHp = st.hp;
+        this.damage = st.damage;
+        this.meleeInterval = st.melee;
+        this.sight = st.sight;
+        this.drop = st.drop;
     }
 
     update() {
@@ -1989,6 +1996,9 @@ class Enemy extends Entity {
             if (minDist < this.radius + (target.radius || 5) + 4 && this.meleeCD <= 0) {
                 this.meleeCD = this.meleeInterval;
                 target.hp -= this.damage;
+                if (this.type === 'scorpion' && target.slowTimer !== undefined) {
+                    target.slowTimer = Math.max(target.slowTimer, 170);
+                }
                 if (!target.isStatic) {
                     target.x += Math.cos(targetAngle) * 4.5;
                     target.y += Math.sin(targetAngle) * 4.5 * TILT;
@@ -2025,7 +2035,8 @@ class Enemy extends Entity {
         const barWidth = this.radius * 2.2;
         ctx.fillStyle = 'rgba(0,0,0,0.65)';
         ctx.fillRect(-barWidth / 2, -this.radius - 16, barWidth, 4.5);
-        ctx.fillStyle = this.type === 'mantis' ? '#ffbe0b' : '#ff4d6d';
+        const barColors = { mantis: '#ffbe0b', antlion: '#f4a261', scorpion: '#e5383b', centipede: '#e76f51', wasp: '#ffd166' };
+        ctx.fillStyle = barColors[this.type] || '#ff4d6d';
         ctx.fillRect(-barWidth / 2, -this.radius - 16, barWidth * Math.max(0, this.hp / this.maxHp), 4.5);
 
         ctx.fillStyle = 'rgba(0,0,0,0.45)';
@@ -2074,6 +2085,164 @@ class Enemy extends Entity {
             ctx.arc(23, -4.5, 2.6, 0, Math.PI * 2);
             ctx.arc(23, 4.5, 2.6, 0, Math.PI * 2);
             ctx.fill();
+        } else if (this.type === 'antlion') {
+            ctx.strokeStyle = '#6b4b2a';
+            ctx.lineWidth = 2;
+            const sw = Math.sin(this.walkCycle) * 3;
+            ctx.beginPath();
+            for (let i = -1; i <= 1; i++) {
+                ctx.moveTo(i * 6, 8); ctx.lineTo(i * 7 + sw, 17);
+                ctx.moveTo(i * 6, -8); ctx.lineTo(i * 7 - sw, -17);
+            }
+            ctx.stroke();
+
+            ctx.fillStyle = '#c9ae7f';
+            ctx.beginPath();
+            ctx.ellipse(-8, 0, 16, 11, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = 'rgba(90, 66, 38, 0.55)';
+            ctx.lineWidth = 1.2;
+            for (let i = 0; i < 4; i++) {
+                ctx.beginPath();
+                ctx.arc(-8, 0, 4 + i * 3.2, -1.1, 1.1);
+                ctx.stroke();
+            }
+
+            ctx.fillStyle = '#a98b5c';
+            ctx.beginPath();
+            ctx.ellipse(8, 0, 9, 7.5, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#2b1a0c';
+            ctx.beginPath();
+            ctx.arc(12, -3, 1.8, 0, Math.PI * 2);
+            ctx.arc(12, 3, 1.8, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = '#3d2b18';
+            ctx.lineWidth = 3.2;
+            ctx.beginPath();
+            ctx.moveTo(15, -3); ctx.quadraticCurveTo(24, -9, 31, -3);
+            ctx.moveTo(15, 3); ctx.quadraticCurveTo(24, 9, 31, 3);
+            ctx.stroke();
+        } else if (this.type === 'scorpion') {
+            ctx.strokeStyle = '#4a1414';
+            ctx.lineWidth = 2.2;
+            const sw = Math.sin(this.walkCycle) * 3;
+            for (let i = -1; i <= 1; i += 2) {
+                ctx.beginPath();
+                ctx.moveTo(-8, i * 4); ctx.lineTo(-16 + sw, i * 14);
+                ctx.moveTo(-4, i * 5); ctx.lineTo(-6 - sw, i * 17);
+                ctx.moveTo(2, i * 5); ctx.lineTo(4 + sw, i * 16);
+                ctx.moveTo(7, i * 4); ctx.lineTo(12 - sw, i * 14);
+                ctx.stroke();
+            }
+
+            ctx.strokeStyle = '#7f1d1d';
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            ctx.moveTo(-14, 0);
+            ctx.quadraticCurveTo(-22, -6, -14, -14);
+            ctx.stroke();
+            ctx.fillStyle = '#ffd166';
+            ctx.beginPath();
+            ctx.arc(-13, -16, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#6a1f1f';
+            ctx.beginPath();
+            ctx.ellipse(-10, 0, 8, 6.5, 0, 0, Math.PI * 2);
+            ctx.ellipse(-2, 0, 6, 5.5, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#8c2f2f';
+            ctx.beginPath();
+            ctx.ellipse(7, 0, 7, 6, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = '#6a1f1f';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(12, -3); ctx.lineTo(20, -8);
+            ctx.moveTo(12, 3); ctx.lineTo(20, 8);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(20, -10, 3.4, Math.PI * 0.4, Math.PI * 1.9);
+            ctx.arc(20, 10, 3.4, Math.PI * 1.1, Math.PI * 0.6, true);
+            ctx.stroke();
+
+            ctx.fillStyle = '#e9c46a';
+            ctx.beginPath();
+            ctx.arc(15, -3, 1.3, 0, Math.PI * 2);
+            ctx.arc(15, 3, 1.3, 0, Math.PI * 2);
+            ctx.fill();
+        } else if (this.type === 'centipede') {
+            ctx.strokeStyle = '#7a2a12';
+            ctx.lineWidth = 1.6;
+            const sw = Math.sin(this.walkCycle) * 3;
+            for (let i = -3; i <= 3; i++) {
+                ctx.beginPath();
+                ctx.moveTo(i * 4.5, 3); ctx.lineTo(i * 4.5 - 3 + sw, 10);
+                ctx.moveTo(i * 4.5, -3); ctx.lineTo(i * 4.5 - 3 - sw, -10);
+                ctx.stroke();
+            }
+            for (let i = 0; i < 6; i++) {
+                const x = 12 - i * 6;
+                ctx.fillStyle = i % 2 ? '#b23a1a' : '#8c2f14';
+                ctx.beginPath();
+                ctx.ellipse(x, 0, 4.6, 3.4, 0, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.fillStyle = '#e76f51';
+            ctx.beginPath();
+            ctx.arc(15, 0, 4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#4a1c0e';
+            ctx.lineWidth = 1.4;
+            ctx.beginPath();
+            ctx.moveTo(18, -2); ctx.lineTo(24, -5);
+            ctx.moveTo(18, 2); ctx.lineTo(24, 5);
+            ctx.stroke();
+        } else if (this.type === 'wasp') {
+            const flap = 0.5 + 0.5 * Math.abs(Math.sin(this.walkCycle * 2.2));
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.32)';
+            ctx.beginPath();
+            ctx.ellipse(-4, -9, 11, 4 * flap + 1, -0.5, 0, Math.PI * 2);
+            ctx.ellipse(-4, 9, 11, 4 * flap + 1, 0.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#1b1b1b';
+            ctx.beginPath();
+            ctx.ellipse(-10, 0, 9, 5, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#ffd166';
+            ctx.beginPath();
+            ctx.ellipse(-13, 0, 2.2, 4.2, 0, 0, Math.PI * 2);
+            ctx.ellipse(-7, 0, 2.2, 4.6, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#3d2b0f';
+            ctx.beginPath();
+            ctx.ellipse(0, 0, 4, 3.4, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#ffd166';
+            ctx.beginPath();
+            ctx.arc(6, 0, 3.6, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#1b1b1b';
+            ctx.beginPath();
+            ctx.arc(7.4, -1.2, 1, 0, Math.PI * 2);
+            ctx.arc(7.4, 1.2, 1, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = '#1b1b1b';
+            ctx.lineWidth = 1.6;
+            ctx.beginPath();
+            ctx.moveTo(-18, 0); ctx.lineTo(-23, 0);
+            ctx.stroke();
         } else {
             ctx.strokeStyle = '#0f0f0f';
             ctx.lineWidth = 2.4;
@@ -2366,7 +2535,8 @@ function generateEnvironment(seed) {
 
     paintStaticBase(bgCtx);
 }
- function paintStaticBase(c) {
+
+function paintStaticBase(c) {
     c.setTransform(1, 0, 0, 1, 0, 0);
     c.clearRect(0, 0, WORLD_W, WORLD_H);
 
@@ -2858,7 +3028,7 @@ function init() {
 
     if (gameMode === 'normal') {
         storedFood = 0;
-        normal = { founded: false, wave: 0, phase: 'prepare', timer: 55, spawned: 0, layTimer: 45, spawnTimer: 10 };
+        normal = { founded: false, wave: 0, phase: 'prepare', timer: 55, spawned: 0, layTimer: 45, spawnTimer: 10, endless: false, cathedra: false, bestWave: 0 };
         setTool('queen');
         setStatus('👑 Haz clic en el suelo para colocar a tu Reina');
     } else {
@@ -3148,7 +3318,7 @@ function waveSpawnPoint(beacon) {
         const a = Math.random() * Math.PI * 2;
         const r = 520 + Math.random() * 300;
         const x = clamp(bcx + Math.cos(a) * r, 60, WORLD_W - 60);
-        const y = clamp(bcy + Math.sin(a) * r, 60, WORLD_H - 60);
+               const y = clamp(bcy + Math.sin(a) * r, 60, WORLD_H - 60);
         if (!checkObstacleCollision(x, y, 18)) return { x, y };
     }
     return { x: clamp(bcx + 600, 60, WORLD_W - 60), y: clamp(bcy, 60, WORLD_H - 60) };
@@ -3159,7 +3329,53 @@ function waveAlive() {
     let n = 0;
     for (const t of termites) if (t.wave === normal.wave) n++;
     for (const e of enemies) if (e.wave === normal.wave) n++;
+    if (normal.cathedra) {
+        for (const t of termiteNests) if (t.isWaveNest && t.wave === normal.wave) n++;
+    }
     return n;
+}
+
+function waveDifficulty() {
+    if (!normal) return 1;
+    return 1 + Math.max(0, normal.wave - MAX_WAVES) * 0.18;
+}
+
+function pickWaveEnemyType(w) {
+    const pool = [];
+    if (w <= 2) pool.push('spider', 'centipede', 'centipede');
+    else if (w === 3) pool.push('spider', 'mantis', 'centipede', 'antlion');
+    else if (w === 4) pool.push('mantis', 'antlion', 'scorpion', 'wasp', 'spider');
+    else if (w === 5) pool.push('mantis', 'scorpion', 'antlion', 'wasp', 'centipede');
+    else pool.push('mantis', 'scorpion', 'antlion', 'wasp', 'wasp', 'centipede', 'spider', 'antlion');
+    return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function spawnRaidTermiteNest(beacon, termitesCount, diff) {
+    const oldRaid = termiteNests.filter(n => n.isRaidNest);
+    while (oldRaid.length >= 2) {
+        const victim = oldRaid.shift();
+        const vi = termiteNests.indexOf(victim);
+        if (vi > -1) termiteNests.splice(vi, 1);
+        for (let i = termites.length - 1; i >= 0; i--) if (termites[i].nest === victim) termites.splice(i, 1);
+        if (raidTarget === victim) raidTarget = null;
+    }
+
+    const p = waveSpawnPoint(beacon);
+    const hp = (90 + normal.wave * 12) * diff;
+    const nest = {
+        x: p.x, y: p.y, radius: 30, hp, maxHp: hp, foodIn: 0, isStatic: true,
+        isWaveNest: false, wave: null, isRaidNest: true, style: 'termite'
+    };
+    termiteNests.push(nest);
+    for (let i = 0; i < termitesCount; i++) {
+        const t = new Termite(nest.x, nest.y, nest);
+        t.soldier = Math.random() < 0.45;
+        t.maxHp = (t.soldier ? 34 : 30) * (0.9 + diff * 0.15);
+        t.hp = t.maxHp;
+        t.damage = (t.soldier ? 5 : 3) * (0.9 + diff * 0.2);
+        termites.push(t);
+    }
+    return nest;
 }
 
 function getWaveNest() {
@@ -3183,13 +3399,17 @@ function damageTermiteNest(nest, amount) {
         if (t.nest === nest) t.nest = null;
         if (nest.isWaveNest && t.wave === nest.wave) t.beacon = antNests[0] || queen;
     }
-    spawnFoodCluster(nest.x, nest.y, 12);
-    if (nest.isWaveNest) {
-        storedFood += 10;
-        setStatus('💥 Termitero de guerra saqueado · +10 🍓');
-    } else {
-        setStatus('💥 Termitero saqueado por la colonia');
-    }
+    spawnFoodCluster(nest.x, nest.y, nest.isCathedra ? 22 : nest.isWaveNest ? 16 : 11);
+
+    const w = normal ? normal.wave : 1;
+    let reward = nest.isCathedra ? 30 + w * 4 : nest.isWaveNest ? 14 + w * 3 : 8 + w * 2;
+    if (S().venom) reward += 4;
+    storedFood += reward;
+    if (queen && queen.hp > 0) queen.hp = Math.min(queen.maxHp, queen.hp + 8);
+
+    const label = nest.isCathedra ? '🏛️ Termitero de la Cátedra' : nest.isWaveNest ? '💥 Termitero de guerra' : '💥 Termitero';
+    setStatus(`${label} saqueado · +${reward} 🍓${S().venom ? ' · botín Leptogenys' : ''}`);
+
     if (raidTarget === nest) raidTarget = null;
     updateUI();
 }
@@ -3197,39 +3417,109 @@ function damageTermiteNest(nest, amount) {
 function startWave() {
     normal.phase = 'wave';
     normal.wave++;
+    normal.cathedra = false;
 
-    const count = 3 + Math.floor(normal.wave * 1.2);
     const beacon = antNests[0] || queen;
+    const diff = waveDifficulty();
+
+    if (normal.wave === 6) {
+        startTermiteCathedra(beacon, diff);
+        updateUI();
+        return;
+    }
+
+    const count = Math.min(18, 3 + Math.floor(normal.wave * 1.2) + Math.max(0, normal.wave - MAX_WAVES));
+    const termiteChance = clamp(0.62 - normal.wave * 0.05, 0.24, 0.6);
 
     for (let i = 0; i < count; i++) {
         const p = waveSpawnPoint(beacon);
-        if (Math.random() < 0.68) {
+        if (Math.random() < termiteChance) {
             const t = new Termite(p.x, p.y, null);
-            t.soldier = true;
-            t.hp = 34;
-            t.maxHp = 34;
+            t.soldier = Math.random() < 0.7;
+            t.maxHp = (t.soldier ? 34 : 30) * diff;
+            t.hp = t.maxHp;
+            t.damage = (t.soldier ? 5 : 3) * (0.9 + diff * 0.2);
             t.wave = normal.wave;
             t.beacon = beacon;
             termites.push(t);
         } else {
-            const type = (normal.wave >= 3 && Math.random() < 0.4) ? 'mantis' : 'spider';
-            const e = new Enemy(p.x, p.y, type);
+            const e = new Enemy(p.x, p.y, pickWaveEnemyType(normal.wave));
+            e.hp = Math.round(e.maxHp * diff);
+            e.maxHp = e.hp;
+            e.damage = e.damage * (0.9 + diff * 0.15);
             e.wave = normal.wave;
             e.beacon = beacon;
             enemies.push(e);
         }
     }
 
+    if (normal.wave >= 2 && (normal.wave % 2 === 0 || normal.wave >= 4)) {
+        const raidNests = 1 + Math.min(2, Math.floor(normal.wave / 4));
+        for (let i = 0; i < raidNests; i++) {
+            spawnRaidTermiteNest(beacon, 4 + Math.floor(normal.wave / 2), diff);
+        }
+        setStatus(`🌊 ¡Oleada ${normal.wave}! Termiteros saqueables detectados — usa la incursión (F)`, true);
+    } else {
+        setStatus(`🌊 ¡Oleada ${normal.wave}! Defiende la colonia`, true);
+    }
+
     const wp = waveSpawnPoint(beacon);
+    const whp = (110 + normal.wave * 50) * diff;
     termiteNests.push({
         x: wp.x, y: wp.y, radius: 30,
-        hp: 110 + normal.wave * 50, maxHp: 110 + normal.wave * 50,
+        hp: whp, maxHp: whp,
         foodIn: 0, isStatic: true, isWaveNest: true, wave: normal.wave, style: 'wave'
     });
-    normal.spawnTimer = 10;
+    normal.spawnTimer = Math.max(7, 10 - Math.max(0, normal.wave - MAX_WAVES));
 
-    setStatus(`🌊 ¡Oleada ${normal.wave}/${MAX_WAVES}! Defiende la colonia`, true);
     updateUI();
+}
+
+function startTermiteCathedra(beacon, diff) {
+    normal.cathedra = true;
+    let created = 0;
+
+    const targetNests = 8;
+    let attempts = 0;
+    while (created < targetNests && attempts < 60) {
+        attempts++;
+        const angle = Math.random() * Math.PI * 2;
+        const radius = 300 + Math.random() * 460;
+        const x = clamp(beacon.x + Math.cos(angle) * radius, 80, WORLD_W - 80);
+        const y = clamp(beacon.y + Math.sin(angle) * radius, 80, WORLD_H - 80);
+        if (canPlaceAt(x, y, 'termite_nest')) {
+            const hp = (110 + normal.wave * 18) * diff;
+            const nest = {
+                x, y, radius: 32, hp, maxHp: hp, foodIn: 0, isStatic: true,
+                isWaveNest: true, wave: normal.wave, isCathedra: true, style: 'wave'
+            };
+            termiteNests.push(nest);
+            created++;
+
+            for (let k = 0; k < 5; k++) {
+                const t = new Termite(x + (Math.random() - 0.5) * 34, y + (Math.random() - 0.5) * 34 * TILT, nest);
+                t.soldier = k % 2 === 0;
+                t.maxHp = (t.soldier ? 40 : 30) * diff;
+                t.hp = t.maxHp;
+                t.damage = (t.soldier ? 6 : 3) * (0.9 + diff * 0.2);
+                t.wave = normal.wave;
+                t.beacon = beacon;
+                termites.push(t);
+            }
+        }
+    }
+
+    if (created === 0) {
+        spawnRaidTermiteNest(beacon, 10, diff);
+        const last = termiteNests[termiteNests.length - 1];
+        last.isWaveNest = true;
+        last.wave = normal.wave;
+        last.isCathedra = true;
+        for (const t of termites) if (t.nest === last) { t.wave = normal.wave; t.beacon = beacon; }
+    }
+    normal.spawnTimer = 8;
+    setStatus('🏛️ OLEADA 6 · CÁTEDRA DE TERMITAS: ¡solo termitas! Destruye todos los termiteros', true);
+    spawnHitParticles(beacon.x, beacon.y, '#dda15e', 26);
 }
 
 function finishWave() {
@@ -3238,14 +3528,29 @@ function finishWave() {
     }
     if (raidTarget && !termiteNests.includes(raidTarget)) raidTarget = null;
 
-    if (normal.wave >= MAX_WAVES) {
-        endGame('victory');
-        return;
-    }
+    const cleared = normal.wave;
+    normal.cathedra = false;
     normal.phase = 'prepare';
-    normal.timer = 35;
-    storedFood += 15;
-    setStatus(`✅ Oleada ${normal.wave} repelida · +15 🍓 · Próxima en 35s`);
+    normal.timer = Math.max(12, 35 - Math.max(0, cleared - MAX_WAVES) * 3);
+
+    if (cleared === MAX_WAVES) {
+        normal.endless = true;
+        storedFood += 60;
+        setStatus('🏆 ¡5 oleadas superadas! MODO INFINITO desbloqueado: cada oleada será más dura (+60 🍓)');
+    } else if (cleared === 6) {
+        normal.endless = true;
+        normal.bestWave = Math.max(normal.bestWave || 0, cleared);
+        storedFood += 40;
+        setStatus('🏛️ ¡Cátedra de termitas saqueada! +40 🍓 · La siguiente oleada será aún más dura');
+    } else if (normal.endless) {
+        normal.bestWave = Math.max(normal.bestWave || 0, cleared);
+        storedFood += 20;
+        setStatus(`♾️ Oleada ${cleared} repelida · +20 🍓 · Próxima en ${Math.ceil(normal.timer)}s`);
+    } else {
+        storedFood += 15;
+        setStatus(`✅ Oleada ${cleared} repelida · +15 🍓 · Próxima en ${Math.ceil(normal.timer)}s`);
+    }
+    updateUI();
 }
 
 function updateNormalStep() {
@@ -3267,21 +3572,45 @@ function updateNormalStep() {
         normal.timer -= STEP;
         if (normal.timer <= 0) startWave();
     } else if (normal.phase === 'wave') {
-        const wnest = getWaveNest();
-        if (wnest) {
+        if (normal.cathedra) {
+            const diff = waveDifficulty();
             normal.spawnTimer -= STEP;
             if (normal.spawnTimer <= 0) {
-                normal.spawnTimer = 10;
-                if (waveAlive() < 12) {
-                    for (let i = 0; i < 2; i++) {
-                        const p = waveSpawnPoint(wnest);
-                        const t = new Termite(p.x, p.y, null);
-                        t.soldier = true;
-                        t.hp = 34;
-                        t.maxHp = 34;
+                normal.spawnTimer = 9;
+                const cNests = termiteNests.filter(n => n.isWaveNest && n.wave === normal.wave);
+                if (cNests.length > 0 && waveAlive() < 46) {
+                    const src = cNests[Math.floor(Math.random() * cNests.length)];
+                    for (let i = 0; i < 3; i++) {
+                        const t = new Termite(src.x + (Math.random() - 0.5) * 34, src.y + (Math.random() - 0.5) * 34 * TILT, src);
+                        t.soldier = Math.random() < 0.6;
+                        t.maxHp = (t.soldier ? 40 : 30) * diff;
+                        t.hp = t.maxHp;
+                        t.damage = (t.soldier ? 6 : 3) * (0.9 + diff * 0.2);
                         t.wave = normal.wave;
                         t.beacon = antNests[0] || queen;
                         termites.push(t);
+                    }
+                }
+            }
+        } else {
+            const wnest = getWaveNest();
+            if (wnest) {
+                normal.spawnTimer -= STEP;
+                if (normal.spawnTimer <= 0) {
+                    normal.spawnTimer = Math.max(7, 10 - Math.max(0, normal.wave - MAX_WAVES));
+                    if (waveAlive() < 12 + Math.max(0, normal.wave - MAX_WAVES) * 2) {
+                        const diff = waveDifficulty();
+                        for (let i = 0; i < 2; i++) {
+                            const p = waveSpawnPoint(wnest);
+                            const t = new Termite(p.x, p.y, null);
+                            t.soldier = true;
+                            t.maxHp = 34 * diff;
+                            t.hp = t.maxHp;
+                            t.damage = 5 * (0.9 + diff * 0.2);
+                            t.wave = normal.wave;
+                            t.beacon = antNests[0] || queen;
+                            termites.push(t);
+                        }
                     }
                 }
             }
@@ -3308,12 +3637,13 @@ function endGame(kind, reason) {
     try { localStorage.removeItem(SAVE_KEY); } catch (e) {}
 
     document.getElementById('end-title').textContent = kind === 'victory' ? '🏆 ¡Victoria!' : '💀 Derrota';
-    const survived = normal ? Math.max(0, normal.wave - (kind === 'victory' ? 0 : 1)) : 0;
+    const survived = normal ? Math.max(0, normal.wave - 1) : 0;
+    const best = Math.max(normal && normal.bestWave ? normal.bestWave : 0, survived);
     const body = kind === 'victory'
         ? `Has repelido las ${MAX_WAVES} oleadas y la colonia prospera.`
         : (reason || 'La colonia ha caído.');
     document.getElementById('end-text').innerHTML =
-        `${body}<br><br>Oleadas: <strong>${survived}/${MAX_WAVES}</strong> · Hormigas: <strong>${ants.length}</strong> · Tiempo: <strong>${Math.floor(gameTime)}s</strong>`;
+        `${body}<br><br>Oleadas superadas: <strong>${survived}</strong> · Récord: <strong>${best}</strong> · Hormigas: <strong>${ants.length}</strong> · Tiempo: <strong>${Math.floor(gameTime)}s</strong>`;
     endScreen.classList.add('show');
     updateUI();
 }
@@ -3375,7 +3705,8 @@ function saveGame() {
             })),
             termiteNests: termiteNests.map(n => ({
                 x: n.x, y: n.y, radius: n.radius, hp: n.hp, maxHp: n.maxHp,
-                wave: n.wave ?? null, isWaveNest: !!n.isWaveNest, style: n.style || 'termite'
+                wave: n.wave ?? null, isWaveNest: !!n.isWaveNest, isRaidNest: !!n.isRaidNest,
+                isCathedra: !!n.isCathedra, style: n.style || 'termite'
             })),
             ants: ants.map(a => ({
                 x: a.x, y: a.y, angle: a.angle, hp: a.hp, hasFood: a.hasFood,
@@ -3383,11 +3714,11 @@ function saveGame() {
                 tempLife: a.tempLife ?? null
             })),
             termites: termites.map(t => ({
-                x: t.x, y: t.y, angle: t.angle, hp: t.hp, hasFood: t.hasFood,
+                x: t.x, y: t.y, angle: t.angle, hp: t.hp, maxHp: t.maxHp, hasFood: t.hasFood,
                 soldier: t.soldier, wave: t.wave, nest: termiteNests.indexOf(t.nest)
             })),
             beetles: beetles.map(b => ({ x: b.x, y: b.y, angle: b.angle, hp: b.hp, hasBall: b.hasBall })),
-            enemies: enemies.map(e => ({ x: e.x, y: e.y, angle: e.angle, hp: e.hp, type: e.type, wave: e.wave })),
+            enemies: enemies.map(e => ({ x: e.x, y: e.y, angle: e.angle, hp: e.hp, maxHp: e.maxHp, type: e.type, wave: e.wave, damage: e.damage })),
             eggs: eggs.map(e => ({ x: e.x, y: e.y, timer: e.timer, nest: antNests.indexOf(e.nest) })),
             foods: foods.map(f => ({ x: f.x, y: f.y, amount: f.amount })),
             pheromones: pheromones.map(p => ({ x: p.x, y: p.y, life: p.life })),
@@ -3414,7 +3745,12 @@ function applySave(d) {
     gameTime = d.gameTime || 0;
     natureTimer = d.natureTimer || 300;
     normal = d.normal || null;
-    if (normal && normal.spawnTimer == null) normal.spawnTimer = 10;
+    if (normal) {
+        if (normal.spawnTimer == null) normal.spawnTimer = 10;
+        if (normal.endless == null) normal.endless = normal.wave > MAX_WAVES;
+        if (normal.cathedra == null) normal.cathedra = false;
+        if (normal.bestWave == null) normal.bestWave = 0;
+    }
     endState = null;
 
     camera.x = d.camera ? d.camera.x : WORLD_W / 2;
@@ -3438,7 +3774,8 @@ function applySave(d) {
     termiteNests = (d.termiteNests || []).map(n => ({
         x: n.x, y: n.y, radius: n.radius || 26, hp: n.hp ?? 500, maxHp: n.maxHp ?? 500,
         foodIn: 0, isStatic: true, wave: n.wave ?? null,
-        isWaveNest: !!n.isWaveNest, style: n.style || 'termite'
+        isWaveNest: !!n.isWaveNest, isRaidNest: !!n.isRaidNest, isCathedra: !!n.isCathedra,
+        style: n.style || 'termite'
     }));
 
     raidTarget = null;
@@ -3477,7 +3814,7 @@ function applySave(d) {
         const termite = new Termite(t.x, t.y, nest);
         termite.angle = t.angle || 0;
         termite.soldier = !!t.soldier;
-        termite.maxHp = termite.soldier ? 34 : 30;
+        termite.maxHp = t.maxHp ?? (termite.soldier ? 34 : 30);
         termite.hp = Math.min(t.hp ?? termite.maxHp, termite.maxHp);
         termite.hasFood = !!t.hasFood;
         termite.wave = t.wave ?? null;
@@ -3494,9 +3831,11 @@ function applySave(d) {
     });
 
     enemies = (d.enemies || []).map(e => {
-        const en = new Enemy(e.x, e.y, e.type === 'mantis' ? 'mantis' : 'spider');
+        const en = new Enemy(e.x, e.y, ENEMY_STATS[e.type] ? e.type : 'spider');
         en.angle = e.angle || 0;
+        en.maxHp = e.maxHp ?? en.maxHp;
         en.hp = Math.min(e.hp ?? en.maxHp, en.maxHp);
+        if (e.damage) en.damage = e.damage;
         en.wave = e.wave ?? null;
         en.beacon = antNests[0] || queen;
         return en;
@@ -3517,7 +3856,7 @@ function applySave(d) {
     document.getElementById('btn-speed').textContent = `Velocidad: ${gameSpeed}x`;
 
     refreshNormalTools();
-    if (gameMode === 'normal' && !normal) normal = { founded: false, wave: 0, phase: 'prepare', timer: 55, spawned: 0, spawnTimer: 10 };
+    if (gameMode === 'normal' && !normal) normal = { founded: false, wave: 0, phase: 'prepare', timer: 55, spawned: 0, spawnTimer: 10, endless: false, cathedra: false, bestWave: 0 };
     setStatus('▶ Partida restaurada');
     updateUI();
 }
@@ -3554,12 +3893,16 @@ function updateUI() {
         waveEl.textContent = '—';
     } else if (!normal.founded) {
         waveEl.textContent = 'Prepara la colonia';
+    } else if (normal.cathedra) {
+        waveEl.textContent = `🏛️ Cátedra · ${waveAlive()} termitas/nidos`;
     } else if (normal.phase === 'prepare') {
-        waveEl.textContent = `${normal.wave}/${MAX_WAVES} · en ${Math.max(0, Math.ceil(normal.timer))}s`;
+        const tag = normal.endless ? `∞ · oleada ${normal.wave + 1}` : `${normal.wave}/${MAX_WAVES}`;
+        waveEl.textContent = `${tag} · en ${Math.max(0, Math.ceil(normal.timer))}s`;
     } else if (normal.phase === 'wave') {
-        waveEl.textContent = `${normal.wave}/${MAX_WAVES} · ${waveAlive()} hostiles`;
+        const tag = normal.endless ? `∞ ${normal.wave}` : `${normal.wave}/${MAX_WAVES}`;
+        waveEl.textContent = `${tag} · ${waveAlive()} hostiles`;
     } else {
-        waveEl.textContent = `${normal.wave}/${MAX_WAVES}`;
+        waveEl.textContent = normal.endless ? `∞ ${normal.wave}` : `${normal.wave}/${MAX_WAVES}`;
     }
 
     if (speciesLabelEl) speciesLabelEl.textContent = speciesKey === 'generic' ? '—' : S().name;
@@ -3573,6 +3916,10 @@ const toolDescriptions = {
     food: '🍓 Soltar Comida',
     spider: '🕷️ Invocar Araña Teje-redes',
     mantis: '🦗 Invocar Mantis Alfa',
+    antlion: '🪤 Invocar Hormiga León (lenta, mucha vida)',
+    scorpion: '🦂 Invocar Escorpión (su aguijón ralentiza)',
+    centipede: '🐛 Invocar Ciempiés (rápido y escurridizo)',
+    wasp: '🐝 Invocar Avispa Cazadora (muy rápida y frágil)',
     queen: '👑 Haz clic en el suelo del bosque para colocar a tu Hormiga Reina',
     normal_nest: '🏠 Haz clic en un lugar despejado para fundar tu única Colonia',
     control_queen: '👑 Mueve la Reina con WASD/flechas o clic. Recoge hasta 5 🍓 y llévalas al nido (10 🍓 = 1 huevo)'
@@ -4059,7 +4406,9 @@ function render() {
         const valid = canPlaceAt(mouse.x, mouse.y, currentTool);
         const previewRadius = (currentTool === 'nest' || currentTool === 'termite_nest' || currentTool === 'normal_nest') ? 28
             : (currentTool === 'mantis') ? 22
-            : (currentTool === 'spider' || currentTool === 'beetle' || currentTool === 'queen') ? 16 : 14;
+            : (currentTool === 'antlion') ? 24
+            : (currentTool === 'scorpion') ? 20
+            : (currentTool === 'spider' || currentTool === 'beetle' || currentTool === 'queen') ? 16 : 12;
 
         ctx.strokeStyle = valid ? 'rgba(181, 228, 140, 0.95)' : 'rgba(255, 77, 109, 0.98)';
         ctx.fillStyle = valid ? 'rgba(181, 228, 140, 0.2)' : 'rgba(255, 77, 109, 0.3)';
@@ -4141,6 +4490,25 @@ function handleLeftClick(wx, wy) {
             return;
         }
 
+        let clickedNest = null;
+        let clickBest = Infinity;
+        for (const n of termiteNests) {
+            const d = Math.hypot(n.x - wx, (n.y - wy) / TILT);
+            if (d < n.radius + 14 && d < clickBest) { clickBest = d; clickedNest = n; }
+        }
+        if (clickedNest) {
+            if (raidTarget === clickedNest) {
+                raidTarget = null;
+                setStatus('🎯 Incursión cancelada — las hormigas vuelven a sus tareas');
+            } else {
+                raidTarget = clickedNest;
+                spawnHitParticles(clickedNest.x, clickedNest.y, '#dda15e', 8);
+                setStatus(`🎯 Termitero marcado (${Math.ceil(clickedNest.hp)} HP) — tus hormigas lo atacarán`, true);
+            }
+            updateUI();
+            return;
+        }
+
         if (queen) {
             queenTarget = { x: wx, y: wy };
             spawnHitParticles(wx, wy, '#ffd166', 4);
@@ -4161,6 +4529,10 @@ function handleLeftClick(wx, wy) {
     else if (currentTool === 'food') spawnFoodCluster(wx, wy);
     else if (currentTool === 'spider') enemies.push(new Enemy(wx, wy, 'spider'));
     else if (currentTool === 'mantis') enemies.push(new Enemy(wx, wy, 'mantis'));
+    else if (currentTool === 'antlion') enemies.push(new Enemy(wx, wy, 'antlion'));
+    else if (currentTool === 'scorpion') enemies.push(new Enemy(wx, wy, 'scorpion'));
+    else if (currentTool === 'centipede') enemies.push(new Enemy(wx, wy, 'centipede'));
+    else if (currentTool === 'wasp') enemies.push(new Enemy(wx, wy, 'wasp'));
 
     updateUI();
 }
@@ -4389,8 +4761,9 @@ function step() {
 
     for (let i = enemies.length - 1; i >= 0; i--) {
         if (enemies[i].hp <= 0) {
-            const drop = enemies[i].type === 'mantis' ? 30 : 15;
+            const drop = enemies[i].drop || 15;
             spawnFoodCluster(enemies[i].x, enemies[i].y, Math.ceil(drop / 3));
+            if (S().venom) storedFood += Math.ceil(drop / 6);
             enemies.splice(i, 1);
         }
     }
